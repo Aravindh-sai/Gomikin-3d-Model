@@ -18,13 +18,62 @@ export function initUI() {
       padding: 20px;
       box-sizing: border-box;
       overflow-y: auto;
+      overflow-x: hidden;
       z-index: 100;
       backdrop-filter: blur(4px);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    
+    /* Custom scrollbar */
+    #gomikin-ui::-webkit-scrollbar {
+      width: 6px;
+    }
+    #gomikin-ui::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+    }
+    #gomikin-ui::-webkit-scrollbar-thumb {
+      background: rgba(0, 255, 204, 0.3);
+      border-radius: 3px;
+    }
+
+    #ui-toggle-btn {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 90;
+      background: rgba(10, 15, 20, 0.85);
+      border: 1px solid rgba(0, 255, 204, 0.5);
+      color: #00ffcc;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      font-family: 'Segoe UI', sans-serif;
+      cursor: pointer;
+      border-radius: 4px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+
+    #ui-close-btn {
+      display: none;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: #88aa99;
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 5px;
+    }
+
     .ui-header {
       margin-bottom: 24px;
       border-bottom: 1px solid rgba(0, 255, 204, 0.3);
       padding-bottom: 12px;
+      padding-right: 30px; /* space for close btn */
     }
     .ui-title {
       font-size: 24px;
@@ -56,7 +105,7 @@ export function initUI() {
       background: rgba(20, 30, 40, 0.8);
       border: 1px solid rgba(0, 255, 204, 0.2);
       color: #00ffcc;
-      padding: 8px 12px;
+      padding: 10px 12px; /* Increased padding for better touch target */
       margin-bottom: 6px;
       font-size: 12px;
       text-align: left;
@@ -64,6 +113,7 @@ export function initUI() {
       letter-spacing: 1px;
       cursor: pointer;
       transition: all 0.2s ease;
+      touch-action: manipulation;
     }
     .ui-btn:hover {
       background: rgba(0, 255, 204, 0.1);
@@ -112,10 +162,44 @@ export function initUI() {
       letter-spacing: 1px;
       min-height: 20px;
     }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      #gomikin-ui {
+        transform: translateX(-100%);
+        width: 85%;
+        max-width: 340px;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+      }
+      #gomikin-ui.open {
+        transform: translateX(0);
+      }
+      #ui-toggle-btn {
+        display: block;
+      }
+      #ui-close-btn {
+        display: block;
+      }
+      .ui-btn {
+        padding: 12px 14px; /* Even larger on mobile */
+        font-size: 13px;
+      }
+    }
   `;
   document.head.appendChild(style);
 
+  // Add toggle button to body
+  const toggleBtn = document.createElement('button');
+  toggleBtn.id = 'ui-toggle-btn';
+  toggleBtn.innerHTML = '☰ CONTROLS';
+  document.body.appendChild(toggleBtn);
+
+  toggleBtn.onclick = () => {
+    uiContainer.classList.add('open');
+  };
+
   uiContainer.innerHTML = `
+    <button id="ui-close-btn">&times;</button>
     <div class="ui-header">
       <h1 class="ui-title">GOMIKIN</h1>
       <p class="ui-subtitle">SMART WASTE PROCESSING SYSTEM</p>
@@ -172,6 +256,10 @@ export function initUI() {
   // Attach event listeners
   const getBtn = (id) => document.getElementById(id);
 
+  getBtn('ui-close-btn').onclick = () => {
+    uiContainer.classList.remove('open');
+  };
+
   getBtn('btn-cam-exterior').onclick = () => {
     if (window.demoController) window.demoController.showExteriorView();
   };
@@ -189,14 +277,29 @@ export function initUI() {
     if (window.demoController) window.demoController.resetSimulation();
   };
 
+  const closeOnMobile = () => {
+    if (window.innerWidth <= 768) {
+      uiContainer.classList.remove('open');
+    }
+  };
+
   getBtn('btn-organic').onclick = () => {
-    if (window.demoController) window.demoController.startOrganicProcessingDemo();
+    if (window.demoController) {
+      window.demoController.startOrganicProcessingDemo();
+      closeOnMobile();
+    }
   };
   getBtn('btn-inorganic').onclick = () => {
-    if (window.demoController) window.demoController.startInorganicProcessingDemo();
+    if (window.demoController) {
+      window.demoController.startInorganicProcessingDemo();
+      closeOnMobile();
+    }
   };
   getBtn('btn-leachate').onclick = () => {
-    if (window.demoController) window.demoController.startLeachateDemo();
+    if (window.demoController) {
+      window.demoController.startLeachateDemo();
+      closeOnMobile();
+    }
   };
 
   getBtn('btn-mech-cutting').onclick = () => {
