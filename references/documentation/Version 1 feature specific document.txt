@@ -1,0 +1,136 @@
+Version 1
+
+Detailed Description of the Automated Segregation Module
+Apparatus and Components: The segregation module comprises an input receiving section (e.g., a funnel), a continuous distance-measuring sensor (such as an ultrasonic transceiver), a primary control unit, a secondary embedded machine learning node (Edge-AI processing module) equipped with an image capture device, and an electro-mechanical routing mechanism (such as a servo-actuated sorting flap).
+Operational Logic and Stabilization Method:
+Continuous Baseline Monitoring: The distance-measuring sensor continuously monitors a fixed baseline distance to the base of the input receiving section.
+Object Detection and Time-Gated Stabilization: Upon the introduction of waste, the measured distance deviates from the baseline. To prevent motion blur and ensure high-accuracy inference, the primary control unit initiates a stabilization loop. The control unit samples the distance at predetermined intervals and calculates the variation between consecutive readings.
+Settled State Confirmation: The system confirms a "settled state" only when a predefined number of consecutive readings (e.g., three readings) fall within a strict dimensional tolerance (e.g., ±1.0 cm).
+Edge-AI Inference: Upon stabilization confirmation, the primary control unit transmits a secure execution token to the secondary Edge-AI processing node. The image capture device acquires a frame of the settled waste, normalizes the input, and executes a pre-trained, localized convolutional neural network (CNN) entirely offline to classify the object as organic or inorganic.
+Actuation and Reset: The Edge-AI processing node transmits a single-byte classification flag back to the primary control unit. Based on this flag, the primary control unit actuates the routing mechanism to a designated angular position, directing the waste into the corresponding internal chamber. Once the distance-measuring sensor verifies a return to the empty baseline distance, the routing mechanism resets to a neutral position, and the module returns to an idle monitoring state.
+
+
+
+
+
+
+Detailed Description of the Household Cutting and Particle Sizing Mechanism
+Apparatus and Components: The cutting mechanism, positioned directly beneath the organic routing pathway, comprises a top-mounted high-torque electric motor driving a downward-facing rotary shaft equipped with pitched, aerodynamic shear blades. A horizontal perforated sizing screen (mesh) is fixed securely immediately below the rotational path of the blades. An electrical current-sensing module continuously monitors the power draw of the motor. By positioning the motor above the cutting zone, critical electromechanical components are completely isolated from gravitational moisture ingress.
+Operational Logic and Method:
+Pre-Spin Actuation: To overcome rotational inertia and prevent mechanical stalling upon initial impact, the primary control unit energizes the electric motor immediately upon detecting a baseline deviation in the segregation module above, prior to the waste making physical contact with the blades.
+Aerodynamic Sizing and Suction: The directed organic waste falls into the cutting chamber. The downward-facing pitched blades rotate at high speed, generating negative pneumatic pressure (suction) that actively pulls lightweight, low-density waste (such as dry peels) downward, preventing turbulent upward escape. The blades continuously sweep across the surface of the sizing mesh, shearing the waste material. The material remains trapped in the cutting zone until the particles are sufficiently reduced in size to pass through the apertures of the sizing screen and fall into the storage section below.
+Automated Load-Sensing Shutoff: The current-sensing module continuously transmits load data to the control unit. When the waste is fully processed and the sizing screen is empty, the motor experiences a reduction in physical resistance, causing the electrical current to drop to a predefined idle baseline. If the current remains at this idle baseline for a predetermined continuous duration (e.g., 3 seconds), the control unit autonomously severs power to the motor, conserving energy.
+Anti-Jam Protocol: If an unyielding object becomes lodged between a blade and the sizing screen, the motor experiences a sudden spike in physical resistance, resulting in an immediate overcurrent event. The control unit detects this high-current spike, halts forward rotation, and executes a preprogrammed reverse-rotation sequence to dislodge the obstruction before resuming normal operation.
+
+
+
+
+
+
+
+Detailed Description of the Storage and Hydrostatic Drainage Module
+Apparatus and Components: The temporary organic storage module comprises an insulated upper housing configured to isolate odors, a dynamic base assembly featuring a center-hinged double-door mechanism, and a perforated drainage screen affixed parallel to and directly above the solid doors. The underlying solid doors feature a calculated downward gradient directing fluids toward a leachate outlet pipe. The module further includes an electro-mechanical vibration actuator physically coupled to the base assembly, and an odor-mitigation subsystem comprising an active exhaust fan and an activated carbon filtration matrix.
+Operational Logic and Method:
+Hydrostatic Drainage and Liquid Routing: Mechanically sized organic waste falls from the cutting mechanism and accumulates on the perforated drainage screen. The natural accumulated weight of the waste deposits exerts hydrostatic compression on the lower layers, mechanically extracting excess cellular moisture. The liquid passes through the mesh, falls onto the sloped solid doors, and is routed through the outlet pipe into the primary leachate collection section.
+Intermittent Vibratory Agitation: To prevent the wet organic mass from creating a mechanical bridge or clogging the mesh apertures, the primary control unit periodically energizes the vibration actuator for brief, preprogrammed intervals. This vibration disrupts the surface tension of trapped water droplets, accelerating liquid percolation and maintaining mesh permeability.
+Pneumatic Odor Mitigation: To prevent anaerobic putrefaction odors from escaping the apparatus, the control unit continuously or periodically operates the active exhaust fan. This creates a slight negative air pressure environment within the insulated housing, forcing all internal air to pass through the carbon filtration matrix to neutralize volatile organic compounds (VOCs) prior to atmospheric venting.
+Automated Batch Transfer (The Clean Drop): Upon receiving a batch-initiation signal indicating the underlying decomposition chamber is ready for a new cycle, the control unit actuates the double-door mechanism, swinging the base assembly downward. Simultaneously, the control unit energizes the vibration actuator to sever colloidal adhesion (stickiness) between the wet waste and the mesh, ensuring a complete, unhindered gravitational transfer of the compressed organic mass into the decomposition chamber.
+
+
+
+
+
+
+
+
+
+Detailed Description of the Decomposition Initialization and Alert Logic
+Apparatus and Components: The primary decomposition module integrates a sensory feedback array comprising a load cell positioned beneath the decomposition chamber to monitor mass reduction, a core temperature sensor, and a moisture sensor. The primary control unit is communicatively coupled to a User Interaction interface (e.g., an onboard display or network-connected mobile application) to dispatch manual intervention alerts.
+Operational Logic and Method:
+Compost Maturity Detection & Harvest Alert: The control unit continuously evaluates the aerobic curing phase over a predefined batch duration (e.g., 14 to 15 days). Readiness is confirmed through a convergence of independent sensor indicators: the load cell indicates that mass reduction has plateaued, and the temperature sensor confirms the core mass has stabilized near ambient levels following the initial thermophilic spike. Upon satisfying these conditions, the control unit issues a 'Harvest Ready' notification to the user.
+Hardware Interlock and Automated Batch Transfer: The user manually extracts the mature compost. The load cell detects this extraction, registering a return to the zero-tare baseline mass. This empty-state confirmation satisfies the hardware interlock, triggering the primary control unit to actuate the overhead door mechanism, seamlessly transferring the stored, pre-drained organic waste batch into the empty decomposition chamber.
+Microbial Inoculation Prompt: Immediately following the detection of a successful batch transfer (verified by a sudden mass increase on the load cell), the control unit transmits a singular, batch-specific alert to the user interface. This alert instructs the user to manually dispense the prescribed microbial starter pack to initiate the new biological cycle.
+Environmental Maintenance Protocol (Manual Intervention): Throughout the active decomposition cycle, the control unit actively monitors internal microclimates. If the temperature sensor registers an excessive spike beyond the upper thermophilic safety threshold, or if the moisture sensor detects a drop below the optimal hydration band, the control unit dispatches a 'Hydration/Cooling Alert'. This prompts the user to manually add a prescribed volume of water to stabilize the biological ecosystem.
+
+
+
+
+
+
+
+
+
+
+Detailed Description of the Battery-Optimized Decomposition and Aeration Module
+Apparatus and Components: The primary decomposition module comprises a thermally insulated housing, a sensor array (including a core temperature sensor and a moisture sensor), a mass-sensing load cell positioned beneath the chamber, and an automated rotating agitation mechanism driven by a current-sensing DC motor. Aeration is achieved via a unified pneumatic pathway utilizing passive lower intake vents and a singular, shared exhaust fan located in the upper apparatus housing. The system is powered by an internal battery matrix.
+Operational Logic and Method:
+Power-Optimized Periodic Polling: To strictly conserve battery capacity, the primary control unit maintains a low-power "sleep" state, waking only at predefined intervals (e.g., once or twice a day). During this active window, the control unit polls the temperature and moisture sensors to evaluate the biological microclimate and actuates the rotating mechanism to oxygenate the organic mass, before returning to the low-power state.
+Mass-Triggered Inoculation and Homogenization: The initiation of a new batch is governed by sequential load cell monitoring. The control unit detects a primary mass increase when organic waste is transferred from the upper storage section. The system subsequently waits in an idle state until the load cell registers a secondary, discrete mass increase, confirming the manual addition of a carbon buffer (e.g., coco peat) and microbial starter. Only upon verifying this secondary mass increase does the control unit trigger the rotating mechanism for an initial, thorough homogenization mix.
+Unified Pneumatic Aeration (Chimney Effect): To minimize electrical draw, both the storage and decomposition chambers share a singular forced-air system. The unified exhaust fan activates periodically, creating negative pneumatic pressure within the sealed housing. This draws fresh ambient air through the passive lower intake vents, pulling oxygen upward through the actively decomposing mass, circulating through the upper storage mesh, and exhausting odor-neutralized air out through the active carbon filter.
+Current-Sensed Anti-Jam Protocol: During any scheduled agitation cycle, the control unit monitors the electrical current drawn by the rotating mechanism's motor. If the motor encounters heavy resistance (e.g., from dense or unyielding material), a resultant current spike is detected. The control unit instantly halts forward rotation and executes a preprogrammed reverse-rotation clearing sequence (destuck logic) to clear the obstruction, ensuring continuous, jam-free operation without draining the battery against a stalled rotor.
+
+
+
+
+
+Detailed Description of the Leachate Collection, User Interface, and Inorganic Storage Subsystems
+Apparatus and Components: The apparatus further comprises a gravity-fed leachate collection subsystem featuring an outlet pipe and a removable collection tray positioned at the base of the unit. The inorganic waste routing system terminates in a passive Inorganic Storage Chamber. Human-machine interaction is governed by a User Interface module comprising a high-contrast OLED display and an audio transducer (buzzer/chime). The overarching structure utilizes a modular, dispatchable housing architecture.
+Operational Logic and Method:
+Passive Leachate Routing and Extraction: Liquid runoff from the upper organic storage and preprocessing chambers is gravitationally channeled via the outlet pipe into the lower leachate tray. The tray is designed as a modular, user-removable drawer, permitting the operator to easily extract the accumulated liquid for either disposal or agricultural reuse as a liquid fertilizer.
+Simplified Audio-Visual Interface: To ensure accessible operation, the control unit communicates system statuses (e.g., 'Harvest Ready', 'Hydration Required', 'System Jam') using a dual-modality approach. Critical alerts trigger the audio transducer to emit a recognizable chime, drawing the user's attention, while the OLED display outputs simplified, high-contrast visual instructions (icons or brief text), mimicking the intuitive interfaces of standard household smart appliances.
+Passive Inorganic Accumulation: Inorganic items classified and routed by the segregation module fall into the unpowered Inorganic Storage Chamber. This chamber acts as a high-capacity holding bin, temporarily storing non-degradable waste in a clean state until cyclic municipal collection schedules (e.g., bi-daily extraction) require the user to empty the compartment.
+Modular (Dispatchable) Architecture: The main housing of the apparatus is constructed from interlocking, dispatchable structural sections (e.g., an independent segregation/cutting collar, a main decomposition body, and a removable base). This modularity allows for rapid disassembly, facilitating streamlined localized maintenance, effortless component replacement, and scalable manufacturing.
+
+
+
+
+
+
+
+
+
+
+
+Detailed Description of the Passive Leftover Food Storage Module (Alternative Embodiment B)
+Apparatus and Components: The leftover food subsystem comprises a dual-layer holding chamber featuring an outer container integrated into the main housing and a removable, bucket-style perforated inner tray (strainer). The outer container features a downward-sloping base terminating in an outlet port communicatively coupled to the primary leachate section. The module optionally includes an absorbent pad matrix positioned beneath the waste zone and is pneumatically linked to the apparatus's unified exhaust fan and carbon filtration subsystem.
+Operational Logic and Method:
+Gravitational Liquid Separation: High-moisture, cooked, or oily organic waste is deposited directly into the removable perforated inner tray. The perforations physically retain the solid particulate matter while permitting low-viscosity liquids (e.g., water, oils, and gravies) to freely drain downward via gravity. The expelled liquid impacts the sloped base of the outer container and is routed into the leachate collection tray, isolating the solids from standing liquid.
+Moisture Buffering (Optional): An absorbent pad may be situated at the base of the chamber to actively sequester residual moisture and congealed oils that do not easily flow to the leachate tray, further accelerating the drying of the solid waste mass and preventing leakage.
+Passive Drying and Odor Control: The solid waste retained in the perforated tray is subjected to the continuous negative air pressure generated by the main apparatus exhaust fan. This airflow passively evaporates surface moisture from the cooked solids, while volatile odorous compounds are pulled through the central carbon filtration matrix before atmospheric venting, thereby suppressing anaerobic putrefaction.
+Hygienic Manual Extraction: The dried, stabilized solid waste remains securely contained within the inner perforated tray for a holding period (e.g., 48 hours). For waste disposal, the user manually extracts the inner tray via an integrated handle, allowing for clean, bag-free transfer of the solids to municipal collection agents without direct contact with wet waste or resulting sludge.
+
+
+
+
+
+
+
+
+
+
+
+
+Detailed Description of the Front-Loading Leftover Food Inlet (Drawer Mechanism)
+Apparatus and Components: In lieu of utilizing the primary top-mounted segregation funnel, the leftover food subsystem is integrated into the apparatus as a flush-mounted, front-loading sliding drawer assembly. This drawer housing is positioned horizontally beneath the primary input section and contains the removable perforated inner tray and the sloped outer containment shell. The drawer mechanism is physically isolated from the primary machine learning classification pathway.
+Operational Logic and Method:
+Independent Manual Access (Bypass Logic): To circumvent complex algorithmic classification requirements, the user manually actuates the drawer mechanism, sliding it outward from the main housing. Leftover organic matter is deposited directly into the exposed perforated inner tray, completely bypassing the ultrasonic sensor and Edge-AI segregation module.
+Aesthetic and Functional Integration: When in the closed position, the exterior face of the drawer aligns flush with the primary geometric housing of the apparatus. This flush-mount configuration maintains structural aesthetics and preserves the internal pneumatic odor-sealing integrity required for the exhaust filtration system.
+Continuous Internal Plumbing: The sliding mechanism is dynamically coupled to the internal leachate routing system. The sloped base of the outer containment shell is configured to align with the primary internal leachate outlet pipe when the drawer is seated in the closed position, ensuring uninterrupted gravitational drainage from the nested perforated tray down into the lower leachate collection section.
+
+Formal Specification for Master Document: Version 1 Battery-Optimized Power Management Architecture
+Apparatus and Components: The primary electrical subsystem comprises a rechargeable DC battery matrix, an Ultra-Low-Power (ULP) interrupt controller, and a solid-state Motor Driver equipped with Pulse Width Modulation (PWM) capabilities. The primary control unit and Edge-AI processing node feature Deep Sleep modes with RTC (Real-Time Clock) RAM state retention. Peripherals are divided into isolated power rails governed by logic-level MOSFET switches.
+Operational Logic and Method:
+Asynchronous Micro-Polling (Tier 1): During idle states, the primary control unit, Edge-AI node, and all mechanical actuators are completely unpowered or maintained in Deep Sleep. Only the low-draw continuous distance-measuring sensor remains active on a micro-polling loop. Upon detecting a baseline distance deviation, it transmits an immediate hardware interrupt signal to the primary control unit.
+State-Retained Wake Protocol (Tier 2): Receiving the interrupt, the primary control unit and Edge-AI node wake from Deep Sleep. Because the AI classification model is retained in the actively powered RTC RAM, the system bypasses high-energy boot sequences, executing immediate image capture and classification before autonomously commanding a return to Deep Sleep.
+Sensor Rail Isolation: Environmental sensors (core temperature, moisture, load cell) are physically disconnected from the battery via MOSFET switches during idle states. The control unit energizes this dedicated sensor rail only during the scheduled, brief biological evaluation windows (e.g., once every 12 hours) to completely eliminate parasitic drain.
+PWM Soft-Start Actuation (Tier 3): To prevent battery brownouts and mitigate the severe inrush current characteristic of dead-stop induction, the control unit never supplies instantaneous full voltage to the high-torque cutting or agitation motors. Instead, the control unit commands the motor driver to execute a PWM Soft-Start sequence, stepping the duty cycle upward logarithmically over a predefined temporal window (e.g., 1500 milliseconds) until nominal rotational speed is achieved.
+
+Formal Specification for Master Document: Battery-Optimized Power Management and Modular Energy Architecture (Version 1)
+Apparatus and Components: The primary electrical subsystem comprises a Modular Removable Power Cartridge and an intelligent internal power distribution network. The Power Cartridge encapsulates a high-density 16-cell (4S4P) Lithium Iron Phosphate (LiFePO4) matrix, yielding a 12.8V nominal, 20Ah capacity. This cell matrix is hardwired to an internal, solid-state Battery Management System (BMS) and housed within a rigid, drop-resistant polymeric casing featuring high-current, gold-plated spring-contact terminals.
+The main apparatus housing features a sealed receiving dock with a mechanical locking detent to secure the cartridge. Internally, the apparatus utilizes an Ultra-Low-Power (ULP) interrupt controller, a solid-state Motor Driver equipped with Pulse Width Modulation (PWM) capabilities, and logic-level MOSFET switches for peripheral isolation. The primary control unit and Edge-AI processing node feature Deep Sleep modes with Real-Time Clock (RTC) RAM state retention.
+Operational Logic and Method:
+Electromechanical Engagement and BMS Governance: The user manually inserts the Power Cartridge into the apparatus dock, depressing the contact terminals to establish a continuous electrical pathway to the main distribution rail. During operation, the integrated BMS actively balances cell voltages and monitors thermal outputs. In the event of an electromechanical stall (e.g., rotor jam), the BMS hardware-limits the discharge rate prior to the primary control unit initiating software-level reverse-rotation logic, providing a dual-layer safeguard against over-current brownouts and thermal runaway.
+Asynchronous Micro-Polling (Tier 1 Conservation): During idle states, the primary control unit, Edge-AI node, and all high-draw electromechanical actuators are completely unpowered or maintained in Deep Sleep. Only the low-draw, continuous distance-measuring sensor remains active on a micro-polling loop. Upon detecting a predefined distance deviation (indicating a waste drop), it transmits a hardware interrupt signal to wake the primary control unit.
+State-Retained Wake Protocol (Tier 2 Conservation): Upon receiving the interrupt, the primary control unit and Edge-AI node transition from Deep Sleep to an active state. Because the neural network classification model is retained in the actively powered RTC RAM, the system bypasses high-energy boot sequences, executing immediate image capture and classification before autonomously commanding a return to Deep Sleep. Dedicated sensor rails (load cells, thermistors) are isolated via MOSFET switches and energized exclusively during brief, scheduled biological evaluation windows to eliminate parasitic drain.
+PWM Soft-Start Actuation (Tier 3 Conservation): To prevent battery brownouts and mitigate the severe inrush current characteristic of dead-stop induction, the control unit is programmed to restrict instantaneous full-voltage delivery to the high-torque cutting or agitation motors. Instead, the motor driver executes a PWM Soft-Start sequence, logarithmically stepping the duty cycle upward over a predefined temporal window (e.g., 1500 milliseconds) until nominal rotational speed is achieved.
+Decoupled Charging Protocol: Upon reaching a depletion threshold, the apparatus issues a low-power notification. The user physically ejects the Power Cartridge, completely decoupling the energy source from the biological decomposition environment. The cartridge is then mated to an independent, external AC-to-DC charging base station utilizing a Constant Current/Constant Voltage (CC/CV) profile to safely restore capacity.
