@@ -1,23 +1,23 @@
 # Gomikin 3D Project Context
 
 > **Last Updated:** 2026-10-06  
-> **Status:** Active Development — Dissection Animation & 33-Component Catalogue System Implemented  
+> **Status:** Active Development — Modular Dissection Views & Physical Waste Flow Simulation Implemented  
 > **Rule Compliance:** Updated after every change to track project context, architecture, and ongoing evolution.
 
 ---
 
 ## 1. Project Overview
 
-**Gomikin** is an automated household smart waste segregation and in-vessel processing apparatus.  
-This web-based interactive 3D prototype provides a high-fidelity, real-time visualization of the Gomikin internal mechanics, component hierarchy, and physical workflows.
+**Gomikin** is an automated household smart waste segregation and in-vessel biological processing apparatus.  
+This web-based interactive 3D prototype provides a high-fidelity, real-time visualization of the Gomikin internal mechanics, component hierarchy, modular assemblies, and physical process workflows.
 
 ### Baseline Design: Alternative Embodiment B
 The prototype implements **Alternative Embodiment B** (a practical, cost-effective household iteration of the Gomikin patent):
 - **Batch classification:** Intake funnel directs waste to an orientation platform with Edge-AI computer vision and ultrasonic level sensing.
 - **Three isolated physical sectors:**
   1. **180° Organic Processing Sector:** High-speed cross-shear cutting collar, 8 mm sizing mesh, dual-layer storage chamber with hydrostatic drainage, synchronized drop doors, and lower thermophilic decomposition chamber with helical agitator.
-  2. **90° Inorganic Sector (+X, -Z):** Passive vertical drop shaft into an inorganic collection output drawer.
-  3. **90° Leftover Food Sector (+X, +Z):** 55° ramp access door, dual-layer perforated food tray separating solids from liquids, and sloped leachate collection drainage.
+  2. **90° Inorganic Sector (+X, +Z):** Passive vertical drop shaft into an inorganic collection output drawer.
+  3. **90° Leftover Food Sector (+X, -Z):** 55° ramp access door, dual-layer perforated food tray separating solids from liquids, and sloped leachate collection drainage.
 - **Base / Leachate Plinth (Y = 0 to 100 mm):** Central leachate drawer receiving drainage from all chambers, removable LiFePO4 battery pack, and caster wheels.
 
 ---
@@ -27,7 +27,7 @@ The prototype implements **Alternative Embodiment B** (a practical, cost-effecti
 - **Core:** Vanilla JavaScript (ES Modules), HTML5, Vanilla CSS (dark industrial theme).
 - **3D Graphics Engine:** [Three.js](https://threejs.org/) (`^0.186.0`) with `USDLoader` and `OrbitControls`.
 - **Bundler / Dev Server:** [Vite](https://vitejs.dev/) (`^8.3.0`).
-- **Testing & Headless Verification:** [Playwright](https://playwright.dev/) (`^1.63.0`) for end-to-end visual tests and transform verifications in `scratch/`.
+- **Testing & Headless Verification:** [Playwright](https://playwright.dev/) (`^1.63.0`) using local Chromium/Edge channels for visual UI and transform regression passes in `scratch/`.
 
 ---
 
@@ -60,9 +60,7 @@ Authoritative reference: [`docs/design_specs.md`](file:///c:/Projects/Gomikin-3d
 
 ---
 
-## 4. Dual-Model Architecture & Codebase Structure
-
-The project incorporates two complementary representations:
+## 4. Codebase Structure
 
 ```
 src/
@@ -73,10 +71,13 @@ src/
 │   └── lighting.js                  # 3-point key/fill/rim studio lighting
 ├── components/
 │   ├── componentRegistry.js         # Indexes 33 CAD meshes from Fusion 360 USDZ assembly
+│   ├── moduleRegistry.js            # Groups 33 components into 7 functional sub-assemblies
 │   ├── envelope.js                  # Complete procedural Three.js reconstruction (5300+ LOC)
 │   └── housing.js                   # Legacy procedural housing group
 ├── animation/
-│   ├── dissectionAnimationSystem.js # Master state machine for 3-phase dissection & catalogue
+│   ├── moduleViewController.js      # Functional module isolation, ghosting, sub-assembly explosion
+│   ├── physicalFlowController.js    # 3D waste object motion paths, particle fragmentation & kinematics
+│   ├── dissectionAnimationSystem.js # Master state machine for 3-phase full dissection & catalogue
 │   ├── dissectionChoreography.js    # 7-row layout math, 3D exploded vectors & presentation angles
 │   ├── componentDetailController.js # Single-component CAD inspection mode (MMB/Shift+MMB/Wheel)
 │   ├── componentFocusController.js  # Focus & camera framing controller
@@ -85,6 +86,7 @@ src/
 │   ├── inspectionController.js      # Module-by-module static inspection presets
 │   └── demoController.js            # Legacy continuous mechanism driver
 ├── ui/
+│   ├── modularControlBar.js         # Modern glassmorphism top navigation bar & flow playback dock
 │   ├── demoUI.js                    # Legacy floating HUD dashboard
 │   ├── presentationUI.js            # Presentation mode dock
 │   ├── envelopeUI.js                # Envelope parameter controls
@@ -94,97 +96,68 @@ src/
     └── constants.js                 # Global constants & units
 ```
 
-### Representation 1: Procedural Parametric Envelope (`envelope.js`)
-- Dynamically derives all 30+ physical components from `parameters.js`.
-- Capable of resizing, cutaway shell toggling, and simulating mechanical motion.
-- Preserved intact; can be toggled via `gomikinEnvelope.visible`.
+---
 
-### Representation 2: Fusion 360 USDZ Model (`gomikin_disection.usdz`)
-- Loaded via `USDLoader` into `Fusion360_USDZ_Model`.
-- Parsed by `buildComponentRegistry()`, registering **33 unique component meshes**:
-  1. `Funnel`
-  2. `Main_Housing`
-  3. `Rightside_Divider`
-  4. `central_divider`
-  5. `storage_chamber`
-  6. `decompostion_chamber`
-  7. `leachate_section`
-  8. `inorganic_output_chamber`
-  9. `leftover_food_outpu_section`
-  10. `door_mechanism_left`
-  11. `door_mechanism_right`
-  12. `cutting_blades`
-  13. `cutting_motor`
-  14. `cutting_mesh`
-  15. `circular_frame`
-  16. `agitator`
-  17. `exhaust_fan`
-  18. `carbon_filter`
-  19. `servo`
-  20. `battery_pack`
-  21. `control_unit`
-  22. `camera_module`
-  23. `ultrasonic_sensor`
-  24. `temperature_sensor`
-  25. `moisture_sensor`
-  26. `load_cell`
-  27. `motor_support`
-  28. `cutting_motor_support`
-  29. `top_closuer`
-  30. `leftover_food_closur`
-  31. `bottom_of_decomposition_section`
-  32: `rotating_base`
-  33: `display`
+## 5. Functional Engineering Modules (`moduleRegistry.js` & `moduleViewController.js`)
+
+All 33 physical components are mapped into **7 functional sub-assembly modules**:
+
+1. **Input & Intake Module (`input`):**
+   - Components: `Funnel`, `rotating_base`, `display`, `camera_module`, `ultrasonic_sensor`, `servo`, `top_closuer`.
+   - Focus: Receiving funnel, 2-axis orientable sorting platform, optical Edge-AI camera, acoustic depth sensor, status display.
+2. **Organic Preprocessing & Cutting Module (`cutting`):**
+   - Components: `cutting_motor`, `cutting_motor_support`, `motor_support`, `circular_frame`, `cutting_blades`, `cutting_mesh`.
+   - Focus: High-speed drive motor, cross mounting braces, rotary shear cutting blades, 8 mm sizing mesh.
+3. **Organic Storage & Drainage Module (`storage`):**
+   - Components: `storage_chamber`, `door_mechanism_left`, `door_mechanism_right`.
+   - Focus: 180° storage volume with hydrostatic drainage and synchronized drop doors.
+4. **Decomposition & Agitation Module (`decomposition`):**
+   - Components: `decompostion_chamber`, `agitator`, `bottom_of_decomposition_section`, `load_cell`, `temperature_sensor`, `moisture_sensor`.
+   - Focus: Thermophilic digestion vessel, dual-helix mixing agitator, load cell, temperature & moisture telemetry.
+5. **Inorganic Storage & Segregation Module (`inorganic`):**
+   - Components: `inorganic_output_chamber`, `Rightside_Divider`, `central_divider`.
+   - Focus: Dry recyclables vertical drop shaft, internal divider bulkheads, extraction drawer.
+6. **Leftover Cooked Food Module (`leftover_food`):**
+   - Components: `leftover_food_outpu_section`, `leftover_food_closur`.
+   - Focus: 55° ramp access door, quadrant chamber, dual-layer perforated drainage tray.
+7. **Chassis, Power & Air Handling Module (`chassis_power`):**
+   - Components: `Main_Housing`, `leachate_section`, `battery_pack`, `control_unit`, `exhaust_fan`, `carbon_filter`.
+   - Focus: Main cylindrical enclosure, leachate drainage plinth, LiFePO4 battery pack, master MCU, negative-pressure carbon filter.
+
+### Modular View Capabilities:
+- **Module Isolation:** Automatically centers and frames the camera onto the selected module; non-module components can be hidden or rendered as translucent ghost silhouettes ("Toggle Ghost Housing").
+- **Sub-assembly Dissection ("Explode Module"):** Explodes only the components within that module outward along their mechanical disassembly axes with smooth cubic interpolation.
+- **Coordinate Conversion:** Automatically converts world space meter offsets into Fusion 360 USDZ local coordinates ($X_{\text{local}} = X_{\text{world}} \times 1000$, $Y_{\text{local}} = -Z_{\text{world}} \times 1000$, $Z_{\text{local}} = Y_{\text{world}} \times 1000$).
 
 ---
 
-## 5. Dissection Animation & 3D Catalogue System
+## 6. Physical Waste Object Flow Simulation (`physicalFlowController.js`)
 
-The core interactive feature of the latest version is the **Gomikin Dissection Animation System**:
+Simulates the physical trajectory of waste materials interacting with active CAD mechanisms:
 
-### 1. State Machine
-```
-[ASSEMBLED]  ──(Click "DISSECT GOMIKIN")──>  [DISSECTION (Phase 1 & 2)]  ──>  [EXPLODED (Phase 3 Catalogue Grid)]
-     ▲                                                                                    │
-     └──────────────────────────(Click "RESET GOMIKIN")───────────────────────────────────┘
-```
-- **Phase 1: 3D Explosion ($0.0 \to 0.35$ progress):** Components move outward radially along mechanical disassembly vectors; the cylindrical housing pulls back to reveal internal assemblies.
-- **Phase 2: Transition & Reorientation ($0.35 \to 0.70$ progress):** Components smoothly transition from exploded positions towards their assigned catalogue coordinates and presentation angles.
-- **Phase 3: 7-Row Catalogue Grid ($0.70 \to 1.0$ progress):** Components lock into an organized isometric 7-row layout with zero overlap, and 33 HTML badges project onto screen space.
+1. **Organic Waste Journey:**
+   - Funnel deposit ($Y = 1.06\text{ m} \to 0.945\text{ m}$)
+   - Optical camera & ultrasonic scan cone flash
+   - 2-axis rotating base tilts $30^\circ$ toward organic sector ($-X$)
+   - Falls into cutting collar $\rightarrow$ `cutting_blades` spin at high speed ($\approx 25\text{ rad/s}$) $\rightarrow$ waste particle fragments into tumbling shredded pieces
+   - Passes through sizing mesh into `storage_chamber`
+   - Hydrostatic drainage: amber liquid droplets trickle downward through the center drain tube into `leachate_section`
+   - `door_mechanism_left` and `door_mechanism_right` swing open $45^\circ \rightarrow$ batch drops into `decompostion_chamber`
+   - `agitator` rotates, blending biomass with microbes
+2. **Inorganic Recyclables Journey:**
+   - Funnel deposit $\rightarrow$ classification scan $\rightarrow$ platform tilts toward 90° inorganic quadrant ($+X, +Z$) $\rightarrow$ clean vertical drop into lower collection drawer.
+3. **Leftover Cooked Food Journey:**
+   - `leftover_food_closur` door swings open $55^\circ$ ramp $\rightarrow$ cooked food slides in $\rightarrow$ door returns flush $\rightarrow$ moisture trickles down to leachate plinth.
 
-### 2. 7-Row Catalogue Layout
-1. **Row 1 ($Y = 2.85\text{ m}$):** Input & Sensing (Funnel, Display, Camera, Ultrasonic, Load Cell)
-2. **Row 2 ($Y = 1.95\text{ m}$):** Filtration & Monitoring (Temp Sensor, Moisture Sensor, Circular Frame, Mesh, Blades)
-3. **Row 3 ($Y = 1.05\text{ m}$):** Cutting Drive & Agitation (Cutting Motor, Motor Supports, Agitator, Decomposition Base)
-4. **Row 4 ($Y = 0.15\text{ m}$):** Organic Processing (Storage Chamber, Decomposition Chamber, Left/Right Drop Doors)
-5. **Row 5 ($Y = -0.75\text{ m}$):** Segregation & Output (Central Divider, Right Divider, Inorganic Chamber, Food Output)
-6. **Row 6 ($Y = -1.65\text{ m}$):** Air & Power (Food Closure, Top Closure, Exhaust Fan, Carbon Filter, Control Unit)
-7. **Row 7 ($Y = -2.55\text{ m}$):** Structure & Motion (Battery Pack, Servo, Rotating Base, Main Housing, Leachate Base)
-
-### 3. Component Detail Inspection Mode (`componentDetailController.js`)
-- **Direct Selection:** Left-click on any component in the catalogue grid isolates it, smoothly hides all other 32 components, and centers the part.
-- **CAD Viewport Controls:**
-  - **In Catalogue Grid:** Mouse Wheel = Zoom Camera, Middle Mouse Button (MMB) = Pan Camera, Shift + MMB = Orbit Camera. Left click reserved exclusively for component selection.
-  - **In Component Detail Mode:** Mouse Wheel = Zoom Component, MMB = Pan Component, Shift + MMB = Orbit Component.
-- **HUD & Return:** Clicking the selected component or the floating "← BACK TO CATALOGUE" button returns smoothly to the full catalogue without losing state.
-- **Complete Reversibility:** Clicking "RESET GOMIKIN" resets all 33 components back to their exact original CAD positions and rotations ($0.000\text{ mm}$ mismatch tolerance).
+### Playback Controls:
+- Play / Pause, Timeline Scrubber (0% to 100%), Step-by-Step Navigation, 1x/2x Speed Toggle, and Live Step Callout Badges.
 
 ---
 
-## 6. How to Run & Verify
+## 7. Glassmorphism Top Navigation Bar (`modularControlBar.js`)
 
-1. **Start Dev Server:**
-   ```bash
-   npm run dev
-   ```
-   Open `http://localhost:5173/` in a browser.
-
-2. **Build Production Assets:**
-   ```bash
-   npm run build
-   ```
-
-3. **Verification Scripts (Playwright):**
-   - `scratch/verify_interactive_dissection.cjs`: Tests forward dissection, catalogue layout, badges, and reset restoration.
-   - `scratch/verify_detail_refinement.cjs`: Tests CAD controls, component detail mode isolation, and HUD interaction.
-   - `scratch/verify_all_refinements.cjs`: Full end-to-end regression pass.
+- **Tabs:**
+  - `[ 🏛️ Full Model ]` — Complete assembled appliance
+  - `[ 📦 Modular Views ]` — Sub-bar to choose between the 7 functional sub-assemblies with exploded inspection
+  - `[ ⚡ 33-Part Dissection ]` — Triggers the full 7-row exploded catalogue grid
+  - `[ 🔄 Simulate Flow ]` — Opens the bottom flow playback dock with ghosted housing

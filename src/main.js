@@ -11,6 +11,9 @@ import { initUI } from './ui/demoUI.js';
 import { InspectionController } from './interaction/inspectionController.js';
 import { WorkflowController } from './animation/workflowController.js';
 import { initUnifiedInspectionUI } from './ui/unifiedInspectionUI.js';
+import { ModuleViewController } from './animation/moduleViewController.js';
+import { PhysicalFlowController } from './animation/physicalFlowController.js';
+import { initModularControlBar } from './ui/modularControlBar.js';
 
 function init() {
   const canvas = document.querySelector('#app-canvas');
@@ -49,6 +52,20 @@ function init() {
       // Initialize Gomikin Interactive Dissection & 3D Catalogue System
       const gomikinAnimation = initDissectionAnimationSystem(componentRegistry, camera, controls);
       window.gomikinAnimation = gomikinAnimation;
+
+      // Initialize Modular View Controller & Physical Flow Controller
+      const moduleViewController = new ModuleViewController(componentRegistry, camera, controls);
+      window.moduleViewController = moduleViewController;
+
+      const physicalFlowController = new PhysicalFlowController(componentRegistry, scene, camera, controls);
+      window.physicalFlowController = physicalFlowController;
+
+      // Mount Modern Glassmorphism Modular Control Bar & Workflow Sim Dock
+      initModularControlBar({
+        moduleViewController,
+        physicalFlowController,
+        dissectionAnimationController: gomikinAnimation.controller
+      });
     },
     (progress) => {
       if (progress.total) {
@@ -104,6 +121,16 @@ function init() {
     // Update Dissection Animation System
     if (window.gomikinAnimation && window.gomikinAnimation.controller) {
       window.gomikinAnimation.controller.update(deltaTime);
+    }
+
+    // Update Modular View Controller
+    if (window.moduleViewController) {
+      window.moduleViewController.update(deltaTime);
+    }
+
+    // Update Physical Flow Controller
+    if (window.physicalFlowController) {
+      window.physicalFlowController.update(deltaTime);
     }
 
     // Update Workflow controller
