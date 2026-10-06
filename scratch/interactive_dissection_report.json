@@ -1,0 +1,66 @@
+{
+  "initialCheck": {
+    "state": "ASSEMBLED",
+    "progress": 0,
+    "buttonText": "⚡\n        DISSECT GOMIKIN",
+    "labelsVisible": false
+  },
+  "clickCheck": {
+    "stateAfterClick": "DISSECTION",
+    "isPlaying": true
+  },
+  "midCheck": {
+    "state": "DISSECTION",
+    "progress": 0.4
+  },
+  "catalogueCheck": {
+    "state": "EXPLODED",
+    "progress": 1,
+    "buttonText": "↺\n        RESET GOMIKIN",
+    "labelContainerDisplay": "block",
+    "totalBadges": 33,
+    "allComponentsMoved": true,
+    "totalComponentsAnimated": 33,
+    "badgesSample": [
+      {
+        "id": "badge-Funnel",
+        "title": "Receiving Funnel",
+        "group": "Input & Sensing",
+        "opacity": 1
+      },
+      {
+        "id": "badge-display",
+        "title": "Status OLED Display",
+        "group": "Input & Sensing",
+        "opacity": 1
+      },
+      {
+        "id": "badge-camera_module",
+        "title": "AI Visual Camera Module",
+        "group": "Input & Sensing",
+        "opacity": 1
+      },
+      {
+        "id": "badge-ultrasonic_sensor",
+        "title": "Fill-Level Ultrasonic Sensor",
+        "group": "Input & Sensing",
+        "opacity": 1
+      },
+      {
+        "id": "badge-load_cell",
+        "title": "Chamber Load Cell",
+        "group": "Input & Sensing",
+        "opacity": 1
+      }
+    ]
+  },
+  "resetCheck": {
+    "stateAfterReset": "ASSEMBLED",
+    "progressAfterReset": 0,
+    "buttonText": "⚡\n        DISSECT GOMIKIN",
+    "labelsHidden": true,
+    "allTransformsMatch": true,
+    "mismatchesCount": 0,
+    "totalComponentsVerified": 33
+  }
+}

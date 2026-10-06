@@ -1,5 +1,8 @@
 import './style.css';
 import * as THREE from 'three';
+import { USDLoader } from 'three/addons/loaders/USDLoader.js';
+import { buildComponentRegistry } from './components/componentRegistry.js';
+import { initDissectionAnimationSystem } from './animation/dissectionAnimationSystem.js';
 import { initScene } from './scene/scene.js';
 import { createGomikinEnvelope } from './components/envelope.js';
 import { createHousing } from './components/housing.js';
@@ -15,17 +18,47 @@ function init() {
 
   // 1. Master Physical Envelope (Phase 1 Baseline Parametric Envelope)
   const gomikinEnvelope = createGomikinEnvelope();
+  gomikinEnvelope.visible = false; // Preserved intact, hidden to display loaded USDZ model
   scene.add(gomikinEnvelope);
   window.gomikinEnvelope = gomikinEnvelope;
   window.THREE = THREE;
   window.camera = camera;
   window.controls = controls;
   window.scene = scene;
+  window.renderer = renderer;
 
   // Frame camera on the 1020 mm envelope (center at Y = 0.51 m)
   camera.position.set(0.95, 1.15, 1.55);
   controls.target.set(0, 0.51, 0);
   controls.update();
+
+  // Test loading Fusion 360 USDZ model
+  const usdLoader = new USDLoader();
+  usdLoader.load(
+    'Gomikin/gomikin_disection.usdz',
+    (usdModel) => {
+      usdModel.name = 'Fusion360_USDZ_Model';
+      scene.add(usdModel);
+      window.usdModel = usdModel;
+      console.log('USDZ model loaded successfully:', usdModel);
+
+      // Build clean component registry for animation control
+      const componentRegistry = buildComponentRegistry(usdModel, true);
+      window.componentRegistry = componentRegistry;
+
+      // Initialize Gomikin Interactive Dissection & 3D Catalogue System
+      const gomikinAnimation = initDissectionAnimationSystem(componentRegistry, camera, controls);
+      window.gomikinAnimation = gomikinAnimation;
+    },
+    (progress) => {
+      if (progress.total) {
+        console.log(`Loading USDZ: ${(progress.loaded / progress.total * 100).toFixed(1)}%`);
+      }
+    },
+    (error) => {
+      console.error('Error loading USDZ:', error);
+    }
+  );
 
   // Initialize Objective 1 Static Inspection Controller & Workflow Controller
   const inspectionController = new InspectionController(gomikinEnvelope, camera, controls);
@@ -33,9 +66,13 @@ function init() {
   window.inspectionController = inspectionController;
   window.workflowController = workflowController;
 
-  // Initialize Unified Right-Side Inspection Console (ALL controls in right panel)
+  // Initialize Unified Right-Side Inspection Console (Preserved underlying functionality, hidden for clean Dissection Experience)
   const unifiedUI = initUnifiedInspectionUI(gomikinEnvelope, inspectionController, workflowController, camera, controls);
   window.unifiedUI = unifiedUI;
+  const rightPanel = document.getElementById('gomikin-right-panel');
+  if (rightPanel) {
+    rightPanel.style.display = 'none';
+  }
 
   // 2. Preserved Legacy Components (kept intact, hidden to focus on Master Envelope)
   const gomikin = new THREE.Group();
@@ -62,7 +99,12 @@ function init() {
   // Animation Loop
   function animate() {
     requestAnimationFrame(animate);
-    const deltaTime = clock.getDelta();
+    const deltaTime = Math.min(clock.getDelta(), 0.1);
+
+    // Update Dissection Animation System
+    if (window.gomikinAnimation && window.gomikinAnimation.controller) {
+      window.gomikinAnimation.controller.update(deltaTime);
+    }
 
     // Update Workflow controller
     if (workflowController) {

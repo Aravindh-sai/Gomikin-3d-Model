@@ -1,0 +1,674 @@
+{
+  "totalMeshesFound": 33,
+  "totalGroupsFound": 34,
+  "expectedCount": 33,
+  "allValid": true,
+  "reportDataSummary": {
+    "totalComponents": 33,
+    "totalGroups": 34,
+    "allExpectedPresent": true,
+    "missing": []
+  },
+  "results": [
+    {
+      "name": "Funnel",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef > Funnel",
+      "vertexCount": 1536,
+      "boxDimensions": [
+        492,
+        492,
+        83.6231
+      ],
+      "boxCenter": [
+        0,
+        0,
+        980.0018
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "Main_Housing",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_21",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_21 > Main_Housing",
+      "vertexCount": 1296,
+      "boxDimensions": [
+        500,
+        498.8344,
+        1020
+      ],
+      "boxCenter": [
+        0,
+        0,
+        510
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "Rightside_Divider",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_23",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_23 > Rightside_Divider",
+      "vertexCount": 78,
+      "boxDimensions": [
+        246,
+        4,
+        825
+      ],
+      "boxCenter": [
+        123,
+        2,
+        512.5
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "central_divider",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_22",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_22 > central_divider",
+      "vertexCount": 708,
+      "boxDimensions": [
+        492,
+        492,
+        825
+      ],
+      "boxCenter": [
+        0,
+        0,
+        512.5
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "storage_chamber",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_27",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_27 > storage_chamber",
+      "vertexCount": 7944,
+      "boxDimensions": [
+        238,
+        476,
+        270
+      ],
+      "boxCenter": [
+        -120.5,
+        0.5,
+        779
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "decompostion_chamber",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_28",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_28 > decompostion_chamber",
+      "vertexCount": 6552,
+      "boxDimensions": [
+        238,
+        476,
+        270
+      ],
+      "boxCenter": [
+        -120.5,
+        0.5,
+        249
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "leachate_section",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_30",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_30 > leachate_section",
+      "vertexCount": 708,
+      "boxDimensions": [
+        484,
+        484,
+        90
+      ],
+      "boxCenter": [
+        0,
+        0,
+        50
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "inorganic_output_chamber",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_31",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_31 > inorganic_output_chamber",
+      "vertexCount": 492,
+      "boxDimensions": [
+        238,
+        238,
+        270
+      ],
+      "boxCenter": [
+        119,
+        -119,
+        249
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "leftover_food_outpu_section",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_32",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_32 > leftover_food_outpu_section",
+      "vertexCount": 492,
+      "boxDimensions": [
+        238,
+        238,
+        270
+      ],
+      "boxCenter": [
+        119,
+        122,
+        249
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "door_mechanism_left",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_18",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_18 > door_mechanism_left",
+      "vertexCount": 133758,
+      "boxDimensions": [
+        235.62,
+        235.62,
+        6.93
+      ],
+      "boxCenter": [
+        -119.6914,
+        -117.8463,
+        651.5
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "door_mechanism_right",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_17",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_17 > door_mechanism_right",
+      "vertexCount": 133758,
+      "boxDimensions": [
+        235.62,
+        235.62,
+        6.93
+      ],
+      "boxCenter": [
+        -120.5,
+        118,
+        649.5
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "cutting_blades",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_15",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_15 > cutting_blades",
+      "vertexCount": 842736,
+      "boxDimensions": [
+        211.6026,
+        216.1415,
+        12.1915
+      ],
+      "boxCenter": [
+        -120,
+        2.1785,
+        860.0681
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "cutting_motor",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_16",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_16 > cutting_motor",
+      "vertexCount": 1120008,
+      "boxDimensions": [
+        48.2043,
+        56.8045,
+        60.7388
+      ],
+      "boxCenter": [
+        -120,
+        6.3704,
+        884.254
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "cutting_mesh",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_14",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_14 > cutting_mesh",
+      "vertexCount": 16728,
+      "boxDimensions": [
+        227.2853,
+        232.1606,
+        3.2737
+      ],
+      "boxCenter": [
+        -120,
+        2.1785,
+        850.7924
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "circular_frame",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_13",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_13 > circular_frame",
+      "vertexCount": 1536,
+      "boxDimensions": [
+        227.2853,
+        232.1606,
+        65.475
+      ],
+      "boxCenter": [
+        -120,
+        2.1785,
+        881.8931
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "agitator",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_9",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_9 > agitator",
+      "vertexCount": 6660,
+      "boxDimensions": [
+        224.108,
+        224.108,
+        50.0606
+      ],
+      "boxCenter": [
+        -119.1511,
+        30.3908,
+        146.0668
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "exhaust_fan",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_19",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_19 > exhaust_fan",
+      "vertexCount": 246210,
+      "boxDimensions": [
+        9.9855,
+        69.996,
+        69.996
+      ],
+      "boxCenter": [
+        -243.5,
+        11.2285,
+        500
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "carbon_filter",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_20",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_20 > carbon_filter",
+      "vertexCount": 61392,
+      "boxDimensions": [
+        3.6413,
+        68.3431,
+        70.9829
+      ],
+      "boxCenter": [
+        -247.75,
+        10,
+        500.1002
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "servo",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_2",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_2 > servo",
+      "vertexCount": 1572330,
+      "boxDimensions": [
+        4.9514,
+        15.1017,
+        11.3882
+      ],
+      "boxCenter": [
+        -2,
+        -0.75,
+        932.7
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "battery_pack",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_7",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_7 > battery_pack",
+      "vertexCount": 36,
+      "boxDimensions": [
+        130,
+        85,
+        23.9999
+      ],
+      "boxCenter": [
+        105,
+        135,
+        940
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "control_unit",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_8",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_8 > control_unit",
+      "vertexCount": 4629441,
+      "boxDimensions": [
+        74.93,
+        53.34,
+        15.25
+      ],
+      "boxCenter": [
+        115.235,
+        27.733,
+        933.325
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "camera_module",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_5",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_5 > camera_module",
+      "vertexCount": 1736244,
+      "boxDimensions": [
+        27,
+        40.5,
+        18.0819
+      ],
+      "boxCenter": [
+        -13.5,
+        39.75,
+        1015.9712
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "ultrasonic_sensor",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_4",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_4 > ultrasonic_sensor",
+      "vertexCount": 305763,
+      "boxDimensions": [
+        8.3918,
+        25.1754,
+        11.1891
+      ],
+      "boxCenter": [
+        -8.5,
+        0,
+        1016.7682
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "temperature_sensor",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_11",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_11 > temperature_sensor",
+      "vertexCount": 156198,
+      "boxDimensions": [
+        30.35,
+        15.1,
+        9.725
+      ],
+      "boxCenter": [
+        -17.45,
+        89.925,
+        121.8625
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "moisture_sensor",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_12",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_12 > moisture_sensor",
+      "vertexCount": 47436,
+      "boxDimensions": [
+        100.5,
+        23,
+        9.2202
+      ],
+      "boxCenter": [
+        -55,
+        122.2319,
+        120.75
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "load_cell",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_10",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_10 > load_cell",
+      "vertexCount": 95538,
+      "boxDimensions": [
+        90,
+        60,
+        5.05
+      ],
+      "boxCenter": [
+        -50,
+        -39.325,
+        120
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "motor_support",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_1",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_1 > motor_support",
+      "vertexCount": 36,
+      "boxDimensions": [
+        4.0426,
+        10.27,
+        2.0656
+      ],
+      "boxCenter": [
+        -2,
+        -1.5,
+        926
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "cutting_motor_support",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_26",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_26 > cutting_motor_support",
+      "vertexCount": 96,
+      "boxDimensions": [
+        50,
+        448.2577,
+        4
+      ],
+      "boxCenter": [
+        -120,
+        0.6288,
+        917
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "top_closuer",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_25",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_25 > top_closuer",
+      "vertexCount": 408,
+      "boxDimensions": [
+        246,
+        492,
+        4
+      ],
+      "boxCenter": [
+        -123,
+        0,
+        1022
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "leftover_food_closur",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_24",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_24 > leftover_food_closur",
+      "vertexCount": 276,
+      "boxDimensions": [
+        246,
+        246,
+        3
+      ],
+      "boxCenter": [
+        123,
+        123,
+        926.5
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "bottom_of_decomposition_section",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_29",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_29 > bottom_of_decomposition_section",
+      "vertexCount": 408,
+      "boxDimensions": [
+        238,
+        476,
+        3
+      ],
+      "boxCenter": [
+        -120.5,
+        0,
+        116.5
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "rotating_base",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_3",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_3 > rotating_base",
+      "vertexCount": 852,
+      "boxDimensions": [
+        87.9941,
+        127.5,
+        6
+      ],
+      "boxCenter": [
+        0,
+        0,
+        940.5
+      ],
+      "pointsToRealMesh": true
+    },
+    {
+      "name": "display",
+      "found": true,
+      "type": "Mesh",
+      "targetClass": "Mesh",
+      "parentGroupName": "MeshPrimDef_6",
+      "hierarchyPath": "(Scene) > Fusion360_USDZ_Model > MeshPrimDef_6 > display",
+      "vertexCount": 72162,
+      "boxDimensions": [
+        38.2418,
+        52.4025,
+        10.8458
+      ],
+      "boxCenter": [
+        -205.3472,
+        5.8058,
+        1020.4519
+      ],
+      "pointsToRealMesh": true
+    }
+  ]
+}

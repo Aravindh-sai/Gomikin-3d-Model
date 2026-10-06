@@ -1,0 +1,31 @@
+{
+  "apiCheck": {
+    "hasPlay": true,
+    "hasPause": true,
+    "hasReset": true,
+    "hasProgress": true,
+    "hasState": true,
+    "initialState": "ASSEMBLED",
+    "initialProgress": 0
+  },
+  "buttonCheck": {
+    "found": true,
+    "initialText": "TEST DISSECTION",
+    "clickedText": "✓ VERIFIED (33/33)",
+    "id": "btn-test-dissection"
+  },
+  "stateAndTransformCheck": {
+    "state0": "ASSEMBLED",
+    "prog0": 0,
+    "stateHalf": "DISSECTION",
+    "progHalf": 0.5,
+    "stateFull": "EXPLODED",
+    "progFull": 1,
+    "stateResetting": "RESETTING",
+    "stateAfterReset": "ASSEMBLED",
+    "progAfterReset": 0,
+    "allTransformsMatch": true,
+    "mismatchesCount": 0,
+    "totalComponentsVerified": 33
+  }
+}

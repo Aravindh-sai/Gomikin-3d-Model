@@ -1,0 +1,3102 @@
+{
+  "tree": {
+    "name": "Fusion360_USDZ_Model",
+    "type": "Group",
+    "isMesh": false,
+    "isGroup": true,
+    "depth": 0,
+    "childrenCount": 34,
+    "pos": [
+      0,
+      0,
+      0
+    ],
+    "rot": [
+      -1.5707963267948966,
+      0,
+      0
+    ],
+    "children": [
+      {
+        "name": "Gomikin_3d_model_v1",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 33,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "MeshInstance",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_1",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_10",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_11",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_12",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_13",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_14",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_15",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_16",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_17",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_18",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_19",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_2",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_20",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_21",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "Main_Housing",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_22",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "central_divider",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_23",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "Rightside_Divider",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_24",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "leftover_food_closur",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_25",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "top_closuer",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_26",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "cutting_motor_support",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_27",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "storage_chamber",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_28",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "decompostion_chamber",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_29",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "bottom_of_decomposition_section",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_3",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_30",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "leachate_section",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_31",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "inorganic_output_chamber",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_32",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 1,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": [
+              {
+                "name": "leftover_food_outpu_section",
+                "type": "Object3D",
+                "isMesh": false,
+                "isGroup": false,
+                "depth": 3,
+                "childrenCount": 0,
+                "pos": [
+                  0,
+                  0,
+                  0
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "MeshInstance_4",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_5",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_6",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_7",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_8",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          },
+          {
+            "name": "MeshInstance_9",
+            "type": "Object3D",
+            "isMesh": false,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "Funnel",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_1",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "motor_support",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_10",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "load_cell",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_11",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "temperature_sensor",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_12",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "moisture_sensor",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_13",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "circular_frame",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_14",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "cutting_mesh",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_15",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "cutting_blades",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_16",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "cutting_motor",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_17",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "door_mechanism_right",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_18",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "door_mechanism_left",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_19",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "exhaust_fan",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_2",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "servo",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_20",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "carbon_filter",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_21",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "Main_Housing",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_22",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "central_divider",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_23",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "Rightside_Divider",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_24",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "leftover_food_closur",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_25",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "top_closuer",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_26",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "cutting_motor_support",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_27",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "storage_chamber",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_28",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "decompostion_chamber",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_29",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "bottom_of_decomposition_section",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_3",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "rotating_base",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_30",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "leachate_section",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_31",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "inorganic_output_chamber",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_32",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "leftover_food_outpu_section",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_4",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "ultrasonic_sensor",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_5",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "camera_module",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_6",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "display",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_7",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "battery_pack",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_8",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "control_unit",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "MeshPrimDef_9",
+        "type": "Object3D",
+        "isMesh": false,
+        "isGroup": false,
+        "depth": 1,
+        "childrenCount": 1,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "children": [
+          {
+            "name": "agitator",
+            "type": "Mesh",
+            "isMesh": true,
+            "isGroup": false,
+            "depth": 2,
+            "childrenCount": 0,
+            "pos": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              0
+            ],
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "flatList": [
+    {
+      "name": "Fusion360_USDZ_Model",
+      "type": "Group",
+      "isMesh": false,
+      "isGroup": true,
+      "parentName": "",
+      "childrenCount": 34
+    },
+    {
+      "name": "Gomikin_3d_model_v1",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 33
+    },
+    {
+      "name": "MeshInstance",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_1",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_10",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_11",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_12",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_13",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_14",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_15",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_16",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_17",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_18",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_19",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_2",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_20",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_21",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "Main_Housing",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_21",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_22",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "central_divider",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_22",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_23",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "Rightside_Divider",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_23",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_24",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "leftover_food_closur",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_24",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_25",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "top_closuer",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_25",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_26",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "cutting_motor_support",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_26",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_27",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "storage_chamber",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_27",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_28",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "decompostion_chamber",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_28",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_29",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "bottom_of_decomposition_section",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_29",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_3",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_30",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "leachate_section",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_30",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_31",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "inorganic_output_chamber",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_31",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_32",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 1
+    },
+    {
+      "name": "leftover_food_outpu_section",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "MeshInstance_32",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_4",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_5",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_6",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_7",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_8",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshInstance_9",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Gomikin_3d_model_v1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "Funnel",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_1",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "motor_support",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_1",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_10",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "load_cell",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_10",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_11",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "temperature_sensor",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_11",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_12",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "moisture_sensor",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_12",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_13",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "circular_frame",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_13",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_14",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "cutting_mesh",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_14",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_15",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "cutting_blades",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_15",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_16",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "cutting_motor",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_16",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_17",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "door_mechanism_right",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_17",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_18",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "door_mechanism_left",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_18",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_19",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "exhaust_fan",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_19",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_2",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "servo",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_2",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_20",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "carbon_filter",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_20",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_21",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "Main_Housing",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_21",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_22",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "central_divider",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_22",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_23",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "Rightside_Divider",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_23",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_24",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "leftover_food_closur",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_24",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_25",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "top_closuer",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_25",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_26",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "cutting_motor_support",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_26",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_27",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "storage_chamber",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_27",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_28",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "decompostion_chamber",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_28",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_29",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "bottom_of_decomposition_section",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_29",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_3",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "rotating_base",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_3",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_30",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "leachate_section",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_30",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_31",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "inorganic_output_chamber",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_31",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_32",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "leftover_food_outpu_section",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_32",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_4",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "ultrasonic_sensor",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_4",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_5",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "camera_module",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_5",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_6",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "display",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_6",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_7",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "battery_pack",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_7",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_8",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "control_unit",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_8",
+      "childrenCount": 0
+    },
+    {
+      "name": "MeshPrimDef_9",
+      "type": "Object3D",
+      "isMesh": false,
+      "isGroup": false,
+      "parentName": "Fusion360_USDZ_Model",
+      "childrenCount": 1
+    },
+    {
+      "name": "agitator",
+      "type": "Mesh",
+      "isMesh": true,
+      "isGroup": false,
+      "parentName": "MeshPrimDef_9",
+      "childrenCount": 0
+    }
+  ]
+}

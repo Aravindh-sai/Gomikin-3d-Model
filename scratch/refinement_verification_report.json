@@ -1,0 +1,127 @@
+{
+  "initialCheck": {
+    "state": "ASSEMBLED",
+    "progress": 0,
+    "isRightPanelHidden": true,
+    "buttonText": "⚡\n        DISSECT GOMIKIN"
+  },
+  "catalogueCheck": {
+    "state": "EXPLODED",
+    "totalBadges": 33,
+    "overlapsCount": 0,
+    "overlaps": [],
+    "badgesSample": [
+      {
+        "id": "badge-Funnel",
+        "title": "Receiving Funnel",
+        "left": 931.1077880859375,
+        "right": 1081.0921630859375,
+        "top": -323.29998779296875,
+        "bottom": -301.70623779296875,
+        "width": 149.984375,
+        "height": 21.59375,
+        "opacity": 1
+      },
+      {
+        "id": "badge-display",
+        "title": "OLED Display",
+        "left": 1220.6422119140625,
+        "right": 1352.1578369140625,
+        "top": -374.20001220703125,
+        "bottom": -352.60626220703125,
+        "width": 131.515625,
+        "height": 21.59375,
+        "opacity": 1
+      },
+      {
+        "id": "badge-camera_module",
+        "title": "Camera Module",
+        "left": 1576.8109130859375,
+        "right": 1721.3890380859375,
+        "top": -439.6000061035156,
+        "bottom": -418.0062561035156,
+        "width": 144.578125,
+        "height": 21.59375,
+        "opacity": 1
+      },
+      {
+        "id": "badge-ultrasonic_sensor",
+        "title": "Ultrasonic Sensor",
+        "left": 2060.24853515625,
+        "right": 2212.95166015625,
+        "top": -527.5999755859375,
+        "bottom": -506.0062255859375,
+        "width": 152.703125,
+        "height": 21.59375,
+        "opacity": 1
+      },
+      {
+        "id": "badge-load_cell",
+        "title": "Load Cell",
+        "left": 2771.846923828125,
+        "right": 2881.753173828125,
+        "top": -652,
+        "bottom": -630.40625,
+        "width": 109.90625,
+        "height": 21.59375,
+        "opacity": 1
+      }
+    ]
+  },
+  "focusCheck": {
+    "focusedName": "ultrasonic_sensor",
+    "focusProgress": 0.9996365976735049,
+    "meshScale": [
+      4.4999999993281214,
+      4.4999999993281214,
+      4.4999999993281214
+    ],
+    "meshPos": [
+      8.500000295531436,
+      -4499.999999136156,
+      -966.7681879678537
+    ],
+    "isHudVisible": true,
+    "focusedBadgeHasClass": true
+  },
+  "cadCheck": {
+    "orbit": [
+      0.8499999978601261,
+      0.4499999988671256
+    ],
+    "zoom": 1.5999999984895008,
+    "currentScale": 7.199999993202754,
+    "meshRotation": [
+      0.6999999988671256,
+      0.8499999978601261,
+      0
+    ]
+  },
+  "returnCheck": {
+    "focusedName": null,
+    "focusProgress": 0,
+    "meshScale": [
+      1,
+      1,
+      1
+    ],
+    "isHudVisible": false
+  },
+  "resetCheck": {
+    "verification": {
+      "ready": true,
+      "totalComponents": 33,
+      "expectedComponents": 33,
+      "allComponentsLoaded": true,
+      "allTransformsMatch": true,
+      "mismatches": [],
+      "state": "ASSEMBLED",
+      "progress": 0,
+      "labelsCount": 33
+    },
+    "state": "ASSEMBLED",
+    "progress": 0,
+    "buttonText": "⚡\n        DISSECT GOMIKIN",
+    "labelsHidden": true
+  }
+}
