@@ -300,7 +300,7 @@ export class DissectionAnimationController {
       const comp = this.choreography.componentData.get(name);
       if (!comp) continue;
 
-      const bottomOffset = 0.38;
+      const bottomOffset = 0.75;
       tempVec.set(
         comp.targetWorldCenter.x,
         comp.targetWorldCenter.y - bottomOffset,

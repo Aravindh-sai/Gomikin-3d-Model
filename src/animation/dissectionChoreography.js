@@ -129,7 +129,7 @@ export function buildDissectionChoreography(componentRegistry) {
   const componentData = new Map();
 
   // 7 Functional Modular Pods directly matching GOMIKIN_MODULES
-  // Distinct spatial pods with generous boundary gaps between modules
+  // Spacious, expansive canvas layout with generous breathing room and zero congestion
   const modulePods = [
     // Pod 1: Input & Intake Module (7 parts)
     {
@@ -138,15 +138,15 @@ export function buildDissectionChoreography(componentRegistry) {
       icon: '📥',
       categoryTag: 'INPUT',
       color: '#00ffcc',
-      headerWorldPos: new THREE.Vector3(0.0, 4.45, 0.0),
+      headerWorldPos: new THREE.Vector3(0.0, 6.80, 0.0),
       components: [
-        { name: 'Funnel', pos: new THREE.Vector3(-4.95, 3.60, 0.0) },
-        { name: 'rotating_base', pos: new THREE.Vector3(-3.30, 3.60, 0.0) },
-        { name: 'display', pos: new THREE.Vector3(-1.65, 3.60, 0.0) },
-        { name: 'camera_module', pos: new THREE.Vector3(0.0, 3.60, 0.0) },
-        { name: 'ultrasonic_sensor', pos: new THREE.Vector3(1.65, 3.60, 0.0) },
-        { name: 'servo', pos: new THREE.Vector3(3.30, 3.60, 0.0) },
-        { name: 'top_closuer', pos: new THREE.Vector3(4.95, 3.60, 0.0) }
+        { name: 'Funnel', pos: new THREE.Vector3(-7.80, 5.50, 0.0) },
+        { name: 'rotating_base', pos: new THREE.Vector3(-5.20, 5.50, 0.0) },
+        { name: 'display', pos: new THREE.Vector3(-2.60, 5.50, 0.0) },
+        { name: 'camera_module', pos: new THREE.Vector3(0.0, 5.50, 0.0) },
+        { name: 'ultrasonic_sensor', pos: new THREE.Vector3(2.60, 5.50, 0.0) },
+        { name: 'servo', pos: new THREE.Vector3(5.20, 5.50, 0.0) },
+        { name: 'top_closuer', pos: new THREE.Vector3(7.80, 5.50, 0.0) }
       ]
     },
     // Pod 2: Organic Preprocessing & Cutting Module (6 parts)
@@ -156,72 +156,73 @@ export function buildDissectionChoreography(componentRegistry) {
       icon: '⚙️',
       categoryTag: 'CUTTING',
       color: '#38bdf8',
-      headerWorldPos: new THREE.Vector3(0.0, 2.65, 0.0),
+      headerWorldPos: new THREE.Vector3(0.0, 3.30, 0.0),
       components: [
-        { name: 'cutting_motor', pos: new THREE.Vector3(-4.25, 1.80, 0.0) },
-        { name: 'cutting_motor_support', pos: new THREE.Vector3(-2.55, 1.80, 0.0) },
-        { name: 'motor_support', pos: new THREE.Vector3(-0.85, 1.80, 0.0) },
-        { name: 'circular_frame', pos: new THREE.Vector3(0.85, 1.80, 0.0) },
-        { name: 'cutting_mesh', pos: new THREE.Vector3(2.55, 1.80, 0.0) },
-        { name: 'cutting_blades', pos: new THREE.Vector3(4.25, 1.80, 0.0) }
+        { name: 'cutting_motor', pos: new THREE.Vector3(-6.75, 2.00, 0.0) },
+        { name: 'cutting_motor_support', pos: new THREE.Vector3(-4.05, 2.00, 0.0) },
+        { name: 'motor_support', pos: new THREE.Vector3(-1.35, 2.00, 0.0) },
+        { name: 'circular_frame', pos: new THREE.Vector3(1.35, 2.00, 0.0) },
+        { name: 'cutting_mesh', pos: new THREE.Vector3(4.05, 2.00, 0.0) },
+        { name: 'cutting_blades', pos: new THREE.Vector3(6.75, 2.00, 0.0) }
       ]
     },
-    // Pod 3: Organic Storage & Drainage Module (Left Cluster, 3 parts)
+    // Pod 3: Organic Storage & Drainage Module (Dedicated Row, 3 parts)
     {
       id: 'storage',
-      title: 'Organic Storage Module',
+      title: 'Organic Storage & Drainage Module',
       icon: '📦',
       categoryTag: 'STORAGE',
       color: '#a855f7',
-      headerWorldPos: new THREE.Vector3(-3.50, 0.85, 0.0),
+      headerWorldPos: new THREE.Vector3(0.0, -0.20, 0.0),
       components: [
-        { name: 'storage_chamber', pos: new THREE.Vector3(-5.10, 0.00, 0.0) },
-        { name: 'door_mechanism_left', pos: new THREE.Vector3(-3.50, 0.00, 0.0) },
-        { name: 'door_mechanism_right', pos: new THREE.Vector3(-1.90, 0.00, 0.0) }
+        { name: 'storage_chamber', pos: new THREE.Vector3(-4.00, -1.50, 0.0) },
+        { name: 'door_mechanism_left', pos: new THREE.Vector3(0.00, -1.50, 0.0) },
+        { name: 'door_mechanism_right', pos: new THREE.Vector3(4.00, -1.50, 0.0) }
       ]
     },
-    // Pod 4: Leftover Cooked Food Module (Center Cluster, 2 parts - distinct gap from storage and inorganic)
-    {
-      id: 'leftover_food',
-      title: 'Cooked Food Module',
-      icon: '🍲',
-      categoryTag: 'FOOD',
-      color: '#f59e0b',
-      headerWorldPos: new THREE.Vector3(0.0, 0.85, 0.0),
-      components: [
-        { name: 'leftover_food_outpu_section', pos: new THREE.Vector3(-0.85, 0.00, 0.0) },
-        { name: 'leftover_food_closur', pos: new THREE.Vector3(0.85, 0.00, 0.0) }
-      ]
-    },
-    // Pod 5: Inorganic Segregation & Recycling Module (Right Cluster, 3 parts - distinct gap from food)
-    {
-      id: 'inorganic',
-      title: 'Inorganic Recyclables',
-      icon: '🥫',
-      categoryTag: 'INORGANIC',
-      color: '#06b6d4',
-      headerWorldPos: new THREE.Vector3(3.50, 0.85, 0.0),
-      components: [
-        { name: 'inorganic_output_chamber', pos: new THREE.Vector3(1.90, 0.00, 0.0) },
-        { name: 'Rightside_Divider', pos: new THREE.Vector3(3.50, 0.00, 0.0) },
-        { name: 'central_divider', pos: new THREE.Vector3(5.10, 0.00, 0.0) }
-      ]
-    },
-    // Pod 6: Decomposition & Agitation Module (6 parts)
+    // Pod 4: Decomposition & Agitation Module (6 parts)
     {
       id: 'decomposition',
       title: 'Decomposition & Agitation Module',
       icon: '🌱',
       categoryTag: 'DECOMP',
       color: '#22c55e',
-      headerWorldPos: new THREE.Vector3(0.0, -0.95, 0.0),
+      headerWorldPos: new THREE.Vector3(0.0, -3.70, 0.0),
       components: [
-        { name: 'decompostion_chamber', pos: new THREE.Vector3(-4.25, -1.80, 0.0) },
-        { name: 'agitator', pos: new THREE.Vector3(-2.55, -1.80, 0.0) },
-        { name: 'bottom_of_decomposition_section', pos: new THREE.Vector3(-0.85, -1.80, 0.0) },
-        { name: 'load_cell', pos: new THREE.Vector3(0.85, -1.80, 0.0) },
-        { name: 'temperature_sensor', pos: new THREE.Vector3(2.55, -1.80, 0.0) },
-        { name: 'moisture_sensor', pos: new THREE.Vector3(4.25, -1.80, 0.0) }
+        { name: 'decompostion_chamber', pos: new THREE.Vector3(-6.75, -5.00, 0.0) },
+        { name: 'agitator', pos: new THREE.Vector3(-4.05, -5.00, 0.0) },
+        { name: 'bottom_of_decomposition_section', pos: new THREE.Vector3(-1.35, -5.00, 0.0) },
+        { name: 'load_cell', pos: new THREE.Vector3(1.35, -5.00, 0.0) },
+        { name: 'temperature_sensor', pos: new THREE.Vector3(4.05, -5.00, 0.0) },
+        { name: 'moisture_sensor', pos: new THREE.Vector3(6.75, -5.00, 0.0) }
+      ]
+    },
+    // Pod 5 & 6: Dual Side-by-Side Pods (6.5m gulf between them)
+    // Left: Inorganic Recyclables (3 parts)
+    {
+      id: 'inorganic',
+      title: 'Inorganic Recyclables Module',
+      icon: '🥫',
+      categoryTag: 'INORGANIC',
+      color: '#06b6d4',
+      headerWorldPos: new THREE.Vector3(-5.20, -7.20, 0.0),
+      components: [
+        { name: 'inorganic_output_chamber', pos: new THREE.Vector3(-7.60, -8.50, 0.0) },
+        { name: 'Rightside_Divider', pos: new THREE.Vector3(-5.20, -8.50, 0.0) },
+        { name: 'central_divider', pos: new THREE.Vector3(-2.80, -8.50, 0.0) }
+      ]
+    },
+    // Right: Leftover Cooked Food (2 parts)
+    {
+      id: 'leftover_food',
+      title: 'Cooked Food Module',
+      icon: '🍲',
+      categoryTag: 'FOOD',
+      color: '#f59e0b',
+      headerWorldPos: new THREE.Vector3(5.20, -7.20, 0.0),
+      components: [
+        { name: 'leftover_food_outpu_section', pos: new THREE.Vector3(3.80, -8.50, 0.0) },
+        { name: 'leftover_food_closur', pos: new THREE.Vector3(6.60, -8.50, 0.0) }
       ]
     },
     // Pod 7: Chassis, Power & Air Handling Module (6 parts)
@@ -231,14 +232,14 @@ export function buildDissectionChoreography(componentRegistry) {
       icon: '⚡',
       categoryTag: 'CHASSIS',
       color: '#ec4899',
-      headerWorldPos: new THREE.Vector3(0.0, -2.75, 0.0),
+      headerWorldPos: new THREE.Vector3(0.0, -10.70, 0.0),
       components: [
-        { name: 'Main_Housing', pos: new THREE.Vector3(-4.25, -3.60, 0.0) },
-        { name: 'leachate_section', pos: new THREE.Vector3(-2.55, -3.60, 0.0) },
-        { name: 'battery_pack', pos: new THREE.Vector3(-0.85, -3.60, 0.0) },
-        { name: 'control_unit', pos: new THREE.Vector3(0.85, -3.60, 0.0) },
-        { name: 'exhaust_fan', pos: new THREE.Vector3(2.55, -3.60, 0.0) },
-        { name: 'carbon_filter', pos: new THREE.Vector3(4.25, -3.60, 0.0) }
+        { name: 'Main_Housing', pos: new THREE.Vector3(-6.75, -12.00, 0.0) },
+        { name: 'leachate_section', pos: new THREE.Vector3(-4.05, -12.00, 0.0) },
+        { name: 'battery_pack', pos: new THREE.Vector3(-1.35, -12.00, 0.0) },
+        { name: 'control_unit', pos: new THREE.Vector3(1.35, -12.00, 0.0) },
+        { name: 'exhaust_fan', pos: new THREE.Vector3(4.05, -12.00, 0.0) },
+        { name: 'carbon_filter', pos: new THREE.Vector3(6.75, -12.00, 0.0) }
       ]
     }
   ];
@@ -290,12 +291,11 @@ export function buildDissectionChoreography(componentRegistry) {
       const rot = PRESENTATION_ROTATIONS[name] || [0, 0, 0];
       const presentationRotation = new THREE.Euler(rot[0], rot[1], rot[2]);
 
-      // Balanced presentation scale multiplier for catalogue view:
-      // Normalizes visual diameter of ALL 33 components to ~0.50m.
-      // Small components (sensors, servo, motor support) scale up cleanly (up to 55x);
-      // Large components (housing, dividers) scale down gracefully (to ~0.52x) so everything fits with perfection.
+      // Bold, enlarged presentation scale multiplier for Dissection Catalogue view:
+      // Scaled up to ~1.05m target visual diameter (more than 2x larger than before)
+      // Small components scale up cleanly; large enclosures remain bold and imposing without clipping.
       const maxDim = Math.max(worldDimensions.x, worldDimensions.y, worldDimensions.z);
-      const catalogueScaleMultiplier = THREE.MathUtils.clamp(0.52 / Math.max(0.008, maxDim), 0.52, 55.0);
+      const catalogueScaleMultiplier = THREE.MathUtils.clamp(1.05 / Math.max(0.010, maxDim), 0.85, 95.0);
 
       componentData.set(name, {
         name,
@@ -420,21 +420,21 @@ export function buildDissectionChoreography(componentRegistry) {
   }
 
   function calculateCatalogueCamera(aspectRatio = 16 / 9) {
-    const catWidth = 11.6;
-    const catHeight = 9.4;
-    const catCenter = new THREE.Vector3(0.0, 0.0, 0.0);
-
+    // Generously frame the upper pods (Input & Cutting) with large, bold parts
+    // The user can freely pan the canvas to navigate the remaining module tiers.
     const fov = 45.0 * (Math.PI / 180.0);
     const tanHalfFov = Math.tan(fov * 0.5);
 
-    const distY = (catHeight * 0.5 * 1.15) / tanHalfFov;
-    const distX = (catWidth * 0.5 * 1.15) / (tanHalfFov * Math.max(0.5, aspectRatio));
+    // Fit the width of Pod 1 (~17m span with margins)
+    const requiredHalfWidth = 8.8;
+    const zForWidth = requiredHalfWidth / (tanHalfFov * Math.max(0.6, aspectRatio));
+    const finalZ = Math.max(10.5, Math.min(zForWidth, 16.0));
 
-    const finalZ = Math.max(distY, distX, 13.0);
+    const initialY = 3.75;
 
     return {
-      position: new THREE.Vector3(catCenter.x, catCenter.y, finalZ),
-      target: catCenter.clone()
+      position: new THREE.Vector3(0.0, initialY, finalZ),
+      target: new THREE.Vector3(0.0, initialY, 0.0)
     };
   }
 
@@ -444,7 +444,7 @@ export function buildDissectionChoreography(componentRegistry) {
     evaluateAtProgress,
     calculateCatalogueCamera,
     easeInOutCubic,
-    catalogueCenter: new THREE.Vector3(0.0, 0.45, 0.0),
+    catalogueCenter: new THREE.Vector3(0.0, 3.75, 0.0),
     cameraAssembled: {
       position: new THREE.Vector3(0.95, 1.15, 1.55),
       target: new THREE.Vector3(0, 0.51, 0)
