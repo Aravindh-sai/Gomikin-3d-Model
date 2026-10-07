@@ -52,7 +52,7 @@ export class ComponentDetailController {
     this.targetZoom = 1.0;
 
     // Grid View CAD Camera State
-    this.gridCameraTarget = new THREE.Vector3(0.0, -0.05, 0.0);
+    this.gridCameraTarget = new THREE.Vector3(0.0, 3.75, 0.0);
     this.gridRadius = 9.2;
     this.gridTheta = 0;
     this.gridPhi = Math.PI / 2;
@@ -297,7 +297,17 @@ export class ComponentDetailController {
   }
 
   initGridCameraState() {
-    this.gridCameraTarget = new THREE.Vector3(0.0, 0.45, 0.0);
+    const aspect = (typeof window !== 'undefined' && window.innerHeight > 0) ? (window.innerWidth / window.innerHeight) : 16 / 9;
+    const fitted = this.choreography ? this.choreography.calculateCatalogueCamera(aspect) : null;
+
+    if (this.controls && this.controls.target) {
+      this.gridCameraTarget.copy(this.controls.target);
+    } else if (fitted) {
+      this.gridCameraTarget.copy(fitted.target);
+    } else {
+      this.gridCameraTarget.set(0.0, 3.75, 0.0);
+    }
+
     if (this.camera) {
       const offset = new THREE.Vector3().subVectors(this.camera.position, this.gridCameraTarget);
       this.gridRadius = Math.max(5.0, offset.length());
@@ -683,9 +693,6 @@ export class ComponentDetailController {
       labelOverlay.style.display = 'block';
     }
 
-    // 3. Restore catalogue camera
-    this.resetGridCamera();
-
     if (immediate) {
       this.transitionProgress = 0.0;
       this.targetOrbit.set(0, 0);
@@ -741,8 +748,8 @@ export class ComponentDetailController {
       comp.worldDimensions.z
     );
 
-    // Target visual diameter ~2.4m in world space
-    const baseMult = THREE.MathUtils.clamp(2.4 / Math.max(0.008, maxDim), 1.2, 240.0);
+    // Target visual diameter ~3.5m in world space (fills ~35-40% of viewport)
+    const baseMult = THREE.MathUtils.clamp(3.5 / Math.max(0.008, maxDim), 1.2, 280.0);
     return baseMult * this.detailZoom;
   }
 
@@ -794,8 +801,11 @@ export class ComponentDetailController {
     const tp = this.transitionProgress;
     const easeT = tp < 0.5 ? 4 * tp * tp * tp : (tp - 1) * (2 * tp - 2) * (2 * tp - 2) + 1;
 
-    // Target world center in Detail view
-    const detailWorldCenter = new THREE.Vector3(this.detailPan.x, 0.0 + this.detailPan.y, 0.0);
+    // Target world center in Detail view:
+    // Centers component directly in current viewport between top header card and bottom CAD dock
+    const detailTargetX = (this.camera ? this.camera.position.x : this.gridCameraTarget.x) + this.detailPan.x;
+    const detailTargetY = (this.camera ? this.camera.position.y : this.gridCameraTarget.y) - 0.20 + this.detailPan.y;
+    const detailWorldCenter = new THREE.Vector3(detailTargetX, detailTargetY, 0.0);
     const currentWorldCenter = new THREE.Vector3().lerpVectors(comp.targetWorldCenter, detailWorldCenter, easeT);
 
     // Convert to local parent space

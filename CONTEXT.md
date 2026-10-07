@@ -193,9 +193,12 @@ Simulates the physical trajectory of waste materials interacting with active CAD
 - **Initial Camera Perspective:** Initial framing centers on the upper pods ($Y = 3.75\text{ m}$, $Z \approx 12.0\text{ m}$), allowing the user to naturally pan and scroll the canvas downward to explore all modules without squeezing everything onto one congested screen.
 
 ### 4. Efficient 3D Part Inspection & Rotation
+- **Viewport Centering Alignment:** When entering Detail View, the selected component is centered dynamically to match the active camera focal target (`(camera.position.x, camera.position.y - 0.20, 0.0)`), perfectly and symmetrically framed between the top header card (`top: 76px`) and bottom CAD dock (`bottom: 24px`) regardless of where the user panned on the canvas.
+- **Adaptive Detail Scaling:** Target visual diameter increased to $3.5\text{ m}$ (`clamp(3.5 / maxDim, 1.2, 280.0)`), presenting an imposing, clear inspection model filling ~35-40% of the viewport.
 - **Direct Left-Click Drag Orbit:** In Component Detail View, Left-Click Drag immediately rotates the inspected 3D component in 360° (yaw and pitch) with smooth inertia (zero GPU overhead).
 - **Auto-Rotate Toggle:** An interactive button on the detail CAD control bar toggles continuous hands-free 360° product rotation (`this.targetOrbit.x += deltaTime * 0.7`).
 - **Right-Click / MMB:** Pans the component; scroll wheel zooms.
+- **Non-destructive Return:** Exiting Detail View restores visibility and smoothly returns the component to its modular pod slot without resetting or snapping the user's panned camera position.
 - **Clean Layout:** The detail header sits at `top: 76px` beneath the navigation bar, and the bottom Dissect button is hidden during Detail mode.
 
 ### 5. Seamless Mode Transitions
