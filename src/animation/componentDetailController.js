@@ -63,6 +63,7 @@ export class ComponentDetailController {
     this.dragStart = { x: 0, y: 0 };
     this.pointerDownPos = { x: 0, y: 0 };
     this.isShiftPressed = false;
+    this.autoRotate = false;
 
     // UI elements
     this.detailOverlay = null;
@@ -93,10 +94,33 @@ export class ComponentDetailController {
         display: block;
       }
 
+      .btn-autorotate {
+        background: rgba(0, 255, 204, 0.12);
+        border: 1px solid rgba(0, 255, 204, 0.35);
+        color: #00ffcc;
+        border-radius: 12px;
+        padding: 3px 10px;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        pointer-events: auto;
+      }
+      .btn-autorotate:hover {
+        background: rgba(0, 255, 204, 0.25);
+        box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+      }
+      .btn-autorotate.active {
+        background: #00ffcc;
+        color: #050b14;
+        box-shadow: 0 0 14px rgba(0, 255, 204, 0.5);
+      }
+
       /* Top Header Card */
       .detail-header {
         position: absolute;
-        top: 24px;
+        top: 76px;
         left: 50%;
         transform: translateX(-50%);
         text-align: center;
@@ -214,13 +238,13 @@ export class ComponentDetailController {
       </div>
 
       <div class="detail-cad-hint">
+        <span><kbd>Left-Drag</kbd> Rotate 360°</span>
+        <div class="detail-cad-divider"></div>
+        <span><kbd>RMB / MMB</kbd> Pan</span>
+        <div class="detail-cad-divider"></div>
         <span><kbd>Scroll</kbd> Zoom</span>
         <div class="detail-cad-divider"></div>
-        <span><kbd>MMB</kbd> Pan</span>
-        <div class="detail-cad-divider"></div>
-        <span><kbd>Shift + MMB</kbd> Rotate</span>
-        <div class="detail-cad-divider"></div>
-        <span><kbd>Click Component</kbd> Return</span>
+        <button id="btn-toggle-autorotate" class="btn-autorotate">🔄 Auto-Rotate: OFF</button>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -230,6 +254,16 @@ export class ComponentDetailController {
       backBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         this.exitDetailView();
+      });
+    }
+
+    const autoRotateBtn = document.getElementById('btn-toggle-autorotate');
+    if (autoRotateBtn) {
+      autoRotateBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.autoRotate = !this.autoRotate;
+        autoRotateBtn.classList.toggle('active', this.autoRotate);
+        autoRotateBtn.textContent = this.autoRotate ? '🔄 Auto-Rotate: ON' : '🔄 Auto-Rotate: OFF';
       });
     }
 
@@ -243,6 +277,9 @@ export class ComponentDetailController {
     this._onWheel = this._handleWheel.bind(this);
     this._onKeyDown = this._handleKeyDown.bind(this);
     this._onKeyUp = this._handleKeyUp.bind(this);
+    this._onTouchStart = this._handleTouchStart.bind(this);
+    this._onTouchMove = this._handleTouchMove.bind(this);
+    this._onTouchEnd = this._handleTouchEnd.bind(this);
     this._onContextMenu = (e) => {
       if (this.enabled) e.preventDefault();
     };
@@ -253,11 +290,14 @@ export class ComponentDetailController {
     window.addEventListener('wheel', this._onWheel, { passive: false });
     window.addEventListener('keydown', this._onKeyDown);
     window.addEventListener('keyup', this._onKeyUp);
+    window.addEventListener('touchstart', this._onTouchStart, { passive: false });
+    window.addEventListener('touchmove', this._onTouchMove, { passive: false });
+    window.addEventListener('touchend', this._onTouchEnd, { passive: false });
     window.addEventListener('contextmenu', this._onContextMenu);
   }
 
   initGridCameraState() {
-    this.gridCameraTarget = new THREE.Vector3(0.0, -0.05, 0.0);
+    this.gridCameraTarget = new THREE.Vector3(0.0, 0.45, 0.0);
     if (this.camera) {
       const offset = new THREE.Vector3().subVectors(this.camera.position, this.gridCameraTarget);
       this.gridRadius = Math.max(5.0, offset.length());
@@ -271,11 +311,13 @@ export class ComponentDetailController {
     if (this.enabled) {
       if (this.controls) this.controls.enabled = false;
       this.initGridCameraState();
+      document.body.style.cursor = 'grab';
     } else {
       if (this.mode === 'DETAIL') {
         this.exitDetailView(true);
       }
       if (this.controls) this.controls.enabled = true;
+      document.body.style.cursor = 'default';
     }
   }
 
@@ -383,7 +425,11 @@ export class ComponentDetailController {
   _handlePointerDown(e) {
     if (!this.enabled) return;
 
-    if (e.target.closest('#btn-dissect-gomikin') || e.target.closest('#gomikin-dissect-primary-ui') || e.target.closest('.btn-back-catalogue')) {
+    if (e.target.closest('#btn-dissect-gomikin') || 
+        e.target.closest('#gomikin-dissect-primary-ui') || 
+        e.target.closest('.btn-back-catalogue') || 
+        e.target.closest('#gomikin-modular-nav') ||
+        e.target.closest('#btn-toggle-autorotate')) {
       return;
     }
 
@@ -394,6 +440,10 @@ export class ComponentDetailController {
     this.dragStart.y = e.clientY;
     this.pointerDownPos.x = e.clientX;
     this.pointerDownPos.y = e.clientY;
+
+    if (this.dragButton === 0 || this.dragButton === 1 || this.dragButton === 2) {
+      document.body.style.cursor = 'grabbing';
+    }
   }
 
   _handlePointerMove(e) {
@@ -404,29 +454,46 @@ export class ComponentDetailController {
     this.dragStart.x = e.clientX;
     this.dragStart.y = e.clientY;
 
+    this._updatePointerCoordinates(e);
+
     if (!this.isDragging) {
-      // CRITICAL: HOVER INTERACTION IS COMPLETELY REMOVED.
+      if (this.mode === 'CATALOGUE') {
+        const hit = this._raycastUnderPointer();
+        document.body.style.cursor = hit ? 'pointer' : 'grab';
+      } else if (this.mode === 'DETAIL') {
+        document.body.style.cursor = 'grab';
+      }
       return;
     }
 
-    // CAD Controls handling during drag
-    if (this.dragButton === 1) { // Middle Mouse Button (MMB)
-      if (e.shiftKey || this.isShiftPressed) {
-        // Shift + MMB: ORBIT
-        if (this.mode === 'DETAIL') {
-          this.targetOrbit.x += dx * 0.007; // Yaw
-          this.targetOrbit.y = THREE.MathUtils.clamp(this.targetOrbit.y + dy * 0.007, -Math.PI * 0.45, Math.PI * 0.45); // Pitch
-        } else if (this.mode === 'CATALOGUE') {
+    document.body.style.cursor = 'grabbing';
+
+    // Drag interaction
+    if (this.mode === 'CATALOGUE') {
+      if (this.dragButton === 0 || this.dragButton === 1) {
+        // Left-click drag on canvas background OR Middle-click drag -> PAN CAMERA
+        this.panGridCamera(dx, dy);
+      } else if (this.dragButton === 2) {
+        // Right-click drag -> Pan (or Orbit if Shift/Alt held)
+        if (e.shiftKey || e.altKey || this.isShiftPressed) {
           this.orbitGridCamera(dx, dy);
-        }
-      } else {
-        // MMB: PAN
-        if (this.mode === 'DETAIL') {
-          this.targetPan.x += dx * 0.0035;
-          this.targetPan.y -= dy * 0.0035;
-        } else if (this.mode === 'CATALOGUE') {
+        } else {
           this.panGridCamera(dx, dy);
         }
+      }
+    } else if (this.mode === 'DETAIL') {
+      if (this.dragButton === 0) {
+        // Left-click drag -> ROTATE / ORBIT 3D PART DIRECTLY!
+        this.targetOrbit.x += dx * 0.008; // Yaw
+        this.targetOrbit.y = THREE.MathUtils.clamp(
+          this.targetOrbit.y + dy * 0.008,
+          -Math.PI * 0.45,
+          Math.PI * 0.45
+        ); // Pitch
+      } else if (this.dragButton === 1 || this.dragButton === 2) {
+        // MMB or RMB -> PAN COMPONENT
+        this.targetPan.x += dx * 0.0035;
+        this.targetPan.y -= dy * 0.0035;
       }
     }
   }
@@ -438,7 +505,9 @@ export class ComponentDetailController {
     this.isDragging = false;
     this.dragButton = -1;
 
-    // Deliberate click with Left Mouse Button (0)
+    document.body.style.cursor = this.enabled ? 'grab' : 'default';
+
+    // Deliberate click with Left Mouse Button (0) - dist < 6px
     if (dist < 6 && e.button === 0) {
       this._updatePointerCoordinates(e);
       const hitName = this._raycastUnderPointer();
@@ -452,6 +521,81 @@ export class ComponentDetailController {
           this.exitDetailView();
         }
       }
+    }
+  }
+
+  _handleTouchStart(e) {
+    if (!this.enabled) return;
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      this._updatePointerCoordinates(touch);
+      this.isDragging = true;
+      this.dragButton = 0;
+      this.dragStart.x = touch.clientX;
+      this.dragStart.y = touch.clientY;
+      this.pointerDownPos.x = touch.clientX;
+      this.pointerDownPos.y = touch.clientY;
+    } else if (e.touches.length === 2) {
+      this.touchStartDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
+  }
+
+  _handleTouchMove(e) {
+    if (!this.enabled) return;
+    if (e.touches.length === 1 && this.isDragging) {
+      const touch = e.touches[0];
+      const dx = touch.clientX - this.dragStart.x;
+      const dy = touch.clientY - this.dragStart.y;
+      this.dragStart.x = touch.clientX;
+      this.dragStart.y = touch.clientY;
+
+      if (this.mode === 'CATALOGUE') {
+        this.panGridCamera(dx, dy);
+      } else if (this.mode === 'DETAIL') {
+        this.targetOrbit.x += dx * 0.008;
+        this.targetOrbit.y = THREE.MathUtils.clamp(
+          this.targetOrbit.y + dy * 0.008,
+          -Math.PI * 0.45,
+          Math.PI * 0.45
+        );
+      }
+    } else if (e.touches.length === 2 && this.touchStartDist) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const delta = this.touchStartDist - dist;
+      this.touchStartDist = dist;
+      if (this.mode === 'CATALOGUE') {
+        this.zoomGridCamera(delta * 4);
+      } else if (this.mode === 'DETAIL') {
+        this.targetZoom = THREE.MathUtils.clamp(this.targetZoom * (1 - delta * 0.004), 0.35, 5.0);
+      }
+    }
+  }
+
+  _handleTouchEnd(e) {
+    if (!this.enabled) return;
+    if (this.isDragging && e.changedTouches.length === 1) {
+      const touch = e.changedTouches[0];
+      const dist = Math.hypot(touch.clientX - this.pointerDownPos.x, touch.clientY - this.pointerDownPos.y);
+      this.isDragging = false;
+      this.dragButton = -1;
+      if (dist < 8) {
+        this._updatePointerCoordinates(touch);
+        const hitName = this._raycastUnderPointer();
+        if (this.mode === 'CATALOGUE' && hitName) {
+          this.enterDetailView(hitName);
+        } else if (this.mode === 'DETAIL' && hitName === this.selectedName) {
+          this.exitDetailView();
+        }
+      }
+    }
+    if (e.touches.length === 0) {
+      this.touchStartDist = 0;
     }
   }
 
@@ -491,7 +635,11 @@ export class ComponentDetailController {
       this.detailOverlay.classList.add('detail-active');
     }
 
-    // 4. Reset inspection offsets
+    // 4. Hide bottom Reset/Dissect button during Detail view
+    const dissectBtn = document.getElementById('btn-dissect-gomikin');
+    if (dissectBtn) dissectBtn.style.display = 'none';
+
+    // 5. Reset inspection offsets
     this.targetOrbit.set(0, 0);
     this.targetPan.set(0, 0);
     this.targetZoom = 1.0;
@@ -506,10 +654,20 @@ export class ComponentDetailController {
 
     this.targetTransitionProgress = 0.0;
     this.mode = 'CATALOGUE';
+    this.autoRotate = false;
+    const autoRotateBtn = document.getElementById('btn-toggle-autorotate');
+    if (autoRotateBtn) {
+      autoRotateBtn.classList.remove('active');
+      autoRotateBtn.textContent = '🔄 Auto-Rotate: OFF';
+    }
 
     if (this.detailOverlay) {
       this.detailOverlay.classList.remove('detail-active');
     }
+
+    // Restore bottom Reset/Dissect button
+    const dissectBtn = document.getElementById('btn-dissect-gomikin');
+    if (dissectBtn) dissectBtn.style.display = 'block';
 
     // 1. Restore visibility of ALL 33 components
     for (const name of this.registry.getNames()) {
@@ -595,6 +753,11 @@ export class ComponentDetailController {
   update(deltaTime) {
     if (!this.enabled && this.transitionProgress <= 0.001) return;
 
+    // Auto-rotate inspected 3D part hands-free when enabled
+    if (this.autoRotate && this.mode === 'DETAIL' && !this.isDragging) {
+      this.targetOrbit.x += deltaTime * 0.7;
+    }
+
     // Smoothly damp transition progress
     this.transitionProgress = THREE.MathUtils.damp(
       this.transitionProgress,
@@ -670,6 +833,9 @@ export class ComponentDetailController {
     window.removeEventListener('wheel', this._onWheel);
     window.removeEventListener('keydown', this._onKeyDown);
     window.removeEventListener('keyup', this._onKeyUp);
+    window.removeEventListener('touchstart', this._onTouchStart);
+    window.removeEventListener('touchmove', this._onTouchMove);
+    window.removeEventListener('touchend', this._onTouchEnd);
     window.removeEventListener('contextmenu', this._onContextMenu);
     if (this.detailOverlay) this.detailOverlay.remove();
   }

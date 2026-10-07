@@ -159,5 +159,40 @@ Simulates the physical trajectory of waste materials interacting with active CAD
 - **Tabs:**
   - `[ 🏛️ Full Model ]` — Complete assembled appliance
   - `[ 📦 Modular Views ]` — Sub-bar to choose between the 7 functional sub-assemblies with exploded inspection
-  - `[ ⚡ 33-Part Dissection ]` — Triggers the full 7-row exploded catalogue grid
+  - `[ ⚡ 33-Part Dissection ]` — Triggers the 7-modular-cluster exploded catalogue with pod headers and canvas navigation
   - `[ 🔄 Simulate Flow ]` — Opens the bottom flow playback dock with ghosted housing
+
+---
+
+## 8. Dissection Navigation, Modular Clustering & Transition Enhancements
+
+### 1. Canvas Panning & Navigation
+- **Left-Click Drag:** Dragging on empty canvas space pans the 3D catalogue smoothly (`panGridCamera`). Clicks (<6px) on individual parts still open Detail View.
+- **Right-Click Drag & MMB:** Right-click dragging pans canvas (or orbits with `Shift`/`Alt`). Middle Mouse Button also pans.
+- **Visual Cursors:** Dynamic `grab` over canvas background, `grabbing` while dragging, and `pointer` over clickable badges and components.
+- **Touch Support:** 1-finger drag pans canvas, 2-finger pinch zooms.
+
+### 2. Modular / Category-Based Spatial Grouping
+- All 33 components are arranged into **7 distinct Modular Pods** aligned directly with `GOMIKIN_MODULES`:
+  - **Input & Intake Pod** (7 parts, Cyan `#00ffcc`)
+  - **Organic Preprocessing & Cutting Pod** (6 parts, Sky Blue `#38bdf8`)
+  - **Storage & Drainage Pod** (3 parts, Purple `#a855f7`) [Left cluster]
+  - **Cooked Food Pod** (2 parts, Amber `#f59e0b`) [Center cluster, distinct gap]
+  - **Inorganic Recyclables Pod** (3 parts, Cyan `#06b6d4`) [Right cluster, distinct gap]
+  - **Decomposition & Agitation Pod** (6 parts, Green `#22c55e`)
+  - **Chassis, Power & Air Handling Pod** (6 parts, Pink `#ec4899`)
+- **Illuminated Module Pod Header Banners:** Each pod displays an interactive header banner with icon, module name, and part count. Clicking a pod banner glides the camera directly to center on that cluster.
+- **Generous Gutter Spacing:** 1.80m vertical separation between tiers ensures zero overlap between component badges and pod banners.
+
+### 3. Efficient 3D Part Inspection & Rotation
+- **Direct Left-Click Drag Orbit:** In Component Detail View, Left-Click Drag immediately rotates the inspected 3D component in 360° (yaw and pitch) with smooth inertia (zero GPU overhead).
+- **Auto-Rotate Toggle:** An interactive button on the detail CAD control bar toggles continuous hands-free 360° product rotation (`this.targetOrbit.x += deltaTime * 0.7`).
+- **Right-Click / MMB:** Pans the component; scroll wheel zooms.
+- **Clean Layout:** The detail header sits at `top: 76px` beneath the navigation bar, and the bottom Dissect button is hidden during Detail mode.
+
+### 4. Seamless Mode Transitions
+- **Instant State Handoff:** When leaving Dissection mode, `dissectionAnimationController.reset(true, false)` is called immediately, preventing the 8.5-second rewind loop from clashing with incoming mode animations.
+- **Label Teardown:** The 33-badge overlay is instantly hidden (`display = 'none'`) during transitions.
+- **Transform Preservation:** `moduleViewController.restoreAllComponents()` cleanly restores baseline position, rotation, and scale.
+- **Camera Gliding:** Camera transitions between modes use smooth cubic easing without jarring cuts or snapping.
+

@@ -147,8 +147,15 @@ export class ModuleViewController {
       const origMat = this.originalMaterials.get(mesh);
       if (origMat) mesh.material = origMat;
 
-      const initPos = this.initialPositions.get(name);
-      if (initPos) mesh.position.copy(initPos);
+      const entry = this.registry.getEntry(name);
+      if (entry) {
+        mesh.position.copy(entry.initialPosition);
+        mesh.rotation.copy(entry.initialRotation);
+        mesh.scale.copy(entry.initialScale);
+      } else {
+        const initPos = this.initialPositions.get(name);
+        if (initPos) mesh.position.copy(initPos);
+      }
     }
   }
 

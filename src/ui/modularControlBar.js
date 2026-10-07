@@ -539,35 +539,43 @@ export function initModularControlBar({
       dissectBtn.style.display = (tab === 'full' || tab === 'dissection') ? 'block' : 'none';
     }
 
-    // Handle view transitions
+    // Handle view transitions with zero clashing loops and smooth gliding
+    const labelOverlay = document.getElementById('gomikin-catalogue-labels');
+
     if (tab === 'full') {
       subbarEl.style.display = 'none';
       cardEl.style.display = 'none';
       flowConsole.style.display = 'none';
+      if (labelOverlay) labelOverlay.style.display = 'none';
       physicalFlowController.reset();
-      moduleViewController.selectModule('all');
-      // If full dissection was exploded, reset smoothly
-      if (dissectionAnimationController && dissectionAnimationController.state() === 'EXPLODED') {
-        dissectionAnimationController.reset(false);
+      if (dissectionAnimationController) {
+        dissectionAnimationController.reset(true, false);
       }
+      moduleViewController.selectModule('all');
     } else if (tab === 'modules') {
       subbarEl.style.display = 'flex';
       flowConsole.style.display = 'none';
+      if (labelOverlay) labelOverlay.style.display = 'none';
       physicalFlowController.reset();
-      if (dissectionAnimationController && dissectionAnimationController.state() === 'EXPLODED') {
-        dissectionAnimationController.reset(false);
+      if (dissectionAnimationController) {
+        dissectionAnimationController.reset(true, false);
       }
-      if (moduleViewController.activeModuleId === 'all') {
-        moduleViewController.selectModule('input');
-      } else {
-        updateModuleCard(moduleViewController.activeModuleId);
-      }
+      const targetMod = (moduleViewController.activeModuleId && moduleViewController.activeModuleId !== 'all') 
+        ? moduleViewController.activeModuleId 
+        : 'input';
+      moduleViewController.selectModule(targetMod);
+      updateModuleCard(targetMod);
+      // Update subbar pills active state
+      document.querySelectorAll('.mod-pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mod === targetMod);
+      });
     } else if (tab === 'dissection') {
       subbarEl.style.display = 'none';
       cardEl.style.display = 'none';
       flowConsole.style.display = 'none';
       physicalFlowController.reset();
-      moduleViewController.selectModule('all');
+      moduleViewController.restoreAllComponents();
+      moduleViewController.activeModuleId = 'all';
       if (dissectionAnimationController) {
         dissectionAnimationController.play(1.0);
       }
@@ -575,8 +583,14 @@ export function initModularControlBar({
       subbarEl.style.display = 'none';
       cardEl.style.display = 'none';
       flowConsole.style.display = 'block';
-      // In flow simulation, ghost the outer housing so you can see inside!
-      moduleViewController.selectModule('all');
+      if (labelOverlay) labelOverlay.style.display = 'none';
+      if (dissectionAnimationController) {
+        dissectionAnimationController.reset(true, false);
+      }
+      moduleViewController.restoreAllComponents();
+      moduleViewController.activeModuleId = 'all';
+
+      // In flow simulation, ghost outer housing so user can see material moving through internal chambers
       const housing = moduleViewController.registry.get('Main_Housing');
       if (housing) housing.material = moduleViewController.ghostMaterial;
 

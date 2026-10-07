@@ -72,6 +72,7 @@ export class DissectionAnimationController {
     // HTML Label Overlay System
     this.labelOverlay = null;
     this.labelElements = new Map();
+    this.podHeaderElements = new Map();
     this.initLabelOverlay();
 
     // Primary UI Button
@@ -169,17 +170,84 @@ export class DissectionAnimationController {
           font-weight: 600;
           color: #ffffff;
         }
+
+        /* Modular Pod Header Banners */
+        .gomikin-pod-header {
+          position: absolute;
+          transform: translate(-50%, -50%);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(10, 15, 24, 0.94);
+          border: 1px solid rgba(0, 255, 204, 0.45);
+          border-radius: 20px;
+          padding: 5px 14px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          font-size: 11.5px;
+          font-weight: 700;
+          letter-spacing: 0.6px;
+          text-transform: uppercase;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.85);
+          backdrop-filter: blur(12px);
+          opacity: 0;
+          transition: opacity 0.25s ease-out, transform 0.2s ease, box-shadow 0.2s ease;
+          pointer-events: auto;
+          cursor: pointer;
+          user-select: none;
+          white-space: nowrap;
+          z-index: 910;
+        }
+        .gomikin-pod-header:hover {
+          transform: translate(-50%, -50%) scale(1.05);
+          box-shadow: 0 8px 26px rgba(0, 255, 204, 0.35);
+        }
+        .gomikin-pod-header .pod-icon {
+          font-size: 13px;
+        }
+        .gomikin-pod-header .pod-title {
+          font-weight: 700;
+        }
+        .gomikin-pod-header .pod-count {
+          font-size: 9px;
+          padding: 2px 7px;
+          border-radius: 10px;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+        }
       `;
       document.head.appendChild(style);
     }
 
-    // Create a label badge for each component
+    // 1. Create Module Pod Header Banners
+    if (this.choreography.modulePods) {
+      for (const pod of this.choreography.modulePods) {
+        const header = document.createElement('div');
+        header.className = 'gomikin-pod-header';
+        header.id = `pod-header-${pod.id}`;
+        header.style.borderColor = pod.color;
+        header.innerHTML = `
+          <span class="pod-icon">${pod.icon}</span>
+          <span class="pod-title" style="color: ${pod.color};">${pod.title}</span>
+          <span class="pod-count" style="background: ${pod.color}22; color: ${pod.color}; border: 1px solid ${pod.color}44;">${pod.components.length} PARTS</span>
+        `;
+        header.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.panToPod(pod);
+        });
+        container.appendChild(header);
+        this.podHeaderElements.set(pod.id, header);
+      }
+    }
+
+    // 2. Create a label badge for each component
     for (const [name, comp] of this.choreography.componentData.entries()) {
       const badge = document.createElement('div');
       badge.className = 'gomikin-catalogue-badge';
       badge.id = `badge-${name}`;
+      const color = comp.moduleColor || '#00ffcc';
+      badge.style.borderColor = `${color}55`;
       badge.innerHTML = `
-        <span class="badge-tag">${comp.categoryTag || 'PART'}</span>
+        <span class="badge-tag" style="background: ${color}20; color: ${color}; border: 1px solid ${color}40;">${comp.categoryTag || 'PART'}</span>
         <span class="badge-title">${comp.displayName}</span>
       `;
       badge.addEventListener('click', (e) => {
@@ -191,6 +259,16 @@ export class DissectionAnimationController {
       container.appendChild(badge);
       this.labelElements.set(name, badge);
     }
+  }
+
+  panToPod(pod) {
+    if (!this.detailController || !this.camera) return;
+    const targetCenter = new THREE.Vector3(pod.headerWorldPos.x, pod.headerWorldPos.y - 0.7, 0.0);
+    this.detailController.gridCameraTarget.copy(targetCenter);
+    const offset = new THREE.Vector3().subVectors(this.camera.position, this.controls.target);
+    this.camera.position.copy(targetCenter).add(offset);
+    this.camera.lookAt(targetCenter);
+    if (this.controls) this.controls.target.copy(targetCenter);
   }
 
   /**
@@ -244,6 +322,28 @@ export class DissectionAnimationController {
       const screenY = (-tempVec.y * 0.5 + 0.5) * height;
 
       badge.style.transform = `translate(-50%, 0) translate3d(${screenX.toFixed(1)}px, ${screenY.toFixed(1)}px, 0)`;
+    }
+
+    // Position module pod header banners
+    if (this.podHeaderElements && this.choreography.modulePods) {
+      for (const pod of this.choreography.modulePods) {
+        const headerEl = this.podHeaderElements.get(pod.id);
+        if (!headerEl) continue;
+
+        tempVec.copy(pod.headerWorldPos);
+        headerEl.style.opacity = baseOpacity.toFixed(3);
+
+        tempVec.project(this.camera);
+        if (tempVec.z > 1.0) {
+          headerEl.style.opacity = '0';
+          continue;
+        }
+
+        const screenX = (tempVec.x * 0.5 + 0.5) * width;
+        const screenY = (-tempVec.y * 0.5 + 0.5) * height;
+
+        headerEl.style.transform = `translate(-50%, -50%) translate3d(${screenX.toFixed(1)}px, ${screenY.toFixed(1)}px, 0)`;
+      }
     }
   }
 
@@ -347,8 +447,9 @@ export class DissectionAnimationController {
 
   /**
    * Restores all 33 components to exact initial assembled transforms.
+   * @param {boolean} [restoreCamera=true] Whether to restore camera to assembled framing
    */
-  restoreAssembly() {
+  restoreAssembly(restoreCamera = true) {
     if (this.detailController) {
       this.detailController.exitDetailView(true);
       this.detailController.setEnabled(false);
@@ -368,10 +469,15 @@ export class DissectionAnimationController {
       for (const badge of this.labelElements.values()) {
         badge.style.opacity = '0';
       }
+      if (this.podHeaderElements) {
+        for (const header of this.podHeaderElements.values()) {
+          header.style.opacity = '0';
+        }
+      }
     }
 
-    // Restore assembled camera framing
-    if (this.camera && this.controls) {
+    // Restore assembled camera framing (if requested)
+    if (restoreCamera && this.camera && this.controls) {
       this.camera.position.copy(this.cameraAssembled.position);
       this.controls.target.copy(this.cameraAssembled.target);
       this.controls.enabled = true;
@@ -411,8 +517,9 @@ export class DissectionAnimationController {
   /**
    * Resets the animation to the original ASSEMBLED state.
    * @param {boolean} [instant=false] Smooth animated reset by default, or immediate if true
+   * @param {boolean} [restoreCamera=true] Whether to force camera back to assembled view
    */
-  reset(instant = false) {
+  reset(instant = false, restoreCamera = true) {
     if (this.detailController) {
       this.detailController.exitDetailView(true);
       this.detailController.setEnabled(false);
@@ -422,7 +529,13 @@ export class DissectionAnimationController {
       this.isPlaying = false;
       this._progress = 0.0;
       this._targetProgress = 0.0;
-      this.restoreAssembly();
+      this.restoreAssembly(restoreCamera);
+      if (this.labelOverlay) {
+        this.labelOverlay.style.display = 'none';
+      }
+      if (this.controls) {
+        this.controls.enabled = true;
+      }
       this._state = ANIMATION_STATES.ASSEMBLED;
       this.updateButtonState();
       this.notifyListeners();
