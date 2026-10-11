@@ -38,7 +38,7 @@ function init() {
   // Test loading Fusion 360 USDZ model
   const usdLoader = new USDLoader();
   usdLoader.load(
-    'Gomikin/gomikin_disection.usdz',
+    'https://eqvmxwue8iejzeky.public.blob.vercel-storage.com/gomikin_disection.usdz',
     (usdModel) => {
       usdModel.name = 'Fusion360_USDZ_Model';
       scene.add(usdModel);
