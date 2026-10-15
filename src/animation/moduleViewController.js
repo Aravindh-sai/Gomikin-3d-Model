@@ -136,9 +136,13 @@ export class ModuleViewController {
   }
 
   /**
-   * Restores all components to fully visible with their original materials.
+   * Restores all components to fully visible with their original materials and assembled transforms.
    */
   restoreAllComponents() {
+    this.isModuleDissected = false;
+    this.dissectProgress = 0.0;
+    this.targetDissectProgress = 0.0;
+
     for (const name of this.registry.getNames()) {
       const mesh = this.registry.get(name);
       if (!mesh) continue;
@@ -157,6 +161,13 @@ export class ModuleViewController {
         if (initPos) mesh.position.copy(initPos);
       }
     }
+  }
+
+  /**
+   * Stops any in-progress camera interpolation immediately.
+   */
+  stopCameraAnimation() {
+    this.isCameraAnimating = false;
   }
 
   /**

@@ -7,6 +7,7 @@ import { FLOW_MODES } from '../animation/physicalFlowController.js';
  * control cards for Module Views and Physical Waste Flow Simulation.
  */
 export function initModularControlBar({
+  viewCoordinator,
   moduleViewController,
   physicalFlowController,
   dissectionAnimationController
@@ -523,15 +524,15 @@ export function initModularControlBar({
   // --- Active Nav Tab State ---
   let activeTab = 'full'; // 'full' | 'modules' | 'dissection' | 'flow'
 
-  function setTab(tab) {
+  function syncUI(tab, options = {}) {
     activeTab = tab;
 
     // Update nav tab buttons
     document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
-    if (tab === 'full') document.getElementById('tab-full-model').classList.add('active');
-    if (tab === 'modules') document.getElementById('tab-module-views').classList.add('active');
-    if (tab === 'dissection') document.getElementById('tab-dissection').classList.add('active');
-    if (tab === 'flow') document.getElementById('tab-flow-sim').classList.add('active');
+    if (tab === 'full') document.getElementById('tab-full-model')?.classList.add('active');
+    if (tab === 'modules') document.getElementById('tab-module-views')?.classList.add('active');
+    if (tab === 'dissection') document.getElementById('tab-dissection')?.classList.add('active');
+    if (tab === 'flow') document.getElementById('tab-flow-sim')?.classList.add('active');
 
     // Toggle bottom dissection button visibility based on active tab
     const dissectBtn = document.getElementById('btn-dissect-gomikin');
@@ -539,13 +540,43 @@ export function initModularControlBar({
       dissectBtn.style.display = (tab === 'full' || tab === 'dissection') ? 'block' : 'none';
     }
 
-    // Handle view transitions with zero clashing loops and smooth gliding
-    const labelOverlay = document.getElementById('gomikin-catalogue-labels');
-
     if (tab === 'full') {
       subbarEl.style.display = 'none';
       cardEl.style.display = 'none';
       flowConsole.style.display = 'none';
+    } else if (tab === 'modules') {
+      subbarEl.style.display = 'flex';
+      flowConsole.style.display = 'none';
+      const targetMod = options.moduleId ||
+        (moduleViewController.activeModuleId && moduleViewController.activeModuleId !== 'all'
+          ? moduleViewController.activeModuleId
+          : 'input');
+      updateModuleCard(targetMod);
+      subbarEl.querySelectorAll('.mod-pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mod === targetMod);
+      });
+    } else if (tab === 'dissection') {
+      subbarEl.style.display = 'none';
+      cardEl.style.display = 'none';
+      flowConsole.style.display = 'none';
+    } else if (tab === 'flow') {
+      subbarEl.style.display = 'none';
+      cardEl.style.display = 'none';
+      flowConsole.style.display = 'block';
+    }
+  }
+
+  function setTab(tab, options = {}) {
+    if (viewCoordinator) {
+      viewCoordinator.switchView(tab, options);
+      return;
+    }
+
+    // Fallback if viewCoordinator is not passed
+    syncUI(tab, options);
+    const labelOverlay = document.getElementById('gomikin-catalogue-labels');
+
+    if (tab === 'full') {
       if (labelOverlay) labelOverlay.style.display = 'none';
       physicalFlowController.reset();
       if (dissectionAnimationController) {
@@ -553,26 +584,18 @@ export function initModularControlBar({
       }
       moduleViewController.selectModule('all');
     } else if (tab === 'modules') {
-      subbarEl.style.display = 'flex';
-      flowConsole.style.display = 'none';
       if (labelOverlay) labelOverlay.style.display = 'none';
       physicalFlowController.reset();
       if (dissectionAnimationController) {
         dissectionAnimationController.reset(true, false);
       }
-      const targetMod = (moduleViewController.activeModuleId && moduleViewController.activeModuleId !== 'all') 
-        ? moduleViewController.activeModuleId 
-        : 'input';
+      const targetMod = options.moduleId ||
+        (moduleViewController.activeModuleId && moduleViewController.activeModuleId !== 'all'
+          ? moduleViewController.activeModuleId
+          : 'input');
       moduleViewController.selectModule(targetMod);
       updateModuleCard(targetMod);
-      // Update subbar pills active state
-      document.querySelectorAll('.mod-pill-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.mod === targetMod);
-      });
     } else if (tab === 'dissection') {
-      subbarEl.style.display = 'none';
-      cardEl.style.display = 'none';
-      flowConsole.style.display = 'none';
       physicalFlowController.reset();
       moduleViewController.restoreAllComponents();
       moduleViewController.activeModuleId = 'all';
@@ -580,9 +603,6 @@ export function initModularControlBar({
         dissectionAnimationController.play(1.0);
       }
     } else if (tab === 'flow') {
-      subbarEl.style.display = 'none';
-      cardEl.style.display = 'none';
-      flowConsole.style.display = 'block';
       if (labelOverlay) labelOverlay.style.display = 'none';
       if (dissectionAnimationController) {
         dissectionAnimationController.reset(true, false);
@@ -590,7 +610,6 @@ export function initModularControlBar({
       moduleViewController.restoreAllComponents();
       moduleViewController.activeModuleId = 'all';
 
-      // In flow simulation, ghost outer housing so user can see material moving through internal chambers
       const housing = moduleViewController.registry.get('Main_Housing');
       if (housing) housing.material = moduleViewController.ghostMaterial;
 
@@ -601,6 +620,12 @@ export function initModularControlBar({
 
       physicalFlowController.play();
     }
+  }
+
+  if (viewCoordinator) {
+    viewCoordinator.subscribe(({ activeView, options }) => {
+      syncUI(activeView, options);
+    });
   }
 
   function updateModuleCard(moduleId) {
@@ -648,8 +673,16 @@ export function initModularControlBar({
       subbarEl.querySelectorAll('.mod-pill-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      moduleViewController.selectModule(modId);
-      updateModuleCard(modId);
+      if (viewCoordinator) {
+        if (modId === 'all') {
+          viewCoordinator.switchView('full');
+        } else {
+          viewCoordinator.switchView('modules', { moduleId: modId });
+        }
+      } else {
+        moduleViewController.selectModule(modId);
+        updateModuleCard(modId);
+      }
     });
   });
 

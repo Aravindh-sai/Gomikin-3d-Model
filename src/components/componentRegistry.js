@@ -256,6 +256,21 @@ export class ComponentRegistry {
   }
 
   /**
+   * Authoritatively restores all components to their initial position,
+   * rotation, scale, and visible = true state from the original CAD assembly.
+   */
+  restoreBaselineTransforms() {
+    for (const entry of this.entries.values()) {
+      if (entry && entry.mesh) {
+        entry.mesh.visible = true;
+        entry.mesh.position.copy(entry.initialPosition);
+        entry.mesh.rotation.copy(entry.initialRotation);
+        entry.mesh.scale.copy(entry.initialScale);
+      }
+    }
+  }
+
+  /**
    * Executes the debug reporting utility and logs a complete report to the console.
    * @param {boolean} [logToConsole=true]
    * @returns {Object} Structured report summary

@@ -87,12 +87,37 @@ export class PhysicalFlowController {
     ];
 
     for (const name of mechanicalNames) {
+      const entry = this.registry.getEntry(name);
+      if (entry) {
+        this.cachedTransforms.set(name, {
+          pos: entry.initialPosition.clone(),
+          rot: entry.initialRotation.clone(),
+          scale: entry.initialScale.clone()
+        });
+      } else {
+        const mesh = this.registry.get(name);
+        if (mesh) {
+          this.cachedTransforms.set(name, {
+            pos: mesh.position.clone(),
+            rot: mesh.rotation.clone(),
+            scale: mesh.scale.clone()
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * Authoritatively restores all mechanical parts controlled by flow simulation
+   * to their exact baseline assembled transforms.
+   */
+  resetMechanicalPoses() {
+    for (const [name, baseline] of this.cachedTransforms.entries()) {
       const mesh = this.registry.get(name);
       if (mesh) {
-        this.cachedTransforms.set(name, {
-          pos: mesh.position.clone(),
-          rot: mesh.rotation.clone()
-        });
+        mesh.position.copy(baseline.pos);
+        mesh.rotation.copy(baseline.rot);
+        mesh.scale.copy(baseline.scale);
       }
     }
   }
@@ -244,14 +269,8 @@ export class PhysicalFlowController {
     this.scanBeam.visible = false;
     this.leachateDrops.visible = false;
 
-    // Restore mechanical parts to original rest transforms
-    for (const [name, baseline] of this.cachedTransforms.entries()) {
-      const mesh = this.registry.get(name);
-      if (mesh) {
-        mesh.position.copy(baseline.pos);
-        mesh.rotation.copy(baseline.rot);
-      }
-    }
+    // Restore mechanical parts to exact baseline transforms
+    this.resetMechanicalPoses();
 
     this.notifyListeners();
   }
@@ -271,22 +290,13 @@ export class PhysicalFlowController {
   }
 
   updateOrganicFlow(p) {
+    // 1. Authoritatively reset all mechanical poses before applying progress-specific pose
+    this.resetMechanicalPoses();
+
     this.mainParticle.visible = true;
     this.scanBeam.visible = false;
     this.fragmentsGroup.visible = false;
     this.leachateDrops.visible = false;
-
-    const blades = this.registry.get('cutting_blades');
-    const rotBase = this.registry.get('rotating_base');
-    const doorL = this.registry.get('door_mechanism_left');
-    const doorR = this.registry.get('door_mechanism_right');
-    const agitator = this.registry.get('agitator');
-
-    // Reset baseline transforms
-    if (rotBase) rotBase.rotation.set(0, 0, 0);
-    if (doorL) doorL.rotation.set(0, 0, 0);
-    if (doorR) doorR.rotation.set(0, 0, 0);
-    if (agitator) agitator.rotation.set(0, 0, 0);
 
     // Step 1: Deposit down funnel [0.00 - 0.12]
     if (p <= 0.12) {
@@ -305,7 +315,11 @@ export class PhysicalFlowController {
     else if (p <= 0.35) {
       const u = (p - 0.22) / 0.13;
       const tilt = THREE.MathUtils.degToRad(30 * u);
-      if (rotBase) rotBase.rotation.z = tilt;
+      const rotBase = this.registry.get('rotating_base');
+      const baseRot = this.cachedTransforms.get('rotating_base')?.rot;
+      if (rotBase && baseRot) {
+        rotBase.rotation.set(baseRot.x, baseRot.y, baseRot.z + tilt);
+      }
 
       // Particle slides down tilted base towards cutting entrance
       this.mainParticle.position.set(
@@ -317,8 +331,11 @@ export class PhysicalFlowController {
     // Step 4: Cutting blades shredding [0.35 - 0.48]
     else if (p <= 0.48) {
       const u = (p - 0.35) / 0.13;
-      // High-speed blade rotation around local vertical shaft (local Z axis)!
-      if (blades) blades.rotation.z = u * Math.PI * 18;
+      const blades = this.registry.get('cutting_blades');
+      const baseRot = this.cachedTransforms.get('cutting_blades')?.rot;
+      if (blades && baseRot) {
+        blades.rotation.set(baseRot.x, baseRot.y, baseRot.z + u * Math.PI * 18);
+      }
 
       this.mainParticle.position.set(-0.12, THREE.MathUtils.lerp(0.885, 0.855, u), 0);
       // Particle shrinks as it gets shredded
@@ -355,8 +372,12 @@ export class PhysicalFlowController {
     else if (p <= 0.86) {
       const u = (p - 0.72) / 0.14;
       const doorAngle = Math.sin(u * Math.PI) * THREE.MathUtils.degToRad(45);
-      if (doorL) doorL.rotation.y = -doorAngle;
-      if (doorR) doorR.rotation.y = doorAngle;
+      const doorL = this.registry.get('door_mechanism_left');
+      const doorR = this.registry.get('door_mechanism_right');
+      const baseL = this.cachedTransforms.get('door_mechanism_left')?.rot;
+      const baseR = this.cachedTransforms.get('door_mechanism_right')?.rot;
+      if (doorL && baseL) doorL.rotation.set(baseL.x, baseL.y - doorAngle, baseL.z);
+      if (doorR && baseR) doorR.rotation.set(baseR.x, baseR.y + doorAngle, baseR.z);
 
       this.mainParticle.visible = false;
       this.fragmentsGroup.visible = true;
@@ -365,7 +386,11 @@ export class PhysicalFlowController {
     // Step 8: Thermophilic Agitator Mixing [0.86 - 1.00]
     else {
       const u = (p - 0.86) / 0.14;
-      if (agitator) agitator.rotation.z = u * Math.PI * 12;
+      const agitator = this.registry.get('agitator');
+      const baseRot = this.cachedTransforms.get('agitator')?.rot;
+      if (agitator && baseRot) {
+        agitator.rotation.set(baseRot.x, baseRot.y, baseRot.z + u * Math.PI * 12);
+      }
 
       this.mainParticle.visible = false;
       this.fragmentsGroup.visible = true;
@@ -378,13 +403,13 @@ export class PhysicalFlowController {
   }
 
   updateInorganicFlow(p) {
+    // 1. Authoritatively reset all mechanical poses before applying progress-specific pose
+    this.resetMechanicalPoses();
+
     this.mainParticle.visible = true;
     this.scanBeam.visible = false;
     this.fragmentsGroup.visible = false;
     this.leachateDrops.visible = false;
-
-    const rotBase = this.registry.get('rotating_base');
-    if (rotBase) rotBase.rotation.set(0, 0, 0);
 
     // 1. Enter Funnel [0.0 - 0.20]
     if (p <= 0.20) {
@@ -399,9 +424,14 @@ export class PhysicalFlowController {
     // 3. Platform routes to Inorganic quadrant (+X, +Z) [0.35 - 0.50]
     else if (p <= 0.50) {
       const u = (p - 0.35) / 0.15;
-      if (rotBase) {
-        rotBase.rotation.x = THREE.MathUtils.degToRad(25 * u);
-        rotBase.rotation.z = THREE.MathUtils.degToRad(-25 * u);
+      const rotBase = this.registry.get('rotating_base');
+      const baseRot = this.cachedTransforms.get('rotating_base')?.rot;
+      if (rotBase && baseRot) {
+        rotBase.rotation.set(
+          baseRot.x + THREE.MathUtils.degToRad(25 * u),
+          baseRot.y,
+          baseRot.z + THREE.MathUtils.degToRad(-25 * u)
+        );
       }
       this.mainParticle.position.set(
         THREE.MathUtils.lerp(0, 0.12, u),
@@ -425,24 +455,31 @@ export class PhysicalFlowController {
   }
 
   updateLeftoverFoodFlow(p) {
+    // 1. Authoritatively reset all mechanical poses before applying progress-specific pose
+    this.resetMechanicalPoses();
+
     this.mainParticle.visible = true;
     this.scanBeam.visible = false;
     this.fragmentsGroup.visible = false;
     this.leachateDrops.visible = false;
 
     const door = this.registry.get('leftover_food_closur');
-    if (door) door.rotation.set(0, 0, 0);
+    const baseRot = this.cachedTransforms.get('leftover_food_closur')?.rot;
 
     // 1. Intake door opens outward 55° [0.0 - 0.25]
     if (p <= 0.25) {
       const u = p / 0.25;
-      if (door) door.rotation.x = THREE.MathUtils.degToRad(-55 * u);
+      if (door && baseRot) {
+        door.rotation.set(baseRot.x + THREE.MathUtils.degToRad(-55 * u), baseRot.y, baseRot.z);
+      }
       this.mainParticle.position.set(0.12, 0.95, -0.22);
     }
     // 2. Food slides down ramp into 90° food quadrant (+X, -Z) [0.25 - 0.55]
     else if (p <= 0.55) {
       const u = (p - 0.25) / 0.30;
-      if (door) door.rotation.x = THREE.MathUtils.degToRad(-55);
+      if (door && baseRot) {
+        door.rotation.set(baseRot.x + THREE.MathUtils.degToRad(-55), baseRot.y, baseRot.z);
+      }
       this.mainParticle.position.set(
         0.12,
         THREE.MathUtils.lerp(0.95, 0.26, u),
@@ -452,11 +489,14 @@ export class PhysicalFlowController {
     // 3. Intake door closes flush [0.55 - 0.75]
     else if (p <= 0.75) {
       const u = (p - 0.55) / 0.20;
-      if (door) door.rotation.x = THREE.MathUtils.degToRad(-55 * (1 - u));
+      if (door && baseRot) {
+        door.rotation.set(baseRot.x + THREE.MathUtils.degToRad(-55 * (1 - u)), baseRot.y, baseRot.z);
+      }
       this.mainParticle.position.set(0.12, 0.26, -0.12);
     }
     // 4. Moisture separates and trickles to bottom leachate tray [0.75 - 1.00]
     else {
+      // door is back at baseline pose
       const u = (p - 0.75) / 0.25;
       this.mainParticle.position.set(0.12, 0.26, -0.12);
       this.leachateDrops.visible = true;

@@ -324,7 +324,7 @@ export class ComponentDetailController {
       document.body.style.cursor = 'grab';
     } else {
       if (this.mode === 'DETAIL') {
-        this.exitDetailView(true);
+        this.exitDetailView(true, true);
       }
       if (this.controls) this.controls.enabled = true;
       document.body.style.cursor = 'default';
@@ -656,11 +656,12 @@ export class ComponentDetailController {
   }
 
   /**
-   * Exits Detail Mode and smoothly restores the full 33-component Catalogue Grid.
+   * Exits Detail Mode and smoothly restores the full 33-component Catalogue Grid (or assembled baseline).
    * @param {boolean} [immediate=false]
+   * @param {boolean} [restoreToBaseline=false]
    */
-  exitDetailView(immediate = false) {
-    if (this.mode === 'CATALOGUE' && this.targetTransitionProgress === 0.0) return;
+  exitDetailView(immediate = false, restoreToBaseline = false) {
+    if (this.mode === 'CATALOGUE' && this.targetTransitionProgress === 0.0 && !this.selectedName) return;
 
     this.targetTransitionProgress = 0.0;
     this.mode = 'CATALOGUE';
@@ -687,9 +688,9 @@ export class ComponentDetailController {
       }
     }
 
-    // 2. Restore catalogue labels
+    // 2. Restore catalogue labels only if not resetting to assembled baseline
     const labelOverlay = document.getElementById('gomikin-catalogue-labels');
-    if (labelOverlay) {
+    if (labelOverlay && !restoreToBaseline) {
       labelOverlay.style.display = 'block';
     }
 
@@ -703,9 +704,18 @@ export class ComponentDetailController {
       this.detailZoom = 1.0;
 
       if (this.selectedName) {
-        const comp = this.choreography.componentData.get(this.selectedName);
-        if (comp && comp.mesh) {
-          this._applyCatalogueTransform(comp);
+        if (restoreToBaseline) {
+          const entry = this.registry.getEntry(this.selectedName);
+          if (entry && entry.mesh) {
+            entry.mesh.position.copy(entry.initialPosition);
+            entry.mesh.rotation.copy(entry.initialRotation);
+            entry.mesh.scale.copy(entry.initialScale);
+          }
+        } else {
+          const comp = this.choreography.componentData.get(this.selectedName);
+          if (comp && comp.mesh) {
+            this._applyCatalogueTransform(comp);
+          }
         }
       }
       this.selectedName = null;

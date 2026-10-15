@@ -1,7 +1,7 @@
 # Gomikin 3D Project Context
 
-> **Last Updated:** 2026-10-06  
-> **Status:** Active Development — Modular Dissection Views & Physical Waste Flow Simulation Implemented  
+> **Last Updated:** 2026-10-14  
+> **Status:** Active Development — Phase 1: Animation State & View Transition Reliability Complete  
 > **Rule Compliance:** Updated after every change to track project context, architecture, and ongoing evolution.
 
 ---
@@ -75,6 +75,7 @@ src/
 │   ├── envelope.js                  # Complete procedural Three.js reconstruction (5300+ LOC)
 │   └── housing.js                   # Legacy procedural housing group
 ├── animation/
+│   ├── viewTransitionCoordinator.js # Authoritative central coordinator for view transitions & camera
 │   ├── moduleViewController.js      # Functional module isolation, ghosting, sub-assembly explosion
 │   ├── physicalFlowController.js    # 3D waste object motion paths, particle fragmentation & kinematics
 │   ├── dissectionAnimationSystem.js # Master state machine for 3-phase full dissection & catalogue
@@ -207,4 +208,88 @@ Simulates the physical trajectory of waste materials interacting with active CAD
 - **Transform Preservation:** `moduleViewController.restoreAllComponents()` cleanly restores baseline position, rotation, and scale.
 - **Camera Gliding:** Camera transitions between modes use smooth cubic easing without jarring cuts or snapping.
 
+---
+
+## 9. Phase 1: Animation State & View Transition Reliability Architecture
+
+Implemented in October 2026 to ensure the Gomikin visual pitch demonstration tool never enters a corrupted, inconsistent, or partially animated state regardless of operator view switching or flow scrubbing.
+
+### 1. ViewTransitionCoordinator (`src/animation/viewTransitionCoordinator.js`)
+- **Authoritative High-Level View Ownership:** Controls transitions between `FULL` (`'full'`), `MODULES` (`'modules'`), `DISSECTION` (`'dissection'`), and `FLOW` (`'flow'`).
+- **Universal Baseline Restoration:** Before entering any new view, `componentRegistry.restoreBaselineTransforms()` and `moduleViewController.restoreAllComponents()` strictly return all 33 components to their exact CAD assembled positions, rotations, scales, visibilities (`true`), and original materials.
+- **Unified Camera Glide Engine:** Centralizes camera interpolation across all view switches using cubic ease-out (`1 - (1 - t)^3`). Supersedes in-progress transitions cleanly, preventing competing camera updates and eliminating target drift.
+- **Active Controller Gating:** The render loop in `src/main.js` dispatches frame updates (`update(deltaTime)`) solely to the controller owning the active view. Inactive view controllers are prevented from modifying transforms or camera state in the background.
+
+### 2. Deterministic Flow Kinematics (`src/animation/physicalFlowController.js`)
+- **Pure Function of Progress:** Mechanical poses for moving components (`rotating_base`, `cutting_blades`, `door_mechanism_left`, `door_mechanism_right`, `agitator`, `leftover_food_closur`) are evaluated purely from normalized timeline progress $p \in [0.0, 1.0]$ and CAD baseline transforms.
+- **Instant Pose Resets:** Every frame begins by executing `resetMechanicalPoses()` before applying mode-specific rotations.
+- **Bidirectional Scrubbing & Mode Isolation:** Scrubbing backward or jumping across time steps produces the exact pose for that progress point. Switching between Organic, Inorganic, and Leftover Food modes completely eliminates transform leakage from prior modes.
+
+### 3. CAD Assembly Loading Experience (`src/main.js`)
+- **Live Glassmorphism Loading HUD:** Displays real-time download progress (percentage bar and badge) during USDZ network retrieval.
+- **Network Resilience:** Gracefully catches network failures and provides visible error messaging with a one-click "Retry Load" action.
+
+### 4. Headless Playwright Verification (`scratch/verify_phase1_interruption.cjs`)
+Automated regression suite verified against Edge/Chromium channels:
+- **Test A (Rapid View Switching):** Dissection halfway → Modules → Cutting pill → Flow → Full Model. Result: 100% baseline match across all 33 components, camera posDiff = 0.000.
+- **Test B (Flow Interruption):** Organic mid-cut (blades spinning at 30.4 rad) → Inorganic → scrub backward → Leftover Food → reset → Full Model. Result: zero rotation leakage, pristine baseline restored.
+- **Test C (Scrubbing Determinism):** Poses evaluated at $p = 70\%$ match identically when reached forward vs scrubbed backward from $20\%$.
+- **Test D (Camera Interruptions):** Rapid multi-target camera changes converge strictly to destination coordinates with zero drift.
+- **Test E (Repeated Reset Cycles):** 4 back-to-back full-playback cycles across all 3 waste flows yield zero cumulative transform drift.
+- **Test F (Loading State):** Verified presence of loading HUD and clean transition into interactive view once USDZ is indexed.
+
+---
+
+## 10. Phase 1.1: Post-Implementation Verification Audit & Results
+
+Completed on 2026-10-14 before starting mechanical refinement.
+
+### 1. Verification Suites Executed
+- **Suite 1: `scratch/verify_phase1_1.cjs`:**
+  - **Scenario 1 (Module View → Dissection → Flow → Full Model):** PASSED. Zero transform drift across all 33 components, controls enabled, camera posDiff = 0.000.
+  - **Scenario 2 (Dissection → Component Detail → Flow → Full Model):** PASSED. Isolated component inspection mode cleanly dismantled, Detail UI overlay hidden, all 33 parts restored to visible, housing ghosted in Flow, housing material restored to original in Full Model.
+  - **Scenario 3 (Organic 42% → Inorganic → Leftover Food → Reset):** PASSED. Mid-action blades rotation (30.45 rad), platform tilt (0.15 rad), and door swing (-0.77 rad) reset cleanly with zero transform leakage.
+  - **Scenario 4 (Active Flow Playback → Tab Switch → Return to Flow):** PASSED. Flow controller cleanly paused on yield, particles hidden, playback resumed upon return without state corruption.
+  - **Scenario 5 (Rapid Interrupted Camera Glides):** PASSED. 6 rapid back-to-back tab clicks while camera glides were active converged smoothly to Full Model framing without oscillation.
+  - **Scenario 6 (3 Multi-Mode Reset & Replay Cycles):** PASSED. 3 full cycles across Dissection, Module Explosion, and Flow Simulation verified with zero transform degradation.
+- **Suite 2: `scratch/verify_loading_failure.cjs`:**
+  - Network abort on USDZ download displayed the glassmorphism error card (`Load Error`, Retry button).
+  - Navigation dock and simulation controls were inhibited while model was unavailable.
+  - Clicking "Retry Load" resumed download, loaded USDZ, initialized coordinator, mounted controls, and dismissed loading overlay.
+
+### 2. Defect Identified & Fixed
+- **Favicon 404 Console Error:** Missing `<link rel="icon">` in `index.html` triggered an implicit `/favicon.ico` 404 error from Vite dev server. Fixed by adding an inline SVG favicon tag with the 🏛️ icon to `index.html`. Browser console errors dropped from 1 to 0.
+
+### 3. Exit Decision: PASS
+Phase 1 (Animation State & View Transition Reliability) is verified correct, complete, and fully safe for live founder-led startup pitches.
+## 11. Phase 2.0: Mechanical Relationship Audit & Leftover-Food Subsystem Clarification
+
+Completed in October 2026. Comprehensive read-only audit of CAD bounding volumes, component hierarchies, kinematic pivot offsets, chamber clearances, and verified design intent.
+
+### 1. Root Kinematic Defect: Fusion 360 Baked Coordinate Offsets
+In the Fusion 360 USDZ export, all 33 component meshes share a local origin at $(0, 0, 0)$ with vertex geometry baked at global physical coordinates. Applying direct `.rotation` to these mesh nodes causes components to swing around global $(0, 0, 0)$ rather than their true physical pivot axes:
+- **`cutting_blades` (Hub at $[-0.1200, 0.8601, -0.0022]\text{ m}$):** Direct rotation causes a $120\text{ mm}$ orbital arc, displacing the blade hub by **$169.7\text{ mm}$** out of its cutting collar at $90^\circ$.
+- **`agitator` (Hub at $[-0.1192, 0.1461, -0.0304]\text{ m}$):** Direct rotation causes an orbital translation of **$173.9\text{ mm}$** through the chamber walls at $90^\circ$.
+- **`door_mechanism_left` & `door_mechanism_right` (Hinges at $Z = 0, Y \approx 0.650\text{ m}$):** Direct rotation around local $Y$ flings doors outward into space by **$507.0\text{ mm}$** and **$505.6\text{ mm}$**.
+- **`rotating_base` (Center at $[0, 0.945, 0]\text{ m}$):** Direct rotation around local $X$ causes a **$407.1\text{ mm}$** lateral translation instead of tilting on its mounting gimbal.
+- **`leftover_food_closur`:** Direct rotation causes an **$863.1\text{ mm}$** displacement behind the machine.
+
+*Remediation Path (Phase 2.1):* Introduce an animation pivot wrapper or parent pivot anchor transform to rotate meshes around their physical centroids and hinge lines.
+
+### 2. Physical Interferences & Sensor Clearances
+- **Decomposition Vessel Floor:** `agitator` sweep envelope ($Y \in [0.121, 0.171]\text{ m}$) physically intersects floor telemetry sensors protruding into the vessel: `load_cell` ($1.5\text{ mm}$ protrusion), `temperature_sensor` ($5.7\text{ mm}$ protrusion), and `moisture_sensor` ($4.3\text{ mm}$ protrusion).
+
+### 3. Leftover-Food Subsystem Audit & Confirmed Design Intent
+- **Confirmed Design Intent:**
+  - Leftover-food intake uses a side-mounted, bottom-hinged access door opening outward and downward away from the machine.
+  - Existing component `leftover_food_closur` is a fixed horizontal top cap at $Y \in [0.925, 0.928]\text{ m}$ ($246 \times 3 \times 246\text{ mm}$) sealing the quadrant ceiling and must remain static.
+  - Do not repurpose the top cap as the side door.
+- **Existing vs Missing CAD Geometry:**
+  - The side access door panel, housing cutout aperture, hinge pins, and mounting brackets do **NOT exist** in the 33-part Fusion 360 USDZ asset.
+  - Component `Main_Housing` is an unbroken cylindrical shell ($OD = 500\text{ mm}$, $Y \in [0.100, 0.925]\text{ m}$) with no side aperture.
+- **Procedural Reference Implementation Found:**
+  - `src/components/envelope.js` contains a complete reference implementation (`LeftoverFoodAccessDoor`, `LeftoverFoodDoorHinge_Central`, `LeftoverFoodDoorHinge_Radial`, `LeftoverFoodDoor_Pivot`) utilizing a straight horizontal chord hinge line at $Y = 700\text{ mm}$ and a $100\text{ mm}$ tall curved door panel ($Y = 700\text{--}800\text{ mm}$).
+- **Clearance Verification:**
+  - Door aperture at $Y = 700\text{--}800\text{ mm}$ maintains $+125\text{ mm}$ vertical clearance below static top cap `leftover_food_closur` ($Y = 925\text{ mm}$) and $+316\text{ mm}$ vertical clearance above drawer `leftover_food_outpu_section` ($Y = 384\text{ mm}$).
+  - Bottom-hinged outward/downward opening creates an ergonomic chute for cooked food while maintaining clearance from internal dividers and chassis.
 

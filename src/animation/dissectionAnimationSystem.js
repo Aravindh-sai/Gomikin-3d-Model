@@ -848,6 +848,16 @@ export function createPrimaryDissectButton(controller) {
 
   btn.addEventListener('click', () => {
     const currentState = controller.state();
+    if (window.viewCoordinator) {
+      if (currentState === ANIMATION_STATES.ASSEMBLED) {
+        window.viewCoordinator.switchView('dissection');
+        return;
+      } else if (currentState === ANIMATION_STATES.EXPLODED) {
+        window.viewCoordinator.switchView('full');
+        return;
+      }
+    }
+
     if (currentState === ANIMATION_STATES.ASSEMBLED) {
       controller.play(1.0);
     } else if (currentState === ANIMATION_STATES.EXPLODED) {
