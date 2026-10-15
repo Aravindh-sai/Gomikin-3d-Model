@@ -1,7 +1,7 @@
 # Gomikin 3D Project Context
 
-> **Last Updated:** 2026-10-14  
-> **Status:** Active Development — Phase 1: Animation State & View Transition Reliability Complete  
+> **Last Updated:** 2026-10-15  
+> **Status:** Active Development — Phase 1 Complete, Gravitas Engineering Skill Configured  
 > **Rule Compliance:** Updated after every change to track project context, architecture, and ongoing evolution.
 
 ---
@@ -28,6 +28,7 @@ The prototype implements **Alternative Embodiment B** (a practical, cost-effecti
 - **3D Graphics Engine:** [Three.js](https://threejs.org/) (`^0.186.0`) with `USDLoader` and `OrbitControls`.
 - **Bundler / Dev Server:** [Vite](https://vitejs.dev/) (`^8.3.0`).
 - **Testing & Headless Verification:** [Playwright](https://playwright.dev/) (`^1.63.0`) using local Chromium/Edge channels for visual UI and transform regression passes in `scratch/`.
+- **Engineering Reliability Runtime:** [Gravitas](https://github.com/udaysharmadev/Gravitas) agent skill configured in `.agents/skills/gravitas/` for scoped reconnaissance, evidence-backed verification, and failure recovery.
 
 ---
 
@@ -292,4 +293,68 @@ In the Fusion 360 USDZ export, all 33 component meshes share a local origin at $
 - **Clearance Verification:**
   - Door aperture at $Y = 700\text{--}800\text{ mm}$ maintains $+125\text{ mm}$ vertical clearance below static top cap `leftover_food_closur` ($Y = 925\text{ mm}$) and $+316\text{ mm}$ vertical clearance above drawer `leftover_food_outpu_section` ($Y = 384\text{ mm}$).
   - Bottom-hinged outward/downward opening creates an ergonomic chute for cooked food while maintaining clearance from internal dividers and chassis.
+
+---
+
+## 12. Developer Tooling & Agent Skills
+
+### Gravitas Skill Integration
+- **Source:** [`udaysharmadev/Gravitas`](https://github.com/udaysharmadev/Gravitas)
+- **Installation Path:** [`.agents/skills/gravitas/`](file:///c:/Projects/Gomikin-3d-Model/.agents/skills/gravitas/)
+- **Configuration Command:** `npx skills add udaysharmadev/Gravitas --skill gravitas --agent antigravity --yes`
+- **Capabilities & Workflow:** Model-agnostic reliability runtime enforcing scoped reconnaissance, adaptive planning, evidence-backed verification, requirement tracking, failure recovery, and budget-aware delegation during engineering changes.
+
+---
+
+## 13. Resilient CAD Model Loading, Vercel Streaming & Offline Caching Architecture
+
+Implemented in October 2026 to support high-performance local testing alongside low-latency, disruption-tolerant Vercel cloud deployment for the 268.6 MB (`268,571,020 bytes`) Fusion 360 USDZ model.
+
+### 1. Dual-Source Strategy & Seamless Silent Fallback (`src/utils/resilientModelLoader.js`)
+- **Primary Source:** Local archive path `/Gomikin/gomikin_disection.usdz` (relative to web root in `public/`).
+- **Cloud Fallback Source:** Vercel Blob URL `https://eqvmxwue8iejzeky.public.blob.vercel-storage.com/gomikin_disection.usdz`.
+- **Silent Pre-flight Probing:**
+  - Probes local candidate with a lightweight range/HEAD check (`Range: bytes=0-0`, 6s timeout).
+  - Explicitly filters out false HTTP 200 responses caused by Vite / Vercel SPA 404 rewriting (`Content-Type: text/html` or payload `< 50 MB`).
+  - If local asset is absent (typical in Vercel Git deployments where 268 MB binary files exceed repository limits), loader **automatically and silently switches to Vercel Cloud Storage without raising any error box to the user**.
+- **Source Overrides:** Supports developer URL query parameters:
+  - `?source=local` — Forces local archive.
+  - `?source=vercel` / `?source=remote` — Forces Vercel Blob cloud stream.
+  - `?nocache=1` — Bypasses browser IndexedDB cache to force clean network download.
+
+### 2. Disruption-Tolerant Resumable Chunked Range Download Engine
+- **Chunked HTTP Range Streaming:** Downloads the 268 MB archive in discrete 16 MB chunks (`16,777,216 bytes`, 17 chunks total).
+- **Interruption Recovery & Exponential Backoff:**
+  - Each chunk is protected by a 35-second stall detection controller.
+  - If a network drop, timeout, or packet loss occurs midway (e.g. at Chunk 9 / 144 MB), previously downloaded chunks are preserved in memory.
+  - Automatically retries the failed chunk with exponential backoff (`min(1000 * 2^attempt, 6000) + jitter`) up to 5 attempts.
+  - Telemetry informs the user: `"Connection interrupted. Resuming at 144.0 MB (Attempt 1/5)..."`.
+  - Seamlessly resumes byte-exact transfer from where it was interrupted rather than discarding progress and restarting from 0 MB.
+
+### 3. Persistent Client-Side Caching (IndexedDB Blob Storage)
+- **Database:** `GomikinModelCache` (Store: `models`, Key: `gomikin_disection_usdz_v1`).
+- **Disk-Backed Blob Serialization:** Stores the complete 268 MB archive as a native `Blob` directly in browser IndexedDB, avoiding large V8 heap duplications.
+- **Sub-Second Instant Reload:** Subsequent visits or browser page refreshes load directly from local IndexedDB cache in <1 second (verified ~880 ms), eliminating network bandwidth and eliminating cloud storage transfer costs.
+
+### 4. Glassmorphism HUD Telemetry & Parsing Transition (`src/main.js`)
+- **Source Pill Badge:** Visually indicates active source with illuminated glassmorphism badges:
+  - `📁 Local CAD Archive` (`#00ffcc`)
+  - `☁️ Vercel Cloud Storage` (`#38bdf8`)
+  - `⚡ Instant Browser Cache` (`#a855f7`)
+- **Live Diagnostics:** Displays real-time download progress (`144.0 MB / 268.6 MB (54%)`), rolling transfer speed (`14.2 MB/s`), and calculated ETA (`ETA: 8s`).
+- **Decompression Shimmer:** Upon download completion, updates status to `"Decompressing USDZ archive & assembling 3D CAD meshes..."` with an animated pulsing shimmer bar while Three.js `USDLoader.parse()` extracts the 33 CAD meshes.
+- **Graceful Failure UI:** If all network retries fail, displays `#loading-error-box` with explicit `"Retry Load"` and `"Force Cloud"` recovery buttons.
+
+### 5. Automated Verification Suites (`scratch/`)
+- `scratch/verify_resilient_loader.cjs`:
+  - **Test 1 (Local 404 Fallback):** PASSED. Local `/Gomikin/...` intercepted with 404 HTML; zero error boxes raised; automatically streamed all 17 chunks from Vercel Cloud Storage in 22.3s (~12.8 MB/s); all 33 CAD meshes indexed.
+  - **Test 2 (IndexedDB Cache Hit):** PASSED. Second page load served instantly from IndexedDB cache with 0 network requests.
+  - **Test 3 (CAD Component Completeness):** PASSED. All 33 expected Fusion 360 meshes verified active in `ComponentRegistry`.
+- `scratch/test_interruption_recovery.cjs`:
+  - **Interruption Simulation:** PASSED. Intentionally aborted Chunk 3 (`bytes=67108864-100663295`); loader caught `Failed to fetch`, backed off, retried Chunk 3 without losing Chunks 1-2, and assembled all 268,571,020 bytes.
+- `scratch/verify_loading_failure.cjs`:
+  - **Exhaustive Outage & Retry Recovery:** PASSED. Outage triggers HUD error state without mounting scene controls; clicking Retry cleanly recovers and initializes coordinator.
+- `scratch/verify_phase1_1.cjs` & `scratch/verify_phase1_interruption.cjs`:
+  - **Full Regression Verification:** PASSED. All 6 scenarios (rapid view sequences, detail inspection, bidirectional flow scrubbing, camera convergence, multi-cycle reset) passed with 0 errors and zero transform drift across all 33 components.
+
 
