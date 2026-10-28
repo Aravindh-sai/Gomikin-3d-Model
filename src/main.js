@@ -16,6 +16,7 @@ import { PhysicalFlowController } from './animation/physicalFlowController.js';
 import { initModularControlBar } from './ui/modularControlBar.js';
 
 import { ViewTransitionCoordinator } from './animation/viewTransitionCoordinator.js';
+import { VirtualDoorAssembly } from './components/virtualDoorAssembly.js';
 import { ResilientModelLoader, DEFAULT_MODEL_CONFIG } from './utils/resilientModelLoader.js';
 
 function createLoadingHUD() {
@@ -224,6 +225,10 @@ function init() {
           const componentRegistry = buildComponentRegistry(usdModel, true);
           window.componentRegistry = componentRegistry;
 
+          // Initialize Procedural Virtual Door Assembly for Leftover Food Compartment
+          const virtualDoor = new VirtualDoorAssembly(scene, componentRegistry, renderer);
+          window.virtualDoorAssembly = virtualDoor;
+
           // Initialize Gomikin Interactive Dissection & 3D Catalogue System
           const gomikinAnimation = initDissectionAnimationSystem(componentRegistry, camera, controls);
           window.gomikinAnimation = gomikinAnimation;
@@ -317,6 +322,11 @@ function init() {
   function animate() {
     requestAnimationFrame(animate);
     const deltaTime = Math.min(clock.getDelta(), 0.1);
+
+    // Update Virtual Door Assembly
+    if (window.virtualDoorAssembly) {
+      window.virtualDoorAssembly.update(deltaTime);
+    }
 
     // Authoritative coordinator updates active view and camera interpolation
     if (window.viewCoordinator) {

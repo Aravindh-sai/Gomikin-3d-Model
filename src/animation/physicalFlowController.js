@@ -120,6 +120,9 @@ export class PhysicalFlowController {
         mesh.scale.copy(baseline.scale);
       }
     }
+    if (window.virtualDoorAssembly) {
+      window.virtualDoorAssembly.setDoorAngle(0.0);
+    }
   }
 
   createMainParticle() {
@@ -463,23 +466,20 @@ export class PhysicalFlowController {
     this.fragmentsGroup.visible = false;
     this.leachateDrops.visible = false;
 
-    const door = this.registry.get('leftover_food_closur');
-    const baseRot = this.cachedTransforms.get('leftover_food_closur')?.rot;
-
-    // 1. Intake door opens outward 55° [0.0 - 0.25]
+    // 1. Virtual intake door opens outward 55° [0.0 - 0.25]
     if (p <= 0.25) {
       const u = p / 0.25;
-      if (door && baseRot) {
-        door.rotation.set(baseRot.x + THREE.MathUtils.degToRad(-55 * u), baseRot.y, baseRot.z);
+      if (window.virtualDoorAssembly) {
+        window.virtualDoorAssembly.setDoorAngle(55 * u);
       }
       this.mainParticle.position.set(0.12, 0.95, -0.22);
     }
     // 2. Food slides down ramp into 90° food quadrant (+X, -Z) [0.25 - 0.55]
     else if (p <= 0.55) {
-      const u = (p - 0.25) / 0.30;
-      if (door && baseRot) {
-        door.rotation.set(baseRot.x + THREE.MathUtils.degToRad(-55), baseRot.y, baseRot.z);
+      if (window.virtualDoorAssembly) {
+        window.virtualDoorAssembly.setDoorAngle(55);
       }
+      const u = (p - 0.25) / 0.30;
       this.mainParticle.position.set(
         0.12,
         THREE.MathUtils.lerp(0.95, 0.26, u),
@@ -489,14 +489,16 @@ export class PhysicalFlowController {
     // 3. Intake door closes flush [0.55 - 0.75]
     else if (p <= 0.75) {
       const u = (p - 0.55) / 0.20;
-      if (door && baseRot) {
-        door.rotation.set(baseRot.x + THREE.MathUtils.degToRad(-55 * (1 - u)), baseRot.y, baseRot.z);
+      if (window.virtualDoorAssembly) {
+        window.virtualDoorAssembly.setDoorAngle(55 * (1 - u));
       }
       this.mainParticle.position.set(0.12, 0.26, -0.12);
     }
     // 4. Moisture separates and trickles to bottom leachate tray [0.75 - 1.00]
     else {
-      // door is back at baseline pose
+      if (window.virtualDoorAssembly) {
+        window.virtualDoorAssembly.setDoorAngle(0.0);
+      }
       const u = (p - 0.75) / 0.25;
       this.mainParticle.position.set(0.12, 0.26, -0.12);
       this.leachateDrops.visible = true;

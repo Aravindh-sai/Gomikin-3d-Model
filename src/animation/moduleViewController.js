@@ -111,6 +111,10 @@ export class ModuleViewController {
    */
   isolateModuleComponents(moduleDef) {
     const moduleCompSet = new Set(moduleDef.components);
+    if (window.virtualDoorAssembly) {
+      window.virtualDoorAssembly.setVisible(moduleDef.id === 'leftover_food');
+      window.virtualDoorAssembly.reset();
+    }
 
     for (const name of this.registry.getNames()) {
       const mesh = this.registry.get(name);
@@ -140,6 +144,11 @@ export class ModuleViewController {
    */
   restoreAllComponents() {
     this.isModuleDissected = false;
+    if (window.virtualDoorAssembly) {
+      window.virtualDoorAssembly.setVisible(true);
+      window.virtualDoorAssembly.reset();
+      window.virtualDoorAssembly.group.position.set(0, 0, 0);
+    }
     this.dissectProgress = 0.0;
     this.targetDissectProgress = 0.0;
 
@@ -203,6 +212,9 @@ export class ModuleViewController {
 
   applyModuleDissectProgress(p) {
     if (this.activeModuleId === 'all') return;
+    if (this.activeModuleId === 'leftover_food' && window.virtualDoorAssembly) {
+      window.virtualDoorAssembly.group.position.set(0.12 * p, 0.05 * p, -0.12 * p);
+    }
     const mod = getModuleById(this.activeModuleId);
     if (!mod || !mod.explodedOffsets) return;
 

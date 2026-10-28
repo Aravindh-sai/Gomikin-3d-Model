@@ -118,6 +118,10 @@ export class ViewTransitionCoordinator {
     // --- STEP 1: Safe View Teardown & Ownership Yield ---
     this.stopCameraGlide(false);
 
+    if (window.virtualDoorAssembly) {
+      window.virtualDoorAssembly.reset();
+    }
+
     // Stop module view controller camera if it was animating
     if (this.moduleViewController) {
       this.moduleViewController.isCameraAnimating = false;
@@ -168,6 +172,10 @@ export class ViewTransitionCoordinator {
     this.activeView = targetView;
 
     if (targetView === VIEWS.FULL) {
+      if (window.virtualDoorAssembly) {
+        window.virtualDoorAssembly.setVisible(true);
+        window.virtualDoorAssembly.reset();
+      }
       if (this.moduleViewController) {
         this.moduleViewController.activeModuleId = 'all';
       }
@@ -177,6 +185,12 @@ export class ViewTransitionCoordinator {
         0.9
       );
     } else if (targetView === VIEWS.MODULES) {
+      const isFoodMod = (options.moduleId === 'leftover_food');
+      if (window.virtualDoorAssembly) {
+        window.virtualDoorAssembly.setVisible(isFoodMod);
+        window.virtualDoorAssembly.reset();
+      }
+
       const targetModId = options.moduleId ||
         (this.moduleViewController && this.moduleViewController.activeModuleId !== 'all'
           ? this.moduleViewController.activeModuleId
@@ -195,6 +209,9 @@ export class ViewTransitionCoordinator {
         );
       }
     } else if (targetView === VIEWS.DISSECTION) {
+      if (window.virtualDoorAssembly) {
+        window.virtualDoorAssembly.setVisible(false);
+      }
       if (this.moduleViewController) {
         this.moduleViewController.activeModuleId = 'all';
       }
@@ -202,6 +219,11 @@ export class ViewTransitionCoordinator {
         this.dissectionController.play(1.0);
       }
     } else if (targetView === VIEWS.FLOW) {
+      if (window.virtualDoorAssembly) {
+        window.virtualDoorAssembly.setVisible(true);
+        window.virtualDoorAssembly.reset();
+      }
+
       if (this.moduleViewController) {
         this.moduleViewController.activeModuleId = 'all';
         // Ghost outer housing for internal flow visibility

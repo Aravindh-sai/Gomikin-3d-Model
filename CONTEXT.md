@@ -358,3 +358,52 @@ Implemented in October 2026 to support high-performance local testing alongside 
   - **Full Regression Verification:** PASSED. All 6 scenarios (rapid view sequences, detail inspection, bidirectional flow scrubbing, camera convergence, multi-cycle reset) passed with 0 errors and zero transform drift across all 33 components.
 
 
+
+---
+
+## 14. Phase 3.0: Virtual Curved Side-Opening Door Assembly (No CAD Rebuild)
+
+Implemented in October 2026. Delivers a high-fidelity, visual-only curved side-opening door for the Leftover-Food compartment without modifying the underlying 268 MB Fusion 360 USDZ CAD archive or changing compartment volume ratios.
+
+### 1. Architectural Geometry & Sector Boundaries (`src/components/virtualDoorAssembly.js`)
+- **Cylindrical Conformation:** Outer radius $R = 250\text{ mm}$ ($OD = 500\text{ mm}$), matching `Main_Housing` exterior profile.
+- **Elevation Envelope:** Sits in the middle elevation between lower drawer `leftover_food_outpu_section` ($Y = 0.384\text{ m}$) and static ceiling cap `leftover_food_closur` ($Y = 0.925\text{ m}$).
+  - Bottom elevation: $Y_{\text{bottom}} = 0.388\text{ m}$ (4 mm clearance above drawer).
+  - Top elevation: $Y_{\text{top}} = 0.921\text{ m}$ (4 mm clearance below top cap).
+  - Vertical height: $H = 533\text{ mm}$.
+- **Sector Boundaries (Leftover Food 90° Quadrant: $+X, -Z$):**
+  - Spans $\theta \in [\pi/2, \pi]$ ($90^\circ$).
+  - Boundary 1 (Radial edge): $(X = R, Z = 0)$ near `Rightside_Divider`.
+  - Boundary 2 (Bulkhead edge): $(X = 0, Z = -R)$ near `central_divider`.
+- **Hinge Pivot & Kinematic Axis:**
+  - Dedicated vertical hinge line positioned on the RIGHT edge when viewed from outside facing the door ($X = 0, Z = -R$).
+  - Dedicated `VirtualDoor_HingePivot` group anchored at $(0, Y_{\text{center}}, -R)$.
+  - Direct assignment `pivotGroup.rotation.y = -degToRad(angle)` eliminates cumulative rotational drift.
+  - Door swings outward to the LEFT away from housing from $0^\circ$ (closed, flush with cylinder) up to $120^\circ$ (wide open).
+
+### 2. Housing Aperture Management (`setupHousingAperture`)
+- Utilizes Three.js local clipping planes (`renderer.localClippingEnabled = true`) with `clipIntersection = true` on `Main_Housing.material`.
+- 4 bounding planes ($X > 0$, $Z < 0$, $Y > 0.388$, $Y < 0.921$) discard fragments strictly within the doorway box.
+- Preserves 100% of the original CAD `Main_Housing` mesh without seams, discoloration, or model duplication.
+- Supported by a subtle aperture casing frame (`VirtualDoor_ApertureFrame`) and realistic grounded hinge pins (`VirtualDoor_HingeHardware`).
+
+### 3. Subsystem Integration & Kinematic Fix
+- **Physical Waste Flow Simulation (`src/animation/physicalFlowController.js`):**
+  - Fixed kinematic defect: `leftover_food_closur` (the ceiling cap) now stays 100% static at baseline.
+  - In Leftover Food flow playback, `VirtualDoorAssembly` dynamically pivots open $0^\circ \to 55^\circ$ during deposit $[0.0 \to 0.25]$, holds open $[0.25 \to 0.55]$, and smoothly closes flush $[0.55 \to 0.75]$.
+- **View Transition Coordinator (`src/animation/viewTransitionCoordinator.js`):**
+  - In Dissection Mode: Door assembly is safely hidden and clipping planes removed from `Main_Housing` to display pristine exploded tiers.
+  - In Full Model & Modular Views: Door assembly is restored visible and flush at $0.000^\circ$.
+- **UI Interaction (`src/ui/modularControlBar.js`):**
+  - Added interactive top-bar toggle `[ 🚪 Door: Closed (0°) ]` and module card action `[ 🚪 Open Food Door (120°) ]`.
+
+### 4. Verification Suite (`scratch/verify_virtual_door.cjs`)
+- Verified against headless Microsoft Edge:
+  - **Test 1 (Closed & Flush):** Hinge fixed at $(0, y, -0.250)$, angle = $0.000^\circ$, verified flush with outer radius.
+  - **Test 2 (Open 60°):** Rotated to $-1.047\text{ rad}$, free edge swung outward to left.
+  - **Test 3 (Fully Open 120°):** Rotated to $-2.094\text{ rad}$, maximum opening angle.
+  - **Test 4 (Exposed Compartment):** Verified aperture clipping and interior component visibility (`Rightside_Divider`, `central_divider`, drawer top).
+  - **Test 5 (Repeated Cycles):** 5 rapid cycles yielded zero cumulative drift, returning to exact $0.000^\circ$ closed pose.
+  - **Test 6 (View Transitions):** Clean handoff across Dissection, Full Model, and Modular Views with zero state corruption.
+  - **Test 7 (Flow Kinematics):** Virtual door synchronized with flow timeline ($44^\circ$ at $p=0.20$, $0^\circ$ at $p=0.90$), top cap static.
+- **VERDICT: PASS (7/7 tests passed).**

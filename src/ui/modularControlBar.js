@@ -435,6 +435,9 @@ export function initModularControlBar({
     <button class="nav-tab-btn" id="tab-flow-sim">
       <span>🔄</span> Simulate Flow
     </button>
+    <button class="nav-tab-btn" id="tab-toggle-door" title="Toggle Curved Leftover Food Door (0° - 120°)" style="border-color: rgba(245, 158, 11, 0.35); color: #f59e0b;">
+      <span>🚪</span> <span id="nav-door-label">Door: Closed (0°)</span>
+    </button>
   `;
   document.body.appendChild(navEl);
 
@@ -479,6 +482,9 @@ export function initModularControlBar({
       </button>
       <button class="btn-action secondary" id="btn-toggle-ghost">
         <span>👻</span> Toggle Ghost Housing
+      </button>
+      <button class="btn-action secondary" id="btn-card-door-toggle" style="display: none; background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #f59e0b;">
+        <span>🚪</span> <span id="card-door-label">Open Food Door (120°)</span>
       </button>
       <button class="btn-action secondary" id="btn-reset-module">
         <span>↺</span> Back to Full Model
@@ -643,6 +649,10 @@ export function initModularControlBar({
     document.getElementById('mc-count').textContent = `${mod.components.length} components`;
     document.getElementById('mc-desc').textContent = mod.description;
 
+    const cardDoorBtn = document.getElementById('btn-card-door-toggle');
+    if (cardDoorBtn) {
+      cardDoorBtn.style.display = (moduleId === 'leftover_food') ? 'inline-flex' : 'none';
+    }
     const listEl = document.getElementById('mc-comps');
     listEl.innerHTML = '';
     mod.components.forEach(c => {
@@ -704,6 +714,40 @@ export function initModularControlBar({
   document.getElementById('btn-reset-module').addEventListener('click', () => {
     setTab('full');
   });
+
+  // Bind Virtual Door Toggle Buttons
+  const navDoorBtn = document.getElementById('tab-toggle-door');
+  if (navDoorBtn) {
+    navDoorBtn.addEventListener('click', () => {
+      if (window.virtualDoorAssembly) {
+        window.virtualDoorAssembly.toggleDoor(0.8);
+      }
+    });
+  }
+
+  const cardDoorBtn = document.getElementById('btn-card-door-toggle');
+  if (cardDoorBtn) {
+    cardDoorBtn.addEventListener('click', () => {
+      if (window.virtualDoorAssembly) {
+        window.virtualDoorAssembly.toggleDoor(0.8);
+      }
+    });
+  }
+
+  // Subscribe to Virtual Door state updates for UI feedback
+  if (window.virtualDoorAssembly) {
+    window.virtualDoorAssembly.addListener((state) => {
+      const navDoorLabel = document.getElementById('nav-door-label');
+      const cardDoorLabel = document.getElementById('card-door-label');
+      const text = state.isClosed
+        ? 'Door: Closed (0°)'
+        : (state.isFullyOpen ? 'Door: Open (120°)' : `Door: ${state.angleDeg.toFixed(0)}°`);
+      if (navDoorLabel) navDoorLabel.textContent = text;
+      if (cardDoorLabel) {
+        cardDoorLabel.textContent = state.isClosed ? 'Open Food Door (120°)' : 'Close Food Door (0°)';
+      }
+    });
+  }
 
   // Bind Flow Mode Tabs
   flowConsole.querySelectorAll('.flow-mode-btn').forEach(btn => {
