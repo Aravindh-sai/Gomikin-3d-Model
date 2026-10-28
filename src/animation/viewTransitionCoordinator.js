@@ -50,6 +50,10 @@ export class ViewTransitionCoordinator {
       FLOW: {
         position: new THREE.Vector3(-0.75, 1.05, 0.95),
         target: new THREE.Vector3(-0.06, 0.55, 0)
+      },
+      FLOW_LEFTOVER: {
+        position: new THREE.Vector3(1.05, 0.85, -1.05),
+        target: new THREE.Vector3(0.05, 0.55, -0.05)
       }
     };
 
@@ -219,6 +223,9 @@ export class ViewTransitionCoordinator {
         this.dissectionController.play(1.0);
       }
     } else if (targetView === VIEWS.FLOW) {
+      const flowMode = options.flowMode ||
+        (this.physicalFlowController ? this.physicalFlowController.activeMode : 'ORGANIC');
+
       if (window.virtualDoorAssembly) {
         window.virtualDoorAssembly.setVisible(true);
         window.virtualDoorAssembly.reset();
@@ -226,15 +233,22 @@ export class ViewTransitionCoordinator {
 
       if (this.moduleViewController) {
         this.moduleViewController.activeModuleId = 'all';
-        // Ghost outer housing for internal flow visibility
         const housing = this.registry.get('Main_Housing');
-        if (housing && this.moduleViewController.ghostMaterial) {
-          housing.material = this.moduleViewController.ghostMaterial;
+        if (housing) {
+          if (flowMode === 'LEFTOVER_FOOD') {
+            if (housing.userData && housing.userData.originalMaterial) {
+              housing.material = housing.userData.originalMaterial;
+            }
+            if (window.virtualDoorAssembly) {
+              window.virtualDoorAssembly.setupHousingAperture();
+            }
+          } else {
+            if (this.moduleViewController.ghostMaterial) {
+              housing.material = this.moduleViewController.ghostMaterial;
+            }
+          }
         }
       }
-
-      const flowMode = options.flowMode ||
-        (this.physicalFlowController ? this.physicalFlowController.activeMode : 'ORGANIC');
 
       if (this.physicalFlowController) {
         if (flowMode !== this.physicalFlowController.activeMode) {
@@ -243,9 +257,13 @@ export class ViewTransitionCoordinator {
         this.physicalFlowController.play();
       }
 
+      const camPreset = (flowMode === 'LEFTOVER_FOOD')
+        ? this.cameraPresets.FLOW_LEFTOVER
+        : this.cameraPresets.FLOW;
+
       this.glideCameraTo(
-        this.cameraPresets.FLOW.position,
-        this.cameraPresets.FLOW.target,
+        camPreset.position,
+        camPreset.target,
         0.9
       );
     }

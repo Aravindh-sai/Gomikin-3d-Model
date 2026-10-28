@@ -25,10 +25,10 @@ export const FLOW_STEPS = {
     { title: '5. Lower Drawer Collection', desc: 'Dry waste accumulates in the lower extraction drawer for recycling.' }
   ],
   LEFTOVER_FOOD: [
-    { title: '1. Intake Door Opening', desc: 'Leftover food front door pivots outward 55° into a loading chute.' },
-    { title: '2. Waste Slide Intake', desc: 'Cooked/wet food is loaded onto the ramp and slides into the 90° quadrant (+X, -Z).' },
-    { title: '3. Flush Pneumatic Seal', desc: 'Intake door returns flush to upright position, sealing odor and pests.' },
-    { title: '4. Liquid Drainage & Aeration', desc: 'High-moisture liquids drain through perforated tray into leachate collection.' }
+    { title: '1. Open Access Door', desc: 'Operator swings the curved side door 120° outward to the left, exposing the leftover-food compartment.' },
+    { title: '2. Manual Food Deposit', desc: 'Cooked leftover food is deposited manually from outside through the open side access door.' },
+    { title: '3. Close Access Door', desc: 'The curved side door swings back to its flush closed position, sealing the compartment.' },
+    { title: '4. Leftover Food Stored', desc: 'Leftover food remains safely stored inside the isolated 25% quadrant.' }
   ]
 };
 
@@ -71,6 +71,9 @@ export class PhysicalFlowController {
 
     this.leachateDrops = this.createLeachateDrops();
     this.flowGroup.add(this.leachateDrops);
+
+    this.leftoverFoodScrapsGroup = this.createLeftoverFoodScraps();
+    this.flowGroup.add(this.leftoverFoodScrapsGroup);
 
     this.listeners = [];
     this.reset();
@@ -120,9 +123,7 @@ export class PhysicalFlowController {
         mesh.scale.copy(baseline.scale);
       }
     }
-    if (window.virtualDoorAssembly) {
-      window.virtualDoorAssembly.setDoorAngle(0.0);
-    }
+
   }
 
   createMainParticle() {
@@ -271,6 +272,12 @@ export class PhysicalFlowController {
     this.fragmentsGroup.visible = false;
     this.scanBeam.visible = false;
     this.leachateDrops.visible = false;
+    if (this.leftoverFoodScrapsGroup) {
+      this.leftoverFoodScrapsGroup.visible = false;
+    }
+    if (window.virtualDoorAssembly) {
+      window.virtualDoorAssembly.setDoorAngle(0.0);
+    }
 
     // Restore mechanical parts to exact baseline transforms
     this.resetMechanicalPoses();
@@ -295,6 +302,8 @@ export class PhysicalFlowController {
   updateOrganicFlow(p) {
     // 1. Authoritatively reset all mechanical poses before applying progress-specific pose
     this.resetMechanicalPoses();
+    if (this.leftoverFoodScrapsGroup) this.leftoverFoodScrapsGroup.visible = false;
+    if (window.virtualDoorAssembly) window.virtualDoorAssembly.setDoorAngle(0.0);
 
     this.mainParticle.visible = true;
     this.scanBeam.visible = false;
@@ -408,6 +417,8 @@ export class PhysicalFlowController {
   updateInorganicFlow(p) {
     // 1. Authoritatively reset all mechanical poses before applying progress-specific pose
     this.resetMechanicalPoses();
+    if (this.leftoverFoodScrapsGroup) this.leftoverFoodScrapsGroup.visible = false;
+    if (window.virtualDoorAssembly) window.virtualDoorAssembly.setDoorAngle(0.0);
 
     this.mainParticle.visible = true;
     this.scanBeam.visible = false;
@@ -457,56 +468,149 @@ export class PhysicalFlowController {
     }
   }
 
+  createLeftoverFoodScraps() {
+    const group = new THREE.Group();
+    group.name = 'LeftoverFood_ScrapsGroup';
+
+    // 1. Cooked rice / grain cluster (matte warm white/cream spheroids)
+    const riceMat = new THREE.MeshStandardMaterial({
+      color: 0xfef3c7,
+      roughness: 0.7,
+      metalness: 0.1
+    });
+    const riceGeo = new THREE.DodecahedronGeometry(0.012, 1);
+    [
+      [0, 0, 0],
+      [0.010, 0.006, 0.005],
+      [-0.008, 0.004, -0.006],
+      [0.003, -0.005, 0.008]
+    ].forEach(([x, y, z]) => {
+      const riceMesh = new THREE.Mesh(riceGeo, riceMat);
+      riceMesh.position.set(x, y, z);
+      group.add(riceMesh);
+    });
+
+    // 2. Cooked greens / broccoli morsels (textured deep green)
+    const vegMat = new THREE.MeshStandardMaterial({
+      color: 0x15803d,
+      roughness: 0.8,
+      metalness: 0.1
+    });
+    const vegGeo = new THREE.DodecahedronGeometry(0.014, 0);
+    [
+      [-0.012, 0.008, 0.008],
+      [0.014, 0.010, -0.010]
+    ].forEach(([x, y, z]) => {
+      const vegMesh = new THREE.Mesh(vegGeo, vegMat);
+      vegMesh.position.set(x, y, z);
+      group.add(vegMesh);
+    });
+
+    // 3. Cooked diced carrot / pumpkin piece (vibrant orange cuboid)
+    const carrotMat = new THREE.MeshStandardMaterial({
+      color: 0xf97316,
+      roughness: 0.45,
+      metalness: 0.15
+    });
+    const carrotGeo = new THREE.BoxGeometry(0.012, 0.010, 0.012);
+    const carrotMesh = new THREE.Mesh(carrotGeo, carrotMat);
+    carrotMesh.position.set(-0.006, -0.008, 0.010);
+    group.add(carrotMesh);
+
+    // 4. Bread crust / toast piece (golden-brown chunk)
+    const crustMat = new THREE.MeshStandardMaterial({
+      color: 0xd97706,
+      roughness: 0.65,
+      metalness: 0.1
+    });
+    const crustGeo = new THREE.BoxGeometry(0.020, 0.008, 0.014);
+    const crustMesh = new THREE.Mesh(crustGeo, crustMat);
+    crustMesh.position.set(0.012, -0.006, 0.004);
+    crustMesh.rotation.set(0.2, 0.4, 0.1);
+    group.add(crustMesh);
+
+    // 5. Cooked savory protein morsel (rich warm brown)
+    const proteinMat = new THREE.MeshStandardMaterial({
+      color: 0xb45309,
+      roughness: 0.55,
+      metalness: 0.2
+    });
+    const proteinGeo = new THREE.SphereGeometry(0.013, 12, 12);
+    const proteinMesh = new THREE.Mesh(proteinGeo, proteinMat);
+    proteinMesh.position.set(-0.010, -0.004, -0.010);
+    proteinMesh.scale.set(1.2, 0.8, 1.0);
+    group.add(proteinMesh);
+
+    group.visible = false;
+    return group;
+  }
+
   updateLeftoverFoodFlow(p) {
-    // 1. Authoritatively reset all mechanical poses before applying progress-specific pose
+    // 1. Authoritatively reset mechanical poses
     this.resetMechanicalPoses();
 
-    this.mainParticle.visible = true;
+    // Hide unrelated top funnel / shredder / leachate visuals
+    this.mainParticle.visible = false;
     this.scanBeam.visible = false;
     this.fragmentsGroup.visible = false;
     this.leachateDrops.visible = false;
 
-    // 1. Virtual intake door opens outward 55° [0.0 - 0.25]
-    if (p <= 0.25) {
-      const u = p / 0.25;
-      if (window.virtualDoorAssembly) {
-        window.virtualDoorAssembly.setDoorAngle(55 * u);
+    // Trajectory coordinates:
+    // P0: Outside machine approaching from user hand
+    const p0 = new THREE.Vector3(0.42, 0.70, -0.32);
+    // Pmid: Aperture doorway center (through open door sector)
+    const pMid = new THREE.Vector3(0.26, 0.58, -0.20);
+    // P1: Resting position on bottom plate of leftover-food quadrant (+X, -Z)
+    const p1 = new THREE.Vector3(0.12, 0.42, -0.12);
+
+    if (this.leftoverFoodScrapsGroup) {
+      // Step 1: Open Door [0.00 - 0.25]
+      // Animate door from 0° to 120° outward to the left; food stays waiting outside/hidden
+      if (p <= 0.25) {
+        const u = p / 0.25;
+        if (window.virtualDoorAssembly) {
+          window.virtualDoorAssembly.setDoorAngle(120.0 * u);
+        }
+        this.leftoverFoodScrapsGroup.visible = false;
       }
-      this.mainParticle.position.set(0.12, 0.95, -0.22);
-    }
-    // 2. Food slides down ramp into 90° food quadrant (+X, -Z) [0.25 - 0.55]
-    else if (p <= 0.55) {
-      if (window.virtualDoorAssembly) {
-        window.virtualDoorAssembly.setDoorAngle(55);
+      // Step 2: Manual Deposit [0.25 - 0.50]
+      // Door remains fully open at 120°; food scraps traverse through doorway into compartment
+      else if (p <= 0.50) {
+        if (window.virtualDoorAssembly) {
+          window.virtualDoorAssembly.setDoorAngle(120.0);
+        }
+        this.leftoverFoodScrapsGroup.visible = true;
+        const u = (p - 0.25) / 0.25;
+        // Quadratic Bezier interpolation: P(u) = (1-u)^2 * P0 + 2(1-u)u * Pmid + u^2 * P1
+        const invU = 1.0 - u;
+        const curX = invU * invU * p0.x + 2 * invU * u * pMid.x + u * u * p1.x;
+        const curY = invU * invU * p0.y + 2 * invU * u * pMid.y + u * u * p1.y;
+        const curZ = invU * invU * p0.z + 2 * invU * u * pMid.z + u * u * p1.z;
+        this.leftoverFoodScrapsGroup.position.set(curX, curY, curZ);
+        // Natural slight tumble during flight
+        this.leftoverFoodScrapsGroup.rotation.set(u * 0.4, u * 1.2, u * 0.3);
       }
-      const u = (p - 0.25) / 0.30;
-      this.mainParticle.position.set(
-        0.12,
-        THREE.MathUtils.lerp(0.95, 0.26, u),
-        THREE.MathUtils.lerp(-0.22, -0.12, u)
-      );
-    }
-    // 3. Intake door closes flush [0.55 - 0.75]
-    else if (p <= 0.75) {
-      const u = (p - 0.55) / 0.20;
-      if (window.virtualDoorAssembly) {
-        window.virtualDoorAssembly.setDoorAngle(55 * (1 - u));
+      // Step 3: Close Door [0.50 - 0.75]
+      // Door closes from 120° back to 0° flush; deposited food remains stationary inside
+      else if (p <= 0.75) {
+        const u = (p - 0.50) / 0.25;
+        if (window.virtualDoorAssembly) {
+          window.virtualDoorAssembly.setDoorAngle(120.0 * (1.0 - u));
+        }
+        this.leftoverFoodScrapsGroup.visible = true;
+        this.leftoverFoodScrapsGroup.position.copy(p1);
+        this.leftoverFoodScrapsGroup.rotation.set(0.4, 1.2, 0.3);
       }
-      this.mainParticle.position.set(0.12, 0.26, -0.12);
-    }
-    // 4. Moisture separates and trickles to bottom leachate tray [0.75 - 1.00]
-    else {
-      if (window.virtualDoorAssembly) {
-        window.virtualDoorAssembly.setDoorAngle(0.0);
+      // Step 4: Food Stored [0.75 - 1.00]
+      // Door remains flush closed at 0°; food rests stably inside compartment
+      else {
+        if (window.virtualDoorAssembly) {
+          window.virtualDoorAssembly.setDoorAngle(0.0);
+        }
+        this.leftoverFoodScrapsGroup.visible = true;
+        this.leftoverFoodScrapsGroup.position.copy(p1);
+        this.leftoverFoodScrapsGroup.rotation.set(0.4, 1.2, 0.3);
       }
-      const u = (p - 0.75) / 0.25;
-      this.mainParticle.position.set(0.12, 0.26, -0.12);
-      this.leachateDrops.visible = true;
-      this.leachateDrops.position.set(0.12, 0, -0.12);
-      this.leachateDrops.children.forEach((drop, idx) => {
-        const dropY = 0.24 - ((u * 3 + idx * 0.2) % 1.0) * 0.18;
-        drop.position.set(0, dropY, 0);
-      });
     }
   }
 

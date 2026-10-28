@@ -140,7 +140,8 @@ export class VirtualDoorAssembly {
     // In pivot-relative coordinates, free edge is at (X = R, Z = R).
     const handleGroup = new THREE.Group();
     handleGroup.name = 'VirtualDoor_Handle';
-    handleGroup.position.set(R - 0.002, 0, R - 0.008);
+    // Free edge is at (X = R, Z = R) in pivot coords. Outer normal points +X.
+    handleGroup.position.set(R + 0.008, 0, R);
 
     const handleBarGeo = new THREE.CylinderGeometry(0.005, 0.005, 0.16, 16);
     const handleMat = new THREE.MeshStandardMaterial({
@@ -152,11 +153,11 @@ export class VirtualDoorAssembly {
     handleBar.name = 'VirtualDoor_HandleBar';
     handleGroup.add(handleBar);
 
-    // Top and bottom handle standoffs
+    // Top and bottom handle standoffs connecting back to door surface
     [-0.07, 0.07].forEach((yOff) => {
-      const standGeo = new THREE.BoxGeometry(0.012, 0.006, 0.016);
+      const standGeo = new THREE.BoxGeometry(0.016, 0.006, 0.008);
       const standMesh = new THREE.Mesh(standGeo, handleMat);
-      standMesh.position.set(0.006, yOff, 0);
+      standMesh.position.set(-0.008, yOff, 0);
       handleGroup.add(standMesh);
     });
 
@@ -301,7 +302,7 @@ export class VirtualDoorAssembly {
    * Authoritative door angle setter (degrees).
    * Range: [0.0, 120.0].
    * Clamps angle and directly updates Euler rotation around the vertical hinge axis.
-   * Rotation sign: -angleRad swings the free edge outward and to the left!
+   * Rotation sign: +angleRad (counter-clockwise viewed from top) swings the free edge outward and to the left!
    * @param {number} angleDeg
    */
   setDoorAngle(angleDeg) {
@@ -312,7 +313,7 @@ export class VirtualDoorAssembly {
 
     // Direct assignment prevents cumulative rotation errors
     const rad = THREE.MathUtils.degToRad(clampedDeg);
-    this.pivotGroup.rotation.y = -rad;
+    this.pivotGroup.rotation.y = rad;
 
     this.notifyListeners();
   }
@@ -384,11 +385,11 @@ export class VirtualDoorAssembly {
 
     this.currentAngleDeg = newAngle;
     const rad = THREE.MathUtils.degToRad(newAngle);
-    this.pivotGroup.rotation.y = -rad;
+    this.pivotGroup.rotation.y = rad;
 
     if (progress >= 1.0) {
       this.currentAngleDeg = this.targetAngleDeg;
-      this.pivotGroup.rotation.y = -THREE.MathUtils.degToRad(this.targetAngleDeg);
+      this.pivotGroup.rotation.y = THREE.MathUtils.degToRad(this.targetAngleDeg);
       this.isAnimating = false;
     }
 
@@ -444,3 +445,4 @@ export class VirtualDoorAssembly {
     this.scene.remove(this.group);
   }
 }
+

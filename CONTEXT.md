@@ -407,3 +407,41 @@ Implemented in October 2026. Delivers a high-fidelity, visual-only curved side-o
   - **Test 6 (View Transitions):** Clean handoff across Dissection, Full Model, and Modular Views with zero state corruption.
   - **Test 7 (Flow Kinematics):** Virtual door synchronized with flow timeline ($44^\circ$ at $p=0.20$, $0^\circ$ at $p=0.90$), top cap static.
 - **VERDICT: PASS (7/7 tests passed).**
+
+---
+
+## 15. Leftover-Food Door Direction & Manual Intake Flow Correction (October 2026)
+
+### 1. Root Cause & Kinematic Correction (`src/components/virtualDoorAssembly.js`)
+- **Previous Defect:** In the initial virtual door implementation, `pivotGroup.rotation.y = -rad` applied clockwise Euler rotation around $+Y$. Because the pivot is grounded at $(0, y_{\text{center}}, -R)$ and the free latch edge starts at $(R, y_{\text{center}}, 0)$, clockwise rotation drove the panel inward towards the cylinder core ($r_{\text{mid}} = 0.129\text{ m} < 0.250\text{ m}$).
+- **Kinematic Solution:** Corrected Euler rotation sign to positive counter-clockwise rotation (`rotation.y = +rad`):
+  - At $0.0^\circ$: Free edge at $(+0.250, 0.655, 0.000)\text{ m}$ ($r = 0.250\text{ m}$, flush with housing).
+  - At $60.0^\circ$: Free edge at $(+0.342, 0.655, -0.342)\text{ m}$ ($r = 0.483\text{ m} > 0.250\text{ m}$).
+  - At $120.0^\circ$: Free edge at $(+0.092, 0.655, -0.592)\text{ m}$ ($r = 0.599\text{ m} \gg 0.250\text{ m}$).
+  - Minimum radial distance across all vertices remains $\ge 0.250\text{ m}$ throughout the entire arc.
+- **Ergonomic Handle:** Positioned at $(R + 0.008, 0, R)$ with standoffs connecting cleanly to the outer door face.
+
+### 2. UI Streamlining (`src/ui/modularControlBar.js`)
+- Completely removed the standalone `#tab-toggle-door` from the floating top navigation bar and `#btn-card-door-toggle` from the module card.
+- The 4 canonical navigation tabs (`Full Model`, `Modular Views`, `33-Part Dissection`, `Simulate Flow`) remain intact without visual clutter.
+- The virtual door operates exclusively within **Simulate Flow** when the operator selects **Leftover Food**.
+
+### 3. Manual Waste Intake Flow Sequence (`src/animation/physicalFlowController.js`)
+Eliminated legacy automated top-funnel/chute animations; leftover food is manual intake only:
+- **Step 1 — Open Access Door ($p \in [0.00, 0.25]$):** Operator swings the curved door $0^\circ \to 120^\circ$ outward to the left, exposing the compartment. Food scraps remain hidden outside.
+- **Step 2 — Manual Food Deposit ($p \in [0.25, 0.50]$):** Door remains fully open at $120^\circ$. A colorful cluster of cooked food scraps (`LeftoverFood_ScrapsGroup`: rice grains, broccoli florets, diced carrot, bread crust, protein morsel) enters through the open side aperture from outside $(0.42, 0.70, -0.32)$ through doorway $(0.26, 0.58, -0.20)$ to rest on the compartment shelf $(0.12, 0.42, -0.12)$ via quadratic Bezier interpolation.
+- **Step 3 — Close Access Door ($p \in [0.50, 0.75]$):** Door swings back from $120^\circ \to 0^\circ$ flush with the cylinder. Food scraps stay stationary inside at $(0.12, 0.42, -0.12)$.
+- **Step 4 — Leftover Food Stored ($p \in [0.75, 1.00]$):** Door remains sealed flush at $0^\circ$. Deposited food rests safely in the isolated $25\%$ quadrant.
+
+### 4. View & Camera Coordination (`src/animation/viewTransitionCoordinator.js`)
+- Added `FLOW_LEFTOVER` camera preset $(1.05, 0.85, -1.05)$ targeting $(0.05, 0.55, -0.05)$, smoothly framing the entire machine and Leftover Food door quadrant.
+- During Leftover Food flow, `Main_Housing` retains solid brushed metallic finish with aperture clipping enabled; for Organic/Inorganic flows, `Main_Housing` dynamically switches to `ghostMaterial` for interior visibility.
+
+### 5. Automated Verification & Test Results
+- Ran `scratch/run_full_verification.cjs` via headless Microsoft Edge Playwright suite:
+  - Standalone button removal: PASSED (0 occurrences in DOM).
+  - Radial outward clearance: PASSED ($r \ge 0.250\text{ m}$ everywhere).
+  - 3x Rapid cycle & reset: PASSED ($0.000^\circ$ residual drift).
+  - Mode transition isolation: PASSED (Organic/Inorganic/Full Model states clean).
+  - Production build: PASSED (`npm run build` in $1.29\text{s}$, 0 errors).
+
