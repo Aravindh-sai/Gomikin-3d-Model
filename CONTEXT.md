@@ -528,3 +528,60 @@ Eliminated legacy automated top-funnel/chute animations; leftover food is manual
   - Fullscreen toggle and exit verified.
   - Error simulation and non-reloading retry verified.
   - Console Errors: 0 errors recorded.
+
+
+---
+
+## 18. Phase C.1 — Landing Page Refinement & 3D Launch Experience (November 2026)
+
+### 1. Architectural Motivation & Scope
+Phase C.1 simplifies and elevates the landing page into a clean, single-viewport product presentation while introducing background CAD model pre-loading and seamless fullscreen 3D launching:
+- **Single Desktop Viewport ($100\text{vh}$ Fit):** Eliminated all page scrolling on desktop viewports (`1440\times 900`, `1920\times 1080`). All clutter—including multi-item navigation bars, redundant metric grids ($500\text{ mm}, 1020\text{ mm}$), bottom feature cards, and deep footers—has been removed.
+- **Brand Asset Fidelity:** Integrated the official text wordmark asset (`public/assets/Gomikin-text-black.png`, $2172\times 724\text{px}$) with natural aspect ratio constraints ($28\text{px}$ height, `object-fit: contain`) rather than HTML text recreation.
+- **Minimalist Header:** Preserves only the official Gomikin text logo on the left and a single pill-shaped dark Graphite `#343B36` "Contact Us" button (`mailto:info@gomikin.com`) on the right.
+- **Background CAD Model Pre-Loading:**
+  - Starts pre-fetching the 268 MB CAD model immediately on page load in the background via `ResilientModelLoader`.
+  - The landing page remains completely calm, clean, and interactive with ZERO download overlays, speeds, or MB indicators.
+  - IndexedDB cache ensures instantaneous load on repeat visits without redundant network usage.
+- **Fullscreen 3D Launch Transition:**
+  - Clicking "Explore 3D Prototype" or the canvas preview card triggers an immediate fullscreen transition.
+  - If the model is already ready (or cached), the 3D model and OrbitControls appear instantly with zero delay.
+  - If background download is still in progress, a fullscreen overlay displays the current progress strictly as a percentage with the word **"Loading"** (never "Downloading"), and absolutely no numerical MB or speed indicators.
+  - On USDLoader parse completion, the overlay fades out and reveals the 3D model.
+  - Supports both the `Escape` key and an explicit "Exit Fullscreen" toggle to return to the single desktop viewport while preserving the loaded 3D scene in memory.
+- **Refined Canvas CAD Invitation UI:**
+  - Styled with subtle CAD grid background, thin Champagne accent border (`rgba(185, 154, 99, 0.35)`), official Gomikin emblem (`public/assets/Gomikin-logo.png`), header title "Explore the Engineering", description "Inspect the mechanical architecture and internal processing system.", and primary button "Launch 3D Experience".
+- **Minimal Initialization Skeleton:**
+  - Light skeleton overlay (`#gomikin-init-screen`) dismisses within milliseconds on initial DOM paint without blocking.
+
+### 2. Files Modified & Updated
+1. [`index.html`](file:///c:/Projects/Gomikin-3d-Model/index.html):
+   - Refactored header to text logo and pill "Contact Us" button.
+   - Refactored hero section to single desktop viewport layout without specs grid or secondary links.
+   - Simplified canvas card with refined "Explore the Engineering" preview.
+   - Configured fullscreen loading overlay (percentage only, word "Loading").
+   - Added minimal initialization skeleton screen.
+   - Removed feature sections, contact card, and heavy footer.
+2. [`src/style.css`](file:///c:/Projects/Gomikin-3d-Model/src/style.css):
+   - Enforced single desktop viewport layout rules (`@media (min-width: 1025px) { height: 100vh; overflow: hidden; }`).
+   - Added minimalist header and pill contact button styles.
+   - Added CAD preview idle card with thin Champagne border and subtle grid.
+   - Added fullscreen studio layout and loading track styles.
+   - Cleaned up obsolete feature section and heavy footer styles.
+3. [`src/main.js`](file:///c:/Projects/Gomikin-3d-Model/src/main.js):
+   - Implemented `modelState` state machine (`idle`, `loading`, `parsing`, `ready`, `error`).
+   - Initiated non-blocking background loading (`startBackgroundLoad`) immediately on bootstrap.
+   - Configured `enterFullscreen3D` and `exitFullscreen3D` handlers with `Escape` key binding.
+   - Synchronized fullscreen loading overlay telemetry (percentage only, word "Loading", never "Downloading").
+   - Preserved all 3D controllers (`moduleViewController`, `dissectionAnimationSystem`, `physicalFlowController`, `viewCoordinator`, `virtualDoorAssembly`).
+
+### 3. Automated Verification Evidence (`scratch/verify_phase_c1.cjs`)
+- **Compilation Check:** `npm run build` succeeded in $1.73\text{s}$ with 0 errors.
+- **Single Desktop Viewport:** Validated `scrollHeight === clientHeight` ($900\text{px} / 900\text{px}$) with `overflow: hidden` on desktop.
+- **Header Asset:** Validated `Gomikin-text-black.png` and pill "Contact Us" button.
+- **Background Loading:** Confirmed background download initiates without landing page UI interruption.
+- **Fullscreen Launch:** Confirmed canvas expands to `100vw \times 100vh` on Explore trigger. Loading overlay strictly displays `Loading... XX%` (no "Downloading", no MB metrics).
+- **Sub-System Navigation:** Validated all 4 canonical view modes (`Full Model`, `Modular Views`, `33-Part Dissection`, `Simulate Flow`) inside fullscreen.
+- **Escape & Exit:** Confirmed pressing `Escape` or clicking `Exit Fullscreen` smoothly returns to single-viewport landing page with model kept resident in memory.
+- **Re-Entry:** Confirmed re-entering fullscreen immediately shows the ready 3D model without reloading.
+- **Browser Console Errors:** 0 severe errors detected.

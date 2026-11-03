@@ -21,12 +21,11 @@ import { ResilientModelLoader, DEFAULT_MODEL_CONFIG } from './utils/resilientMod
 
 /**
  * In-Canvas State HUD Controller
- * Manages minimal, elegant in-canvas status transitions without blocking the landing page:
- * - State 1 & 2: Idle Preview (Invitation to explore 3D CAD model)
- * - State 3: Model Download (Clean horizontal progress bar, percentage only)
- * - State 4: Model Initialization ("Preparing 3D experience...")
- * - State 5: Model Ready (Smooth transition to live Three.js viewport)
- * - State 6: Error / Retry (Clean recovery action without page reload)
+ * Manages minimal, elegant status transitions:
+ * - Idle Preview (Interactive invitation on landing page)
+ * - Fullscreen Loading (Percentage only, word "Loading", never "Downloading")
+ * - Fullscreen Ready (Reveal 3D model, enable OrbitControls)
+ * - Fullscreen Error / Retry (Clean recovery action without page reload)
  */
 function initCanvasHUD() {
   const idleOverlay = document.getElementById('canvas-idle-overlay');
@@ -47,6 +46,9 @@ function initCanvasHUD() {
       if (errorOverlay) errorOverlay.style.display = 'none';
       if (statusDot) statusDot.className = 'status-dot idle';
     },
+    hideIdle: () => {
+      if (idleOverlay) idleOverlay.style.display = 'none';
+    },
     showLoading: () => {
       if (idleOverlay) idleOverlay.style.display = 'none';
       if (loadingOverlay) {
@@ -55,24 +57,22 @@ function initCanvasHUD() {
       }
       if (errorOverlay) errorOverlay.style.display = 'none';
       if (statusDot) statusDot.className = 'status-dot loading';
-      if (progressFill) {
-        progressFill.style.width = '0%';
-        progressFill.classList.remove('pulse-anim');
-      }
-      if (progressPct) progressPct.textContent = '0%';
-      if (loadingStatus) loadingStatus.textContent = 'Downloading product model...';
+    },
+    hideLoading: () => {
+      if (loadingOverlay) loadingOverlay.style.display = 'none';
     },
     setProgress: (pct) => {
       const p = Math.min(100, Math.max(0, pct || 0));
       if (progressFill) progressFill.style.width = `${p.toFixed(0)}%`;
       if (progressPct) progressPct.textContent = `${p.toFixed(0)}%`;
+      if (loadingStatus) loadingStatus.textContent = `Loading... ${p.toFixed(0)}%`;
     },
     setStatus: (statusText) => {
       if (loadingStatus && statusText) loadingStatus.textContent = statusText;
     },
     setParsing: (isParsing) => {
       if (loadingStatus && isParsing) {
-        loadingStatus.textContent = 'Preparing 3D experience...';
+        loadingStatus.textContent = 'Loading... Preparing 3D model...';
       }
       if (progressFill && isParsing) {
         progressFill.style.width = '100%';
@@ -87,53 +87,19 @@ function initCanvasHUD() {
       if (retryBtn) retryBtn.onclick = onRetry;
       if (cloudBtn) cloudBtn.onclick = onForceCloud || onRetry;
     },
+    hideError: () => {
+      if (errorOverlay) errorOverlay.style.display = 'none';
+    },
     complete: () => {
       if (statusDot) statusDot.className = 'status-dot active';
       if (loadingOverlay) {
         loadingOverlay.style.opacity = '0';
         setTimeout(() => {
           loadingOverlay.style.display = 'none';
-        }, 400);
+        }, 350);
       }
     }
   };
-}
-
-/**
- * Configures the responsive Fullscreen mode for the product canvas container.
- */
-function setupFullscreenToggle() {
-  const fullscreenBtn = document.getElementById('btn-canvas-fullscreen');
-  const canvasWrapper = document.getElementById('gomikin-canvas-wrapper');
-  const fullscreenText = document.getElementById('fullscreen-text');
-  const fullscreenIcon = document.getElementById('fullscreen-icon');
-
-  if (!fullscreenBtn || !canvasWrapper) return;
-
-  const toggle = () => {
-    const isFull = canvasWrapper.classList.toggle('fullscreen-mode');
-    if (isFull) {
-      if (fullscreenText) fullscreenText.textContent = 'Exit Fullscreen';
-      if (fullscreenIcon) fullscreenIcon.textContent = '✕';
-      document.body.style.overflow = 'hidden';
-    } else {
-      if (fullscreenText) fullscreenText.textContent = 'Fullscreen';
-      if (fullscreenIcon) fullscreenIcon.textContent = '⛶';
-      document.body.style.overflow = '';
-    }
-    window.dispatchEvent(new Event('resize'));
-  };
-
-  fullscreenBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggle();
-  });
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && canvasWrapper.classList.contains('fullscreen-mode')) {
-      toggle();
-    }
-  });
 }
 
 function init() {
@@ -143,7 +109,7 @@ function init() {
     return;
   }
 
-  // 1. Initialize Three.js Scene within the embedded canvas container
+  // 1. Initialize Three.js Scene within the canvas container
   const { scene, camera, renderer, controls } = initScene(canvas);
 
   // Baseline Parametric Envelope (preserved intact, hidden for loaded CAD assembly)
@@ -162,162 +128,278 @@ function init() {
   controls.target.set(0, 0.51, 0);
   controls.update();
 
-  // Initially disable OrbitControls during idle/loading so cursor clicks don't spin empty studio
+  // Initially disable OrbitControls during idle so clicking canvas doesn't spin empty studio
   controls.enabled = false;
 
-  // 2. Initialize in-canvas HUD controller
+  // 2. Initialize Canvas HUD Controller
   const canvasHUD = initCanvasHUD();
   canvasHUD.showIdle();
 
-  // 3. Setup Fullscreen toggling
-  setupFullscreenToggle();
-
-  // Model loading state flags
-  let isLoadingModel = false;
-  let isModelLoaded = false;
-
-  // 4. On-Demand CAD Model Loader (Decoupled from landing page startup)
-  async function loadUSDZ(forcedSource = null) {
-    if (isModelLoaded || isLoadingModel) return;
-    isLoadingModel = true;
-
-    canvasHUD.showLoading();
-
-    try {
-      const loaderConfig = {};
-      if (forcedSource === 'cloud') {
-        loaderConfig.sources = DEFAULT_MODEL_CONFIG.sources.filter(s => !s.isLocal);
-      } else if (forcedSource === 'local') {
-        loaderConfig.sources = DEFAULT_MODEL_CONFIG.sources.filter(s => s.isLocal);
-      }
-
-      const modelLoader = new ResilientModelLoader(loaderConfig);
-
-      // Download archive buffer with progress telemetry
-      const buffer = await modelLoader.loadModelBuffer({
-        onStatus: (statusText) => {
-          // Minimal status update
-        },
-        onProgress: (progress) => {
-          // STRICT REQUIREMENT: Only percentage displayed in UI, no numerical MB or speed
-          canvasHUD.setProgress(progress.percent);
-        }
-      });
-
-      // Parsing phase (State 4)
-      canvasHUD.setParsing(true);
-
-      const usdLoader = new USDLoader();
-      usdLoader.parse(
-        buffer,
-        '',
-        (usdModel) => {
-          usdModel.name = 'Fusion360_USDZ_Model';
-          scene.add(usdModel);
-          window.usdModel = usdModel;
-          console.log('USDZ model loaded and parsed successfully:', usdModel);
-
-          // Build clean component registry for animation control
-          const componentRegistry = buildComponentRegistry(usdModel, true);
-          window.componentRegistry = componentRegistry;
-
-          // Initialize Procedural Virtual Door Assembly for Leftover Food Compartment
-          const virtualDoor = new VirtualDoorAssembly(scene, componentRegistry, renderer);
-          window.virtualDoorAssembly = virtualDoor;
-
-          // Initialize Gomikin Interactive Dissection & 3D Catalogue System
-          const gomikinAnimation = initDissectionAnimationSystem(componentRegistry, camera, controls);
-          window.gomikinAnimation = gomikinAnimation;
-
-          // Initialize Modular View Controller & Physical Flow Controller
-          const moduleViewController = new ModuleViewController(componentRegistry, camera, controls);
-          window.moduleViewController = moduleViewController;
-
-          const physicalFlowController = new PhysicalFlowController(componentRegistry, scene, camera, controls);
-          window.physicalFlowController = physicalFlowController;
-
-          // Initialize Authoritative View Transition Coordinator
-          const viewCoordinator = new ViewTransitionCoordinator({
-            componentRegistry,
-            camera,
-            controls,
-            moduleViewController,
-            dissectionController: gomikinAnimation.controller,
-            physicalFlowController
-          });
-          window.viewCoordinator = viewCoordinator;
-
-          // Mount Modern Glassmorphism Modular Control Bar & Workflow Sim Dock
-          initModularControlBar({
-            viewCoordinator,
-            moduleViewController,
-            physicalFlowController,
-            dissectionAnimationController: gomikinAnimation.controller
-          });
-
-          // Enable controls for user exploration
-          controls.enabled = true;
-          isModelLoaded = true;
-          isLoadingModel = false;
-
-          canvasHUD.complete();
-        },
-        (error) => {
-          console.error('Error parsing USDZ:', error);
-          isLoadingModel = false;
-          canvasHUD.showError(
-            'Failed to parse 3D CAD data.',
-            () => loadUSDZ(),
-            () => loadUSDZ('cloud')
-          );
-        }
-      );
-    } catch (loadErr) {
-      console.error('Error loading CAD model:', loadErr);
-      isLoadingModel = false;
-      canvasHUD.showError(
-        loadErr.message || 'Failed to download CAD assembly.',
-        () => loadUSDZ(),
-        () => loadUSDZ('cloud')
-      );
-    }
+  // 3. Dismiss Minimal Initialization Screen
+  const initScreen = document.getElementById('gomikin-init-screen');
+  if (initScreen) {
+    setTimeout(() => {
+      initScreen.classList.add('hidden');
+      setTimeout(() => initScreen.remove(), 400);
+    }, 80);
   }
 
-  // 5. Wire User Interactive Triggers
+  // 4. Model State & Background CAD Loading Architecture
+  const modelState = {
+    status: 'idle', // 'idle' | 'loading' | 'parsing' | 'ready' | 'error'
+    progress: 0,
+    error: null,
+    isFullscreen: false,
+    loadPromise: null
+  };
+  window.gomikinModelState = modelState;
+
+  function startBackgroundLoad(forcedSource = null) {
+    if (modelState.status === 'ready') return Promise.resolve();
+    if (modelState.status === 'loading' && modelState.loadPromise && !forcedSource) {
+      return modelState.loadPromise;
+    }
+
+    modelState.status = 'loading';
+    modelState.progress = 0;
+    modelState.error = null;
+
+    if (modelState.isFullscreen) {
+      canvasHUD.showLoading();
+      canvasHUD.setProgress(0);
+    }
+
+    const loaderConfig = {};
+    if (forcedSource === 'cloud') {
+      loaderConfig.sources = DEFAULT_MODEL_CONFIG.sources.filter(s => !s.isLocal);
+    } else if (forcedSource === 'local') {
+      loaderConfig.sources = DEFAULT_MODEL_CONFIG.sources.filter(s => s.isLocal);
+    }
+
+    const modelLoader = new ResilientModelLoader(loaderConfig);
+
+    modelState.loadPromise = (async () => {
+      try {
+        const buffer = await modelLoader.loadModelBuffer({
+          onStatus: () => {},
+          onProgress: (progress) => {
+            modelState.progress = Math.min(100, Math.max(0, progress.percent || 0));
+            // Only update loading overlay if fullscreen is active
+            if (modelState.isFullscreen) {
+              canvasHUD.setProgress(modelState.progress);
+            }
+          }
+        });
+
+        modelState.status = 'parsing';
+        if (modelState.isFullscreen) {
+          canvasHUD.setParsing(true);
+        }
+
+        await new Promise((resolve, reject) => {
+          const usdLoader = new USDLoader();
+          usdLoader.parse(
+            buffer,
+            '',
+            (usdModel) => {
+              usdModel.name = 'Fusion360_USDZ_Model';
+              scene.add(usdModel);
+              window.usdModel = usdModel;
+              console.log('USDZ model loaded and parsed successfully:', usdModel);
+
+              // Build clean component registry for animation control
+              const componentRegistry = buildComponentRegistry(usdModel, true);
+              window.componentRegistry = componentRegistry;
+
+              // Initialize Procedural Virtual Door Assembly for Leftover Food Compartment
+              const virtualDoor = new VirtualDoorAssembly(scene, componentRegistry, renderer);
+              window.virtualDoorAssembly = virtualDoor;
+
+              // Initialize Gomikin Interactive Dissection & 3D Catalogue System
+              const gomikinAnimation = initDissectionAnimationSystem(componentRegistry, camera, controls);
+              window.gomikinAnimation = gomikinAnimation;
+
+              // Initialize Modular View Controller & Physical Flow Controller
+              const moduleViewController = new ModuleViewController(componentRegistry, camera, controls);
+              window.moduleViewController = moduleViewController;
+
+              const physicalFlowController = new PhysicalFlowController(componentRegistry, scene, camera, controls);
+              window.physicalFlowController = physicalFlowController;
+
+              // Initialize Authoritative View Transition Coordinator
+              const viewCoordinator = new ViewTransitionCoordinator({
+                componentRegistry,
+                camera,
+                controls,
+                moduleViewController,
+                dissectionController: gomikinAnimation.controller,
+                physicalFlowController
+              });
+              window.viewCoordinator = viewCoordinator;
+
+              // Mount Modern Glassmorphism Modular Control Bar & Workflow Sim Dock
+              initModularControlBar({
+                viewCoordinator,
+                moduleViewController,
+                physicalFlowController,
+                dissectionAnimationController: gomikinAnimation.controller
+              });
+
+              // Enable controls for user exploration
+              controls.enabled = true;
+              modelState.status = 'ready';
+
+              if (modelState.isFullscreen) {
+                canvasHUD.complete();
+                window.dispatchEvent(new Event('resize'));
+              } else {
+                const statusDot = document.getElementById('canvas-status-dot');
+                if (statusDot) statusDot.className = 'status-dot active';
+              }
+
+              resolve(usdModel);
+            },
+            (error) => {
+              console.error('Error parsing USDZ:', error);
+              modelState.status = 'error';
+              modelState.error = 'Failed to parse 3D CAD data.';
+              if (modelState.isFullscreen) {
+                canvasHUD.showError(
+                  modelState.error,
+                  () => startBackgroundLoad(),
+                  () => startBackgroundLoad('cloud')
+                );
+              }
+              reject(error);
+            }
+          );
+        });
+      } catch (loadErr) {
+        console.error('Error loading CAD model:', loadErr);
+        modelState.status = 'error';
+        modelState.error = loadErr.message || 'Failed to download CAD assembly.';
+        if (modelState.isFullscreen) {
+          canvasHUD.showError(
+            modelState.error,
+            () => startBackgroundLoad(),
+            () => startBackgroundLoad('cloud')
+          );
+        }
+        throw loadErr;
+      }
+    })();
+
+    return modelState.loadPromise;
+  }
+
+  // Kick off background model loading immediately (quiet, non-blocking)
+  startBackgroundLoad();
+
+  // 5. Fullscreen 3D Launch Experience Transitions
+  function enterFullscreen3D() {
+    const canvasWrapper = document.getElementById('gomikin-canvas-wrapper');
+    if (!canvasWrapper) return;
+
+    canvasWrapper.classList.add('fullscreen-mode');
+    modelState.isFullscreen = true;
+
+    const fullscreenText = document.getElementById('fullscreen-text');
+    const fullscreenIcon = document.getElementById('fullscreen-icon');
+    if (fullscreenText) fullscreenText.textContent = 'Exit Fullscreen';
+    if (fullscreenIcon) fullscreenIcon.textContent = '✕';
+
+    // Hide idle preview overlay in fullscreen
+    canvasHUD.hideIdle();
+
+    if (modelState.status === 'ready') {
+      // Model is already ready! Reveal immediately
+      canvasHUD.hideLoading();
+      canvasHUD.hideError();
+      controls.enabled = true;
+    } else if (modelState.status === 'loading') {
+      // Background download in progress: show fullscreen loading overlay with percentage only
+      canvasHUD.showLoading();
+      canvasHUD.setProgress(modelState.progress);
+    } else if (modelState.status === 'parsing') {
+      canvasHUD.showLoading();
+      canvasHUD.setParsing(true);
+    } else if (modelState.status === 'error') {
+      canvasHUD.showError(
+        modelState.error || 'Failed to load CAD assembly.',
+        () => startBackgroundLoad(),
+        () => startBackgroundLoad('cloud')
+      );
+    } else if (modelState.status === 'idle') {
+      startBackgroundLoad();
+      canvasHUD.showLoading();
+    }
+
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  function exitFullscreen3D() {
+    const canvasWrapper = document.getElementById('gomikin-canvas-wrapper');
+    if (!canvasWrapper) return;
+
+    canvasWrapper.classList.remove('fullscreen-mode');
+    modelState.isFullscreen = false;
+
+    const fullscreenText = document.getElementById('fullscreen-text');
+    const fullscreenIcon = document.getElementById('fullscreen-icon');
+    if (fullscreenText) fullscreenText.textContent = 'Fullscreen';
+    if (fullscreenIcon) fullscreenIcon.textContent = '⛶';
+
+    // If model is not ready, restore idle invitation in hero card
+    if (modelState.status !== 'ready') {
+      canvasHUD.showIdle();
+      canvasHUD.hideLoading();
+    }
+
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  window.enterFullscreen3D = enterFullscreen3D;
+  window.exitFullscreen3D = exitFullscreen3D;
+
+  // 6. Wire User Interactive Triggers
   const heroExploreBtn = document.getElementById('btn-hero-explore');
   const canvasExploreBtn = document.getElementById('btn-canvas-explore');
   const canvasIdleOverlay = document.getElementById('canvas-idle-overlay');
-
-  const startExploring = () => {
-    if (!isModelLoaded && !isLoadingModel) {
-      loadUSDZ();
-    }
-  };
+  const canvasFullscreenBtn = document.getElementById('btn-canvas-fullscreen');
 
   if (heroExploreBtn) {
-    heroExploreBtn.addEventListener('click', () => {
-      startExploring();
-      const wrapper = document.getElementById('gomikin-canvas-wrapper');
-      if (wrapper) {
-        wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    });
+    heroExploreBtn.addEventListener('click', enterFullscreen3D);
   }
 
   if (canvasExploreBtn) {
     canvasExploreBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      startExploring();
+      enterFullscreen3D();
     });
   }
 
   if (canvasIdleOverlay) {
-    canvasIdleOverlay.addEventListener('click', () => {
-      startExploring();
+    canvasIdleOverlay.addEventListener('click', enterFullscreen3D);
+  }
+
+  if (canvasFullscreenBtn) {
+    canvasFullscreenBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (modelState.isFullscreen) {
+        exitFullscreen3D();
+      } else {
+        enterFullscreen3D();
+      }
     });
   }
 
-  // 6. Preserved Controllers & Legacy Infrastructure
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modelState.isFullscreen) {
+      exitFullscreen3D();
+    }
+  });
+
+  // 7. Preserved Controllers & Legacy Infrastructure
   const inspectionController = new InspectionController(gomikinEnvelope, camera, controls);
   const workflowController = new WorkflowController(gomikinEnvelope, scene);
   window.inspectionController = inspectionController;
@@ -345,7 +427,7 @@ function init() {
   if (legacyUI) legacyUI.style.display = 'none';
   if (legacyToggleBtn) legacyToggleBtn.style.display = 'none';
 
-  // 7. Unified Render Loop
+  // 8. Unified Render Loop
   const clock = new THREE.Clock();
 
   function animate() {
