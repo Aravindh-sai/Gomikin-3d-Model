@@ -247,12 +247,14 @@ function init() {
                 canvasHUD.complete();
                 window.dispatchEvent(new Event('resize'));
               } else {
-                // On landing page: Keep 3D canvas and controls hidden!
+                // On landing page: Keep 3D canvas, controls, and dissect buttons strictly hidden!
                 const appCanvas = document.getElementById('app-canvas');
                 if (appCanvas) appCanvas.style.display = 'none';
                 controls.enabled = false;
                 const modularNav = document.getElementById('gomikin-modular-nav');
                 if (modularNav) modularNav.style.display = 'none';
+                const dissectBtn = document.getElementById('btn-dissect-gomikin');
+                if (dissectBtn) dissectBtn.style.display = 'none';
 
                 const statusDot = document.getElementById('canvas-status-dot');
                 if (statusDot) statusDot.className = 'status-dot active';
@@ -423,6 +425,8 @@ function init() {
         controls.enabled = true;
         const modularNav = document.getElementById('gomikin-modular-nav');
         if (modularNav) modularNav.style.display = 'flex';
+        const dissectBtn = document.getElementById('btn-dissect-gomikin');
+        if (dissectBtn) dissectBtn.style.display = 'flex';
         canvasHUD.hideLoading();
       } else if (modelState.status === 'loading' || modelState.status === 'parsing') {
         canvasHUD.showLoading();
@@ -466,6 +470,14 @@ function init() {
       }
       if (fullscreenHeader) fullscreenHeader.style.display = 'none';
       if (modularNav) modularNav.style.display = 'none';
+      const dissectBtn = document.getElementById('btn-dissect-gomikin');
+      if (dissectBtn) dissectBtn.style.display = 'none';
+      const subNav = document.getElementById('gomikin-sub-nav');
+      if (subNav) subNav.style.display = 'none';
+      const flowConsole = document.getElementById('gomikin-flow-console');
+      if (flowConsole) flowConsole.style.display = 'none';
+      const partCard = document.getElementById('gomikin-part-card');
+      if (partCard) partCard.style.display = 'none';
       if (appCanvas) appCanvas.style.display = 'none';
       controls.enabled = false;
       canvasHUD.hideLoading();
@@ -480,9 +492,17 @@ function init() {
     // Normal Motion: Animate back to original bounds
     const targetRect = placeholderEl ? placeholderEl.getBoundingClientRect() : initialRect;
 
-    // Hide fullscreen header and 3D navigation immediately
+    // Hide fullscreen header, 3D navigation, and floating dissect controls immediately
     if (fullscreenHeader) fullscreenHeader.style.display = 'none';
     if (modularNav) modularNav.style.display = 'none';
+    const dissectBtn = document.getElementById('btn-dissect-gomikin');
+    if (dissectBtn) dissectBtn.style.display = 'none';
+    const subNav = document.getElementById('gomikin-sub-nav');
+    if (subNav) subNav.style.display = 'none';
+    const flowConsole = document.getElementById('gomikin-flow-console');
+    if (flowConsole) flowConsole.style.display = 'none';
+    const partCard = document.getElementById('gomikin-part-card');
+    if (partCard) partCard.style.display = 'none';
     canvasHUD.hideLoading();
 
     // Hide 3D canvas so it doesn't leak onto the landing page

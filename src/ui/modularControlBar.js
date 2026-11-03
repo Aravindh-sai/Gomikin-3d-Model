@@ -542,9 +542,15 @@ export function initModularControlBar({
     if (tab === 'flow') document.getElementById('tab-flow-sim')?.classList.add('active');
 
     // Toggle bottom dissection button visibility based on active tab
+    const canvasWrapper = document.getElementById('gomikin-canvas-wrapper');
+    const isFullscreen = canvasWrapper && canvasWrapper.classList.contains('fullscreen-mode');
     const dissectBtn = document.getElementById('btn-dissect-gomikin');
     if (dissectBtn) {
-      dissectBtn.style.display = (tab === 'full' || tab === 'dissection') ? 'block' : 'none';
+      if (!isFullscreen) {
+        dissectBtn.style.display = 'none';
+      } else {
+        dissectBtn.style.display = (tab === 'full' || tab === 'dissection') ? 'flex' : 'none';
+      }
     }
 
     if (tab === 'full') {

@@ -653,6 +653,13 @@ export class DissectionAnimationController {
   updateButtonState() {
     if (!this.primaryButton) return;
 
+    const canvasWrapper = document.getElementById('gomikin-canvas-wrapper');
+    const isFullscreen = canvasWrapper && canvasWrapper.classList.contains('fullscreen-mode');
+    if (!isFullscreen) {
+      this.primaryButton.style.display = 'none';
+      return;
+    }
+
     if (this._state === ANIMATION_STATES.ASSEMBLED) {
       this.primaryButton.innerHTML = `
         <span class="btn-icon">⚡</span>
@@ -879,6 +886,9 @@ export function createPrimaryDissectButton(controller) {
   });
 
   const hostBtn = document.getElementById('gomikin-canvas-wrapper') || document.body;
+  const isFullscreen = hostBtn && hostBtn.classList && hostBtn.classList.contains('fullscreen-mode');
+  btn.style.display = isFullscreen ? 'flex' : 'none';
+
   hostBtn.appendChild(btn);
   controller.primaryButton = btn;
   controller.updateButtonState();

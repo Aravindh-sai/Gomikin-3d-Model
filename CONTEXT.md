@@ -661,3 +661,49 @@ Phase C.2 addresses key visual and interaction refinements requested after initi
 - **Instant Re-Launch:** Confirmed re-entering fullscreen immediately displays ready 3D model without re-downloading.
 - **Mobile Responsive Check:** Validated at $390\times 844\text{px}$.
 - **Severe Console Errors:** 0 errors recorded.
+
+---
+
+## 21. Phase C.2 Clutter Fix: Pure Figma Vector Preview & Dissect Button Neutralization
+
+### 1. Root Cause Analysis
+1. **Dissect Button Leakage:**
+   - In `src/animation/dissectionAnimationSystem.js`, when background CAD loading completed, `initDissectionAnimationSystem` dynamically injected a floating button `#btn-dissect-gomikin` (`⚡ DISSECT GOMIKIN`) with `.btn-dissect-primary { position: absolute; bottom: 24px; left: 50%; z-index: 1500; display: flex; }` directly into `#gomikin-canvas-wrapper`.
+   - Additionally, in `src/ui/modularControlBar.js`, initializing tab `'full'` set `dissectBtn.style.display = 'block'` without checking if the canvas wrapper was in `fullscreen-mode`.
+   - Consequently, as soon as background CAD loading completed, the cyan neon button appeared overlapping the bottom invitation card on the landing page before the user ever clicked launch.
+2. **Double / Overlapping Preview Cards:**
+   - The previously cropped raster image `public/assets/gomikin-cylinder-preview.png` retained the top header of the invitation card from the Figma screenshot.
+   - When the HTML invitation card was positioned over it, the burnt-in card text peered through, causing a cluttered "double card" appearance.
+
+### 2. Implementation Details
+1. **Figma Vector Assets & Styling from `vite.config.zip` / SVG:**
+   - Extracted clean vector SVGs from the Figma project export:
+     - `public/assets/preview-ground-shadow.svg` (Shadow ellipse: `#080A09` at 0.8 opacity)
+     - `public/assets/preview-product-top.svg` (Top ellipse: `#A3A89C`)
+     - `public/assets/preview-product-base.svg` (Base ellipse: `#4D544D`)
+   - Replaced raster cylinder with pure vector DOM composition matching Figma Make (`.preview-product-body`, `.preview-top-rim`, `.preview-door-outer`, `.preview-door-panel`, `.preview-door-hinge`).
+   - Replaced old card with exact Figma launch panel:
+     - Container: `#252b27`, border-radius 14px, Champagne border accent.
+     - Title: *"Explore the Gomikin 3D model"* (`#f2efe6`, 16px semibold).
+     - Description: *"Load the interactive experience when you're ready."* (`#a5aa91`, 12px regular).
+     - Launch button: *"Launch 3D ↗"* (`#b99a63`, `#343b36`, 27px radius pill).
+   - Removed `public/assets/gomikin-cylinder-preview.png` entirely, completely eliminating overlapping card artifacts.
+2. **Triple-Layer Dissect Button & 3D Control Suppression:**
+   - **CSS Boundary (`src/style.css`):**
+     Added strict rules ensuring `#btn-dissect-gomikin`, `.btn-dissect-primary`, `#gomikin-modular-nav`, `#gomikin-sub-nav`, `#gomikin-flow-console`, `#gomikin-part-card` are `display: none !important; visibility: hidden !important; pointer-events: none !important;` whenever `body:not(.in-fullscreen-cad)` or `.canvas-wrapper:not(.fullscreen-mode)`.
+   - **System Controller Initialization (`src/animation/dissectionAnimationSystem.js`):**
+     `createPrimaryDissectButton` and `updateButtonState` check for `.fullscreen-mode` and enforce `btn.style.display = 'none'` when pre-launch.
+   - **Modular Tab Coordinator (`src/ui/modularControlBar.js`):**
+     Guarded tab-switch visibility so `dissectBtn` is only shown when `isFullscreen === true`.
+   - **Transition Handlers (`src/main.js`):**
+     Both `launchCinematicFullscreen()` and `exitCinematicFullscreen()` explicitly manage `#btn-dissect-gomikin` and 3D sub-bars.
+
+### 3. Verification & Evidence (`scratch/verify_phase_c2_fixes.cjs`)
+- **Initial Landing Page:** `#btn-dissect-gomikin` visible: `false`, static preview visible: `true`.
+- **Post Background Load Landing Page:** Model load completes in background (~$3.5\text{s}$), `#btn-dissect-gomikin` computed style: `{ display: 'none', visibility: 'hidden', visible: false }`. Zero clutter.
+- **Clean Vector Rendering:** Single invitation card, pristine floor grid, vector cylinder body, and bottom meta (`MODEL LOADS ON DEMAND · 268 MB`).
+- **Launch 3D:** Seamlessly expands to fullscreen 3D environment, Three.js model and studio controls displayed.
+- **Exit Fullscreen:** Restores clean static preview without any leaking 3D controls or buttons.
+- **Responsive Check:** Verified on Tablet ($1024\times 768\text{px}$) and Mobile ($390\times 844\text{px}$).
+- **Console Errors:** 0 errors.
+

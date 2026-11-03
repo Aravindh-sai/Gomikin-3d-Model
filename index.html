@@ -63,37 +63,46 @@
           <!-- Right Column: Interactive Product Viewport Container -->
           <div class="hero-canvas-column">
             <div id="gomikin-canvas-wrapper" class="canvas-wrapper">
-              <!-- Static Product Preview (Pre-Launch State: matches Figma Artboard) -->
-              <div id="static-product-preview" class="static-preview-container" title="Click anywhere to launch 3D experience">
-                <!-- Preview Minimal Header -->
-                <div class="preview-header-bar">
-                  <div class="preview-header-left">
-                    <span class="preview-title">GOMIKIN / PRODUCT EXPERIENCE</span>
+              <!-- Static Product Preview (Pre-Launch State: Figma Artboard Vector Layout) -->
+              <div id="static-product-preview" class="static-preview-container" title="Click to launch 3D experience">
+                <!-- Figma Header -->
+                <header class="canvas-preview-header">
+                  <p class="preview-eyebrow">GOMIKIN&nbsp;&nbsp;/&nbsp;&nbsp;PRODUCT EXPERIENCE</p>
+                  <div class="preview-status-pill">INTERACTIVE 3D</div>
+                </header>
+
+                <!-- Figma Stage with Vector Cylinder -->
+                <div class="preview-stage">
+                  <div class="preview-floor-grid" aria-hidden="true"></div>
+                  <img class="preview-ground-shadow" src="/assets/preview-ground-shadow.svg" alt="" />
+
+                  <div class="preview-product" aria-label="Gomikin Product Illustration">
+                    <div class="preview-product-body">
+                      <img class="preview-product-top" src="/assets/preview-product-top.svg" alt="" />
+                      <div class="preview-top-rim"></div>
+                      <div class="preview-door-outer">
+                        <div class="preview-door-panel"></div>
+                        <div class="preview-door-hinge"></div>
+                      </div>
+                      <img class="preview-product-base" src="/assets/preview-product-base.svg" alt="" />
+                    </div>
                   </div>
-                  <div class="preview-header-right">
-                    <span class="preview-badge">INTERACTIVE 3D</span>
-                  </div>
-                </div>
-                
-                <!-- Stylized Cylinder Illustration Area -->
-                <div class="preview-illustration-area">
-                  <div class="preview-floor-grid"></div>
-                  <div class="preview-cylinder-shadow"></div>
-                  <img src="/assets/gomikin-cylinder-preview.png" alt="Gomikin Product Preview" class="preview-cylinder-img" />
                 </div>
 
-                <!-- Floating Bottom Invitation Card -->
-                <div class="preview-invitation-card">
-                  <div class="preview-card-info">
-                    <h3 class="preview-card-title">Explore the Gomikin 3D Model</h3>
-                    <p class="preview-card-desc">Explore the mechanical architecture and internal processing system.</p>
-                    <span class="preview-card-label">Interactive engineering environment</span>
+                <!-- Figma Launch Panel (Invitation Card) -->
+                <section class="preview-launch-panel" aria-live="polite">
+                  <div class="preview-launch-copy">
+                    <h3 class="preview-launch-title">Explore the Gomikin 3D model</h3>
+                    <p class="preview-launch-desc">Load the interactive experience when you're ready.</p>
                   </div>
-                  <button id="btn-canvas-explore" class="preview-card-btn" aria-label="Launch 3D Experience">
-                    <span>Launch 3D Experience</span>
-                    <span class="btn-arrow">↗</span>
+                  <button id="btn-canvas-explore" class="preview-launch-button" type="button" aria-label="Launch 3D Experience">
+                    <span>Launch 3D</span>
+                    <span class="launch-btn-arrow">↗</span>
                   </button>
-                </div>
+                </section>
+
+                <!-- Figma Model Meta -->
+                <p class="preview-model-meta">MODEL LOADS ON DEMAND&nbsp;&nbsp;·&nbsp;&nbsp;268 MB</p>
               </div>
 
               <!-- Fullscreen Studio Header Bar (Visible ONLY in Fullscreen Mode) -->

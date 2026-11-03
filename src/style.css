@@ -412,10 +412,10 @@ body.in-fullscreen-cad .gomikin-minimal-footer {
 .canvas-wrapper {
   position: relative;
   width: 100%;
-  height: clamp(480px, 66vh, 600px);
-  background: #181d19;
+  height: clamp(520px, 72vh, 610px);
+  background: #1b211d;
   border: 1px solid rgba(185, 154, 99, 0.35); /* Thin Champagne border */
-  border-radius: 18px;
+  border-radius: 22px;
   overflow: hidden;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28), 0 4px 16px rgba(0, 0, 0, 0.15);
   transition: border-color var(--gomikin-transition-fast), box-shadow var(--gomikin-transition-fast);
@@ -440,7 +440,7 @@ body.in-fullscreen-cad .gomikin-minimal-footer {
 }
 
 /* --------------------------------------------------------------------------
-   PRE-LAUNCH STATIC PRODUCT PREVIEW (Matches Figma Artboard)
+   PRE-LAUNCH STATIC PRODUCT PREVIEW (Exact Figma Layout & Vectors)
    -------------------------------------------------------------------------- */
 
 .static-preview-container {
@@ -452,167 +452,273 @@ body.in-fullscreen-cad .gomikin-minimal-footer {
   cursor: pointer;
   user-select: none;
   z-index: 20;
-  background: #181d19;
+  background: #1b211d;
+  border-radius: 22px;
+  overflow: hidden;
   transition: opacity 0.35s ease;
 }
 
-/* Preview Header */
-.preview-header-bar {
-  height: 48px;
-  padding: 0 22px;
+/* Figma Canvas Header */
+.canvas-preview-header {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 30px;
+  right: 30px;
+  height: 66px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(24, 29, 25, 0.5);
-  backdrop-filter: blur(8px);
-  z-index: 10;
+  border-bottom: 1px solid #323834;
 }
 
-.preview-title {
+.preview-eyebrow {
+  color: #d8c7a5;
+  font-family: var(--gomikin-font-display), sans-serif;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--gomikin-ivory);
-  opacity: 0.9;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  line-height: 1.1;
+  margin: 0;
 }
 
-.preview-badge {
-  font-size: 10px;
-  font-weight: 700;
+.preview-status-pill {
+  width: 146px;
+  height: 32px;
+  border-radius: 16px;
+  background: #323834;
+  color: #d8c7a5;
+  font-family: var(--gomikin-font-display), sans-serif;
+  font-size: 11px;
+  font-weight: 600;
   letter-spacing: 1.2px;
-  color: var(--gomikin-ivory);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  padding: 4px 14px;
-  border-radius: 9999px;
-}
-
-/* Preview Illustration Area */
-.preview-illustration-area {
-  position: relative;
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 0;
+  line-height: 1.1;
+  transition: color 180ms ease, background 180ms ease;
+}
+
+/* Figma Stage & Vector Cylinder */
+.preview-stage {
+  position: absolute;
+  inset: 66px 0 0;
+  min-height: 522px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
 
 .preview-floor-grid {
   position: absolute;
-  inset: 0;
-  background-image: linear-gradient(rgba(185, 154, 99, 0.06) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(185, 154, 99, 0.06) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse at 50% 75%, black 40%, transparent 80%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 75%, black 40%, transparent 80%);
+  z-index: 0;
+  left: 4.45%;
+  right: 4.45%;
+  top: 354px;
+  height: 168px;
+  background-image:
+    repeating-linear-gradient(to bottom, rgba(50, 56, 52, 0.65) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(to right, rgba(50, 56, 52, 0.4) 0 1px, transparent 1px 54px);
+  background-position: 0 10px, 30px 0;
   pointer-events: none;
 }
 
-.preview-cylinder-shadow {
+.preview-ground-shadow {
   position: absolute;
-  width: 220px;
-  height: 40px;
-  bottom: 22%;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.85) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
   z-index: 1;
+  top: 366px;
+  left: 50%;
+  width: 280px;
+  height: 44px;
+  max-width: none;
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 
-.preview-cylinder-img {
-  max-height: 290px;
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.65));
-  position: relative;
+.preview-product {
+  position: absolute;
   z-index: 2;
+  top: 87px;
+  left: 50%;
+  width: 164px;
+  height: 321px;
+  transform: translateX(-50%);
+  perspective: 700px;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.static-preview-container:hover .preview-cylinder-img {
-  transform: translateY(-3px) scale(1.02);
+.static-preview-container:hover .preview-product {
+  transform: translateX(-50%) translateY(-3px);
 }
 
-/* Floating Bottom Invitation Card */
-.preview-invitation-card {
-  margin: 0 16px 16px 16px;
-  padding: 18px 22px;
-  background: rgba(30, 36, 32, 0.92);
-  border: 1px solid rgba(185, 154, 99, 0.32);
-  border-radius: 16px;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55);
+.preview-product-body {
+  position: absolute;
+  top: 21px;
+  left: 0;
+  width: 164px;
+  height: 282px;
+  border-radius: 28px;
+  background: #6e756b;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.2);
+}
+
+.preview-product-top {
+  position: absolute;
+  top: -21px;
+  left: 0;
+  width: 164px;
+  height: 48px;
+  max-width: none;
+  pointer-events: none;
+}
+
+.preview-product-base {
+  position: absolute;
+  top: 256px;
+  left: 0;
+  width: 164px;
+  height: 44px;
+  max-width: none;
+  pointer-events: none;
+}
+
+.preview-top-rim {
+  position: absolute;
+  top: -1px;
+  left: 17px;
+  width: 130px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(242, 239, 230, 0.6);
+  pointer-events: none;
+}
+
+.preview-door-outer {
+  position: absolute;
+  top: 52px;
+  left: 17px;
+  width: 129px;
+  height: 142px;
+  border-radius: 8px;
+  background: #4d574f;
+}
+
+.preview-door-panel {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  width: 115px;
+  height: 128px;
+  border-radius: 5px;
+  background: #636b61;
+}
+
+.preview-door-hinge {
+  position: absolute;
+  top: 12px;
+  right: -1px;
+  width: 5px;
+  height: 118px;
+  border-radius: 2px;
+  background: #b99a63;
+}
+
+/* Figma Launch Panel (Invitation Card) */
+.preview-launch-panel {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 30px;
   display: flex;
+  width: min(598px, calc(100% - 48px));
+  height: 104px;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  z-index: 5;
+  gap: 24px;
+  padding: 0 24px;
+  transform: translateX(-50%);
+  border-radius: 14px;
+  background: #252b27;
+  border: 1px solid rgba(185, 154, 99, 0.22);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
   transition: border-color var(--gomikin-transition-fast), transform var(--gomikin-transition-fast);
 }
 
-.static-preview-container:hover .preview-invitation-card {
-  border-color: rgba(185, 154, 99, 0.55);
-  transform: translateY(-2px);
+.static-preview-container:hover .preview-launch-panel {
+  border-color: rgba(185, 154, 99, 0.45);
+  transform: translateX(-50%) translateY(-2px);
 }
 
-.preview-card-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.preview-card-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--gomikin-ivory);
-  margin: 0;
-  letter-spacing: 0.2px;
-}
-
-.preview-card-desc {
-  font-size: 12px;
-  color: var(--gomikin-sand);
-  margin: 4px 0 0 0;
-  line-height: 1.45;
-}
-
-.preview-card-label {
-  font-size: 10.5px;
+.preview-launch-copy .preview-launch-title {
+  color: #f2efe6;
+  font-family: var(--gomikin-font-display), sans-serif;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--gomikin-sage);
-  margin-top: 5px;
-  letter-spacing: 0.6px;
+  line-height: 1.2;
+  margin: 0;
 }
 
-.preview-card-btn {
+.preview-launch-copy .preview-launch-desc {
+  margin-top: 8px;
+  color: #a5aa91;
+  font-family: var(--gomikin-font-body), sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 0;
+}
+
+.preview-launch-button {
+  flex: 0 0 158px;
+  height: 54px;
+  border: none;
+  border-radius: 27px;
+  background: #b99a63;
+  color: #343b36;
+  font-family: var(--gomikin-font-display), sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #B99A63 0%, #D8C7A5 100%);
-  color: #171B18;
-  border: none;
-  border-radius: 9999px;
-  padding: 12px 24px;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 4px 14px rgba(185, 154, 99, 0.35);
+  transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.preview-launch-button:hover {
+  background: #c8aa70;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(185, 154, 99, 0.5);
+}
+
+.preview-launch-button:active {
+  transform: translateY(0);
+}
+
+.launch-btn-arrow {
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(185, 154, 99, 0.35);
-  transition: all var(--gomikin-transition-fast);
-  flex-shrink: 0;
-}
-
-.preview-card-btn:hover {
-  transform: scale(1.03);
-  box-shadow: 0 6px 22px rgba(185, 154, 99, 0.5);
-}
-
-.preview-card-btn .btn-arrow {
-  font-size: 14px;
   font-weight: 800;
+}
+
+/* Figma Model Meta */
+.preview-model-meta {
+  position: absolute;
+  z-index: 6;
+  bottom: 11px;
+  left: 30px;
+  color: #a5aa91;
+  font-family: var(--gomikin-font-display), sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  margin: 0;
+  opacity: 0.85;
 }
 
 /* --------------------------------------------------------------------------
@@ -720,19 +826,47 @@ body.in-fullscreen-cad .gomikin-minimal-footer {
   display: block;
 }
 
-/* Strict Boundary: Hide all 3D modular navigation controls outside fullscreen */
+/* Strict Boundary: Hide all 3D modular navigation controls & dissect buttons outside fullscreen */
+#btn-dissect-gomikin,
+.btn-dissect-primary,
 #gomikin-modular-nav,
 #gomikin-modules-subbar,
+#gomikin-sub-nav,
 #gomikin-module-card,
+#gomikin-part-card,
 #gomikin-workflow-card,
+#gomikin-flow-console,
 #gomikin-ui,
 #ui-toggle-btn,
-#gomikin-right-panel {
+#gomikin-right-panel,
+#gomikin-presentation-dock,
+#gomikin-inspection-hud,
+#gomikin-inspection-panel,
+#gomikin-component-detail-overlay {
   display: none !important;
+}
+
+body:not(.in-fullscreen-cad) #btn-dissect-gomikin,
+body:not(.in-fullscreen-cad) .btn-dissect-primary,
+.canvas-wrapper:not(.fullscreen-mode) #btn-dissect-gomikin,
+.canvas-wrapper:not(.fullscreen-mode) .btn-dissect-primary {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .canvas-wrapper.fullscreen-mode #gomikin-modular-nav {
   display: flex !important;
+}
+
+.canvas-wrapper.fullscreen-mode #gomikin-sub-nav {
+  display: flex !important;
+}
+
+.canvas-wrapper.fullscreen-mode #btn-dissect-gomikin.btn-dissect-primary {
+  display: flex !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 /* --------------------------------------------------------------------------
