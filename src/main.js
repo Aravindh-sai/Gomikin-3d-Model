@@ -25,39 +25,41 @@ function createLoadingHUD() {
   overlay.style.cssText = `
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
-    background: radial-gradient(circle at center, rgba(17, 24, 39, 0.94) 0%, rgba(10, 10, 13, 0.98) 100%);
-    backdrop-filter: blur(16px);
+    background: radial-gradient(circle at center, rgba(35, 41, 37, 0.96) 0%, rgba(18, 22, 19, 0.99) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    color: #f1f5f9;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    transition: opacity 0.5s ease;
+    color: var(--gomikin-ivory, #F2EFE6);
+    font-family: var(--gomikin-font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   `;
   overlay.innerHTML = `
-    <div style="font-size: 34px; margin-bottom: 6px; filter: drop-shadow(0 0 12px rgba(0,255,204,0.4));">🏛️</div>
-    <div style="font-size: 15px; font-weight: 800; letter-spacing: 2px; color: #00ffcc; margin-bottom: 6px; text-transform: uppercase;">GOMIKIN 3D CAD MODEL</div>
-    <div id="loading-source-badge" style="font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 12px; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; margin-bottom: 10px; transition: all 0.3s ease;">
+    <img src="/assets/Gomikin-logo.png" alt="Gomikin" style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.5));" />
+    <div style="font-size: 15px; font-weight: 700; letter-spacing: 3px; color: var(--gomikin-ivory, #F2EFE6); margin-bottom: 4px; text-transform: uppercase;">GOMIKIN</div>
+    <div style="font-size: 10px; font-weight: 600; letter-spacing: 1.8px; color: var(--gomikin-sage, #A5AA91); margin-bottom: 16px; text-transform: uppercase;">TURNING WASTE INTO VALUE</div>
+    <div id="loading-source-badge" style="font-size: 11px; font-weight: 600; padding: 3px 12px; border-radius: 12px; background: rgba(185, 154, 99, 0.12); border: 1px solid rgba(185, 154, 99, 0.35); color: var(--gomikin-champagne, #B99A63); margin-bottom: 12px; transition: all 0.3s ease;">
       Locating CAD Archive...
     </div>
-    <div id="loading-status-text" style="font-size: 12px; color: #94a3b8; margin-bottom: 14px; max-width: 380px; text-align: center; min-height: 16px;">
+    <div id="loading-status-text" style="font-size: 12px; color: var(--gomikin-sand, #D8C7A5); margin-bottom: 14px; max-width: 400px; text-align: center; min-height: 16px; font-weight: 400; line-height: 1.4;">
       Loading CAD Model Assembly...
     </div>
-    <div style="width: 260px; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; margin-bottom: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
-      <div id="loading-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00ffcc, #00b4d8); transition: width 0.15s ease; box-shadow: 0 0 8px rgba(0,255,204,0.6);"></div>
+    <div style="width: 280px; height: 5px; background: rgba(52, 59, 54, 0.5); border: 1px solid rgba(165, 170, 145, 0.2); border-radius: 4px; overflow: hidden; margin-bottom: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);">
+      <div id="loading-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #B99A63 0%, #D8C7A5 100%); transition: width 0.15s ease; box-shadow: 0 0 10px rgba(185, 154, 99, 0.4);"></div>
     </div>
-    <div style="width: 260px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
-      <span id="loading-size-text" style="color: #64748b;">0 MB / 268 MB</span>
-      <span id="loading-percent-text" style="font-weight: 700; color: #38bdf8;">0%</span>
-      <span id="loading-speed-text" style="color: #64748b;">-- MB/s</span>
+    <div style="width: 280px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
+      <span id="loading-size-text" style="color: var(--gomikin-sage, #A5AA91);">0 MB / 268 MB</span>
+      <span id="loading-percent-text" style="font-weight: 700; color: var(--gomikin-champagne, #B99A63);">0%</span>
+      <span id="loading-speed-text" style="color: var(--gomikin-sage, #A5AA91);">-- MB/s</span>
     </div>
-    <div id="loading-error-box" style="display: none; margin-top: 14px; text-align: center; max-width: 320px;">
-      <div id="loading-error-msg" style="color: #ef4444; font-size: 12px; margin-bottom: 10px; line-height: 1.4;">Failed to load CAD assembly. Check network connection.</div>
+    <div id="loading-error-box" style="display: none; margin-top: 16px; text-align: center; max-width: 320px;">
+      <div id="loading-error-msg" style="color: var(--gomikin-error, #e06c75); font-size: 12px; margin-bottom: 10px; line-height: 1.4;">Failed to load CAD assembly. Check network connection.</div>
       <div style="display: flex; gap: 8px; justify-content: center;">
-        <button id="loading-retry-btn" style="background: rgba(0,255,204,0.18); border: 1px solid #00ffcc; color: #00ffcc; border-radius: 20px; padding: 6px 16px; font-size: 12px; font-weight: 600; cursor: pointer;">Retry Load</button>
-        <button id="loading-force-cloud-btn" style="background: rgba(56,189,248,0.18); border: 1px solid #38bdf8; color: #38bdf8; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;">Force Cloud</button>
+        <button id="loading-retry-btn" style="background: rgba(185, 154, 99, 0.15); border: 1px solid var(--gomikin-champagne, #B99A63); color: var(--gomikin-ivory, #F2EFE6); border-radius: 20px; padding: 6px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Retry Load</button>
+        <button id="loading-force-cloud-btn" style="background: rgba(165, 170, 145, 0.15); border: 1px solid var(--gomikin-sage, #A5AA91); color: var(--gomikin-ivory, #F2EFE6); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Force Cloud</button>
       </div>
     </div>
   `;
@@ -72,17 +74,17 @@ function createLoadingHUD() {
         if (id === 'cache') icon = '⚡';
         badge.textContent = `${icon} ${label}`;
         if (id === 'cache') {
-          badge.style.color = '#a855f7';
-          badge.style.borderColor = 'rgba(168,85,247,0.4)';
-          badge.style.background = 'rgba(168,85,247,0.15)';
+          badge.style.color = '#D8C7A5';
+          badge.style.borderColor = 'rgba(216,199,165,0.45)';
+          badge.style.background = 'rgba(216,199,165,0.12)';
         } else if (id === 'vercel-blob') {
-          badge.style.color = '#38bdf8';
-          badge.style.borderColor = 'rgba(56,189,248,0.4)';
-          badge.style.background = 'rgba(56,189,248,0.15)';
+          badge.style.color = '#B99A63';
+          badge.style.borderColor = 'rgba(185,154,99,0.45)';
+          badge.style.background = 'rgba(185,154,99,0.12)';
         } else {
-          badge.style.color = '#00ffcc';
-          badge.style.borderColor = 'rgba(0,255,204,0.4)';
-          badge.style.background = 'rgba(0,255,204,0.15)';
+          badge.style.color = '#F2EFE6';
+          badge.style.borderColor = 'rgba(242,239,230,0.35)';
+          badge.style.background = 'rgba(242,239,230,0.10)';
         }
       }
     },
@@ -119,7 +121,7 @@ function createLoadingHUD() {
       const bar = document.getElementById('loading-progress-bar');
       if (bar && isParsing) {
         bar.style.width = '100%';
-        bar.style.background = 'linear-gradient(90deg, #38bdf8, #a855f7, #00ffcc)';
+        bar.style.background = 'linear-gradient(90deg, #B99A63, #D8C7A5, #F2EFE6)';
         bar.style.backgroundSize = '200% 100%';
         bar.style.animation = 'pulse 1.5s infinite';
       }

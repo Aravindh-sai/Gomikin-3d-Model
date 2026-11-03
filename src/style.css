@@ -1,14 +1,171 @@
-body, html {
+/* ==========================================================================
+   GOMIKIN DESIGN SYSTEM — GLOBAL TOKENS & TYPOGRAPHY (PHASE B)
+   Premium industrial aesthetics, restrained contrast, and engineering precision.
+   ========================================================================== */
+
+:root {
+  /* --- 1. Official Gomikin Brand Palette --- */
+  --gomikin-ivory: #F2EFE6;
+  --gomikin-graphite: #343B36;
+  --gomikin-champagne: #B99A63;
+  --gomikin-sage: #A5AA91;
+  --gomikin-sand: #D8C7A5;
+
+  /* --- 2. Surface & Background Colors --- */
+  --gomikin-bg-viewport: #0A0D0B;
+  --gomikin-surface-base: #171B18;
+  --gomikin-surface-graphite: #232925;
+  --gomikin-surface-elevated: #2E3631;
+  --gomikin-surface-overlay: rgba(18, 22, 19, 0.94);
+  --gomikin-surface-glass: rgba(52, 59, 54, 0.78);
+  --gomikin-surface-glass-heavy: rgba(35, 41, 37, 0.90);
+  --gomikin-surface-card: rgba(23, 27, 24, 0.88);
+
+  /* --- 3. Typography Colors --- */
+  --gomikin-text-primary: var(--gomikin-ivory);
+  --gomikin-text-secondary: var(--gomikin-sand);
+  --gomikin-text-muted: var(--gomikin-sage);
+  --gomikin-text-accent: var(--gomikin-champagne);
+  --gomikin-text-inverse: var(--gomikin-graphite);
+
+  /* --- 4. Architectural Borders & Dividers --- */
+  --gomikin-border-subtle: rgba(165, 170, 145, 0.22);
+  --gomikin-border-medium: rgba(185, 154, 99, 0.32);
+  --gomikin-border-accent: rgba(185, 154, 99, 0.65);
+  --gomikin-border-focus: var(--gomikin-ivory);
+
+  /* --- 5. Interactive & Feedback States --- */
+  --gomikin-interactive-hover: rgba(185, 154, 99, 0.12);
+  --gomikin-interactive-hover-border: rgba(185, 154, 99, 0.45);
+  --gomikin-interactive-active-bg: linear-gradient(135deg, #B99A63 0%, #D8C7A5 100%);
+  --gomikin-interactive-active-text: #181C1A;
+  --gomikin-interactive-inactive: rgba(242, 239, 230, 0.68);
+  --gomikin-error: #e06c75;
+  --gomikin-error-bg: rgba(224, 108, 117, 0.14);
+  --gomikin-error-border: rgba(224, 108, 117, 0.4);
+
+  /* --- 6. Consistent Spacing Scale --- */
+  --gomikin-space-2xs: 4px;
+  --gomikin-space-xs: 8px;
+  --gomikin-space-sm: 12px;
+  --gomikin-space-md: 16px;
+  --gomikin-space-lg: 24px;
+  --gomikin-space-xl: 32px;
+  --gomikin-space-2xl: 48px;
+
+  /* --- 7. Border Radii --- */
+  --gomikin-radius-xs: 4px;
+  --gomikin-radius-sm: 6px;
+  --gomikin-radius-md: 10px;
+  --gomikin-radius-lg: 14px;
+  --gomikin-radius-xl: 20px;
+  --gomikin-radius-pill: 9999px;
+
+  /* --- 8. Restrained Shadows & Depth --- */
+  --gomikin-shadow-subtle: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --gomikin-shadow-elevated: 0 16px 40px rgba(0, 0, 0, 0.65);
+  --gomikin-shadow-accent: 0 0 24px rgba(185, 154, 99, 0.22);
+  --gomikin-shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+
+  /* --- 9. Refined Transition Timings --- */
+  --gomikin-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --gomikin-transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --gomikin-transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* --- 10. Typography Scale & Fonts --- */
+  --gomikin-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --gomikin-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --gomikin-font-h1: 28px;
+  --gomikin-font-h2: 20px;
+  --gomikin-font-h3: 16px;
+  --gomikin-font-nav: 13px;
+  --gomikin-font-body: 13px;
+  --gomikin-font-tech: 11px;
+  --gomikin-font-badge: 10px;
+}
+
+/* ==========================================================================
+   GLOBAL RESET & CANVAS
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  font-family: sans-serif;
+  background-color: var(--gomikin-bg-viewport);
+  color: var(--gomikin-text-primary);
+  font-family: var(--gomikin-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #app-canvas {
   display: block;
   width: 100vw;
   height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   TYPOGRAPHY HIERARCHY UTILITIES
+   ========================================================================== */
+
+.gomikin-h1 {
+  font-family: var(--gomikin-font-sans);
+  font-size: var(--gomikin-font-h1);
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--gomikin-text-primary);
+  line-height: 1.2;
+}
+
+.gomikin-h2 {
+  font-family: var(--gomikin-font-sans);
+  font-size: var(--gomikin-font-h2);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--gomikin-text-primary);
+  line-height: 1.25;
+}
+
+.gomikin-h3 {
+  font-family: var(--gomikin-font-sans);
+  font-size: var(--gomikin-font-h3);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--gomikin-text-primary);
+  line-height: 1.3;
+}
+
+.gomikin-tech-label {
+  font-family: var(--gomikin-font-sans);
+  font-size: var(--gomikin-font-tech);
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--gomikin-text-muted);
+}
+
+.gomikin-mono-readout {
+  font-family: var(--gomikin-font-mono);
+  font-size: var(--gomikin-font-tech);
+  color: var(--gomikin-text-secondary);
+  letter-spacing: 0.4px;
+}
+
+.gomikin-supporting-text {
+  font-size: var(--gomikin-font-body);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--gomikin-text-secondary);
 }

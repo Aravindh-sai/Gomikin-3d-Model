@@ -445,3 +445,44 @@ Eliminated legacy automated top-funnel/chute animations; leftover food is manual
   - Mode transition isolation: PASSED (Organic/Inorganic/Full Model states clean).
   - Production build: PASSED (`npm run build` in $1.29\text{s}$, 0 errors).
 
+
+---
+
+## 16. Phase B — Gomikin Global Design System & Branding Implementation (November 2026)
+
+### 1. Brand Asset Verification & Selection
+- **Asset Directory:** `public/assets/`
+- **Inspected Assets:**
+  - `Gomikin-logo.png` (1254x1254, transparent PNG): Official standalone folded ribbon 'G' emblem in dark graphite and warm champagne/gold.
+  - `Gomikin-logo-with-text.png` (1254x1254, transparent PNG): Emblem stacked over "GOMIKIN" wordmark and "TURNING WASTE INTO VALUE" tagline.
+  - `Gomikin-text-white.png` & `Gomikin-text-black.png` (2172x724): Horizontal wordmark variants.
+  - `Gomikin-text-with-tagline-white.png` & `Gomikin-text-with-tagline-black.png` (2172x724 / 2156x729): Horizontal wordmark with tagline.
+- **Selection for Loading HUD & Brand Identity:** `public/assets/Gomikin-logo.png` applied with `object-fit: contain` and zero distortion, recolouring, or cropping.
+
+### 2. Centralized Design Tokens (`src/style.css`)
+- **Official Gomikin Palette:**
+  - `--gomikin-ivory: #F2EFE6` (Crisp light text, primary typography, highlights)
+  - `--gomikin-graphite: #343B36` (Primary dark surface tones, architectural borders)
+  - `--gomikin-champagne: #B99A63` (Premium accent, active tabs, interactive highlights, progress indicators)
+  - `--gomikin-sage: #A5AA91` (Secondary technical labels, subtle borders, engineering badges)
+  - `--gomikin-sand: #D8C7A5` (Neutral tertiary details, parameter readouts, muted typography)
+- **Surfaces & Overlays:**
+  - Base viewport: `#0A0D0B`
+  - Base surfaces: `#171B18`, `#232925`, `#2E3631`
+  - Translucent glassmorphism: `rgba(52, 59, 54, 0.78)` and `rgba(35, 41, 37, 0.90)`
+- **Interaction & Typography Tokens:**
+  - Defined active/hover/inactive interaction states, 7-step spacing scale (`--gomikin-space-*`), 6 border radius levels (`--gomikin-radius-*`), restrained drop shadows (`--gomikin-shadow-*`), and cubic-bezier transition curves (`--gomikin-transition-*`).
+  - Typography scale (`--gomikin-font-*`) from Display headings ($28\text{px}$) down to technical badges ($10\text{px}$).
+
+### 3. Loading Screen Overhaul (`src/main.js`)
+- Replaced emoji and legacy cyan/blue theme with the official Gomikin folded-G emblem and typography.
+- Styled source badges, transfer readouts, error states, and retry buttons with the new design tokens.
+- Preserved 100% of the functional loading lifecycle: archive download, progress tracking, decompression, speed calculation, and cloud fallback.
+
+### 4. Verification Suite (`scratch/verify_phase_b.cjs`)
+- **Build Status:** Passed clean compilation (`npm run build` in $1.38\text{s}$, 0 errors).
+- **Headless Edge Verification:**
+  - Loading HUD render: Verified brand emblem, tagline, and token colors.
+  - Model loading: 268 MB CAD archive decompressed and loaded cleanly.
+  - Tab interactions: All 4 navigation tabs (`Full Model`, `Modular Views`, `33-Part Dissection`, `Simulate Flow`) verified functional without state regression.
+  - Console Errors: 0 errors recorded throughout execution.
