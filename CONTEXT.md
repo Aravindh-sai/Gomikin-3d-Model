@@ -706,4 +706,5 @@ Phase C.2 addresses key visual and interaction refinements requested after initi
 - **Exit Fullscreen:** Restores clean static preview without any leaking 3D controls or buttons.
 - **Responsive Check:** Verified on Tablet ($1024\times 768\text{px}$) and Mobile ($390\times 844\text{px}$).
 - **Console Errors:** 0 errors.
+- **Dev Server Watcher Stability:** Configured `vite.config.js` with `server.watch.ignored` for large static CAD binaries (`public/Gomikin/`, `model_parts/`, `*.glb`, `*.usdz`, `scratch/`), preventing Windows `EBUSY` file watcher crashes.
 
