@@ -585,3 +585,79 @@ Phase C.1 simplifies and elevates the landing page into a clean, single-viewport
 - **Escape & Exit:** Confirmed pressing `Escape` or clicking `Exit Fullscreen` smoothly returns to single-viewport landing page with model kept resident in memory.
 - **Re-Entry:** Confirmed re-entering fullscreen immediately shows the ready 3D model without reloading.
 - **Browser Console Errors:** 0 severe errors detected.
+
+
+---
+
+## 19. Phase C.2 — Static Product Preview & Cinematic Fullscreen Expansion (November 2026)
+
+### 1. Architectural Scope & Problem Resolutions
+Phase C.2 addresses key visual and interaction refinements requested after initial landing page implementation:
+1. **Canvas Pre-Launch Isolation (Highest Priority):**
+   - **Problem Solved:** Previously, the Three.js model and `#gomikin-modular-nav` toolbar were rendering in the background and competing with the preview card, creating visual clutter and looking like an already-opened CAD tool.
+   - **Resolution:** Three.js `#app-canvas` is strictly hidden (`display: none`) and OrbitControls disabled before launch. All four navigation tabs, dissection buttons, and simulation controls are completely hidden (`display: none !important`) until fullscreen 3D mode is active.
+2. **Static Product Preview (Figma Artboard Direction):**
+   - Implemented a dedicated `#static-product-preview` within the viewport container:
+     - Minimalist top header bar: `GOMIKIN / PRODUCT EXPERIENCE` and subtle `INTERACTIVE 3D` pill badge.
+     - Center: Stylized cylindrical Gomikin product illustration (`public/assets/gomikin-cylinder-preview.png`) resting on an elliptical shadow and perspective floor grid.
+     - Floating bottom invitation card:
+       - Title: *"Explore the Gomikin 3D Model"*
+       - Description: *"Explore the mechanical architecture and internal processing system."*
+       - Sub-label: *"Interactive engineering environment"*
+       - Button: *"Launch 3D Experience ↗"* with Champagne gradient.
+     - The entire preview area is clickable to launch the 3D experience.
+3. **Cinematic Fullscreen Expansion Animation:**
+   - Replaced the abrupt fullscreen jump with a 700 ms shared-element FLIP expansion animation.
+   - Captures viewport `getBoundingClientRect()` and inserts an invisible placeholder in the document flow to prevent layout shift.
+   - Animates from card coordinates to `100vw \times 100vh` at `top: 0, left: 0`, while border-radius smoothly transitions from `18px` to `0px`.
+   - Fades out surrounding landing page header, hero content, and footer during the transition.
+   - Smooth ease-in-out curve (`cubic-bezier(0.16, 1, 0.3, 1)`).
+   - Reverse animation on Escape / Exit Fullscreen smoothly collapses the viewport back to its original card dimensions and restores the static preview while keeping the 3D model resident in memory.
+   - Fully respects `prefers-reduced-motion`.
+4. **Hero Content & Typography Refinement:**
+   - Scaled headline to restrained, confident proportions (`clamp(28px, 3.4vw, 44px)`).
+   - Formatted first line in Graphite (`#343B36`) and second line in Champagne (`#B99A63`).
+   - Refined description: *"Meet Gomikin — an intelligent waste management system designed to transform everyday waste into something valuable."*
+   - Preserves single desktop viewport fit (`100vh`, zero scrolling).
+5. **Unified Logo Lockup:**
+   - Placed official folded-G emblem (`public/assets/Gomikin-logo.png`, $32\text{px}$) and dark wordmark (`public/assets/Gomikin-text-black.png`, $22\text{px}$) side by side in the upper-left header with a balanced $12\text{px}$ gap.
+   - Preserved original aspect ratios with zero manual text typing or cropping.
+6. **Restrained Skeleton Initialization Screen:**
+   - Fullscreen Graphite background (`#171B18`) with small emblem, white wordmark (`Gomikin-text-white.png`), subtle Champagne sliding bar indicator, and *"Initializing Gomikin"* label.
+   - Dismisses smoothly within $100\text{ms}$ on initial paint.
+
+### 2. Files Modified & Updated
+1. [`index.html`](file:///c:/Projects/Gomikin-3d-Model/index.html):
+   - Added unified emblem + wordmark brand lockup in header.
+   - Added restrained skeleton initialization overlay.
+   - Refined hero headline typography and description wording.
+   - Built pre-launch static product preview with header, floor grid, cylinder illustration, and invitation card.
+   - Separated fullscreen studio header bar from pre-launch state.
+2. [`src/style.css`](file:///c:/Projects/Gomikin-3d-Model/src/style.css):
+   - Added unified header brand styles.
+   - Added restrained initialization skeleton styles.
+   - Enforced single desktop viewport layout rules.
+   - Added `.static-preview-container`, floor grid, cylinder shadow, and invitation card styles.
+   - Enforced strict CSS boundaries: `#gomikin-modular-nav` and controls are `display: none !important` outside fullscreen.
+   - Added cinematic transition classes (`.cinematic-transitioning`, `.in-fullscreen-cad`).
+   - Added `prefers-reduced-motion` fallbacks.
+3. [`src/main.js`](file:///c:/Projects/Gomikin-3d-Model/src/main.js):
+   - Implemented `launchCinematicFullscreen()` and `exitCinematicFullscreen()` with FLIP layout capture and placeholder management.
+   - Bound launch triggers: `#btn-hero-explore`, `#btn-canvas-explore`, and `#static-product-preview`.
+   - Bound exit triggers: `#btn-canvas-fullscreen` and `Escape` key.
+   - Ensured Three.js canvas remains hidden on landing page and only renders in fullscreen mode.
+   - Preserved all 3D controllers and background loading mechanics.
+4. [`public/assets/gomikin-cylinder-preview.png`](file:///c:/Projects/Gomikin-3d-Model/public/assets/gomikin-cylinder-preview.png):
+   - Extracted and refined cylinder artwork from Figma reference with transparent edge blending.
+
+### 3. Automated Verification Evidence (`scratch/verify_phase_c2.cjs`)
+- **Build Status:** `npm run build` succeeded in $1.58\text{s}$, 0 errors.
+- **Pre-Launch Isolation:** Three.js canvas visible pre-launch = `false`, `#gomikin-modular-nav` visible pre-launch = `null` (strictly hidden).
+- **Static Preview Verification:** Card title, description, label, badge, and header all verified against Figma artboard.
+- **Cinematic Expansion Animation:** Validated transition in motion, expanding to `100vw \times 100vh` with border-radius easing.
+- **Fullscreen Model Ready:** Three.js canvas and modular nav displayed once ready in fullscreen.
+- **All 4 Sub-System Modes:** Verified `Full Model`, `Modular Views`, `33-Part Dissection`, `Simulate Flow`.
+- **Reverse Exit Animation:** Validated smooth collapse via Escape back to original card dimensions, restoring static preview and hiding 3D canvas.
+- **Instant Re-Launch:** Confirmed re-entering fullscreen immediately displays ready 3D model without re-downloading.
+- **Mobile Responsive Check:** Validated at $390\times 844\text{px}$.
+- **Severe Console Errors:** 0 errors recorded.

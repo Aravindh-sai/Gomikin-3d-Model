@@ -5,22 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gomikin — Autonomous Bio-Recovery Apparatus</title>
     <link rel="icon" type="image/png" href="/assets/Gomikin-logo.png" />
-    <meta name="description" content="Meet Gomikin — an intelligent waste management system designed to turn everyday waste into something valuable." />
+    <meta name="description" content="Meet Gomikin — an intelligent waste management system designed to transform everyday waste into something valuable." />
   </head>
   <body class="landing-body">
-    <!-- Minimal Initialization Screen (dismissed on app mount) -->
+    <!-- Minimal Restrained Skeleton Initialization Screen -->
     <div id="gomikin-init-screen" class="init-skeleton-screen">
       <div class="init-skeleton-content">
-        <img src="/assets/Gomikin-logo.png" alt="Gomikin" class="init-skeleton-logo" />
-        <div class="init-skeleton-kicker">GOMIKIN</div>
-        <div class="init-skeleton-status">Initializing Gomikin...</div>
+        <div class="init-skeleton-lockup">
+          <img src="/assets/Gomikin-logo.png" alt="Gomikin Emblem" class="init-skeleton-emblem" />
+          <img src="/assets/Gomikin-text-white.png" alt="Gomikin" class="init-skeleton-wordmark" />
+        </div>
+        <div class="init-skeleton-bar">
+          <div class="init-skeleton-bar-fill"></div>
+        </div>
+        <div class="init-skeleton-text">Initializing Gomikin</div>
       </div>
     </div>
 
-    <!-- Minimal Header -->
+    <!-- Minimalist Header with Unified Brand Lockup -->
     <header class="gomikin-header">
       <div class="header-container">
         <a href="#" class="header-brand" aria-label="Gomikin Homepage">
+          <img src="/assets/Gomikin-logo.png" alt="Gomikin Emblem" class="brand-emblem-img" />
           <img src="/assets/Gomikin-text-black.png" alt="Gomikin" class="brand-text-logo-img" />
         </a>
         <div class="header-actions">
@@ -44,58 +50,71 @@
               <span class="headline-accent">It's the beginning.</span>
             </h1>
             <p class="hero-description">
-              Meet Gomikin — an intelligent waste management system designed to turn everyday waste into something valuable.
+              Meet Gomikin — an intelligent waste management system designed to transform everyday waste into something valuable.
             </p>
             <div class="hero-actions">
-              <button id="btn-hero-explore" class="btn-primary-explore">
+              <button id="btn-hero-explore" class="btn-primary-explore" aria-label="Explore 3D Prototype">
                 <span class="btn-icon">▶</span>
                 <span>Explore 3D Prototype</span>
               </button>
             </div>
           </div>
 
-          <!-- Right Column: Interactive Product Canvas Container -->
+          <!-- Right Column: Interactive Product Viewport Container -->
           <div class="hero-canvas-column">
             <div id="gomikin-canvas-wrapper" class="canvas-wrapper">
-              <!-- Canvas Header Bar -->
-              <div class="canvas-header-bar">
+              <!-- Static Product Preview (Pre-Launch State: matches Figma Artboard) -->
+              <div id="static-product-preview" class="static-preview-container" title="Click anywhere to launch 3D experience">
+                <!-- Preview Minimal Header -->
+                <div class="preview-header-bar">
+                  <div class="preview-header-left">
+                    <span class="preview-title">GOMIKIN / PRODUCT EXPERIENCE</span>
+                  </div>
+                  <div class="preview-header-right">
+                    <span class="preview-badge">INTERACTIVE 3D</span>
+                  </div>
+                </div>
+                
+                <!-- Stylized Cylinder Illustration Area -->
+                <div class="preview-illustration-area">
+                  <div class="preview-floor-grid"></div>
+                  <div class="preview-cylinder-shadow"></div>
+                  <img src="/assets/gomikin-cylinder-preview.png" alt="Gomikin Product Preview" class="preview-cylinder-img" />
+                </div>
+
+                <!-- Floating Bottom Invitation Card -->
+                <div class="preview-invitation-card">
+                  <div class="preview-card-info">
+                    <h3 class="preview-card-title">Explore the Gomikin 3D Model</h3>
+                    <p class="preview-card-desc">Explore the mechanical architecture and internal processing system.</p>
+                    <span class="preview-card-label">Interactive engineering environment</span>
+                  </div>
+                  <button id="btn-canvas-explore" class="preview-card-btn" aria-label="Launch 3D Experience">
+                    <span>Launch 3D Experience</span>
+                    <span class="btn-arrow">↗</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Fullscreen Studio Header Bar (Visible ONLY in Fullscreen Mode) -->
+              <div id="fullscreen-header-bar" class="canvas-header-bar" style="display: none;">
                 <div class="canvas-header-left">
                   <span id="canvas-status-dot" class="status-dot idle"></span>
                   <span class="canvas-title">GOMIKIN EMBODIMENT B</span>
                   <span class="canvas-badge">3D CAD VIEWPORT</span>
                 </div>
                 <div class="canvas-header-right">
-                  <button id="btn-canvas-fullscreen" class="btn-canvas-fullscreen-toggle" title="Toggle Fullscreen">
-                    <span id="fullscreen-icon">⛶</span>
-                    <span id="fullscreen-text">Fullscreen</span>
+                  <button id="btn-canvas-fullscreen" class="btn-canvas-fullscreen-toggle" title="Exit Fullscreen (Esc)">
+                    <span id="fullscreen-icon">✕</span>
+                    <span id="fullscreen-text">Exit Fullscreen</span>
                   </button>
                 </div>
               </div>
 
-              <!-- WebGL Canvas -->
-              <canvas id="app-canvas"></canvas>
+              <!-- WebGL Canvas (Strictly hidden before 3D launch) -->
+              <canvas id="app-canvas" style="display: none;"></canvas>
 
-              <!-- State 1 & 2: Interactive CAD Product Preview Invitation -->
-              <div id="canvas-idle-overlay" class="canvas-overlay idle-state">
-                <div class="idle-pattern-bg"></div>
-                <div class="idle-card">
-                  <div class="idle-logo-wrapper">
-                    <img src="/assets/Gomikin-logo.png" alt="Gomikin Emblem" class="idle-logo" />
-                  </div>
-                  <div class="idle-kicker">INTERACTIVE 3D CAD MODEL</div>
-                  <h3 class="idle-title">Explore the Engineering</h3>
-                  <p class="idle-desc">
-                    Inspect the mechanical architecture and internal processing system.
-                  </p>
-                  <button id="btn-canvas-explore" class="btn-canvas-start">
-                    <span class="play-icon">▶</span>
-                    <span>Launch 3D Experience</span>
-                  </button>
-                  <div class="idle-hint">Click anywhere inside canvas to enter fullscreen</div>
-                </div>
-              </div>
-
-              <!-- Fullscreen Loading Overlay (Shown ONLY inside fullscreen if background load is still in progress) -->
+              <!-- Fullscreen Loading Overlay (Percentage only, word 'Loading', no MB/speeds) -->
               <div id="canvas-loading-overlay" class="canvas-overlay loading-state" style="display: none;">
                 <div class="loading-content">
                   <img src="/assets/Gomikin-logo.png" alt="Gomikin" class="loading-logo" />

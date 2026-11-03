@@ -21,14 +21,11 @@ import { ResilientModelLoader, DEFAULT_MODEL_CONFIG } from './utils/resilientMod
 
 /**
  * In-Canvas State HUD Controller
- * Manages minimal, elegant status transitions:
- * - Idle Preview (Interactive invitation on landing page)
- * - Fullscreen Loading (Percentage only, word "Loading", never "Downloading")
- * - Fullscreen Ready (Reveal 3D model, enable OrbitControls)
- * - Fullscreen Error / Retry (Clean recovery action without page reload)
+ * Manages loading telemetry and error handling:
+ * - Percentage-only display with word "Loading" (strictly no "Downloading" and no MB/speed metrics)
+ * - Fades out seamlessly when Three.js CAD scene is ready
  */
 function initCanvasHUD() {
-  const idleOverlay = document.getElementById('canvas-idle-overlay');
   const loadingOverlay = document.getElementById('canvas-loading-overlay');
   const errorOverlay = document.getElementById('canvas-error-overlay');
   const statusDot = document.getElementById('canvas-status-dot');
@@ -40,17 +37,7 @@ function initCanvasHUD() {
   const cloudBtn = document.getElementById('btn-canvas-cloud');
 
   return {
-    showIdle: () => {
-      if (idleOverlay) idleOverlay.style.display = 'flex';
-      if (loadingOverlay) loadingOverlay.style.display = 'none';
-      if (errorOverlay) errorOverlay.style.display = 'none';
-      if (statusDot) statusDot.className = 'status-dot idle';
-    },
-    hideIdle: () => {
-      if (idleOverlay) idleOverlay.style.display = 'none';
-    },
     showLoading: () => {
-      if (idleOverlay) idleOverlay.style.display = 'none';
       if (loadingOverlay) {
         loadingOverlay.style.display = 'flex';
         loadingOverlay.style.opacity = '1';
@@ -109,7 +96,7 @@ function init() {
     return;
   }
 
-  // 1. Initialize Three.js Scene within the canvas container
+  // 1. Initialize Three.js Scene within canvas container (Canvas remains hidden pre-launch)
   const { scene, camera, renderer, controls } = initScene(canvas);
 
   // Baseline Parametric Envelope (preserved intact, hidden for loaded CAD assembly)
@@ -128,23 +115,22 @@ function init() {
   controls.target.set(0, 0.51, 0);
   controls.update();
 
-  // Initially disable OrbitControls during idle so clicking canvas doesn't spin empty studio
+  // Initially disable OrbitControls so cursor interactions do not spin hidden studio
   controls.enabled = false;
 
   // 2. Initialize Canvas HUD Controller
   const canvasHUD = initCanvasHUD();
-  canvasHUD.showIdle();
 
-  // 3. Dismiss Minimal Initialization Screen
+  // 3. Dismiss Minimal Skeleton Initialization Screen
   const initScreen = document.getElementById('gomikin-init-screen');
   if (initScreen) {
     setTimeout(() => {
       initScreen.classList.add('hidden');
       setTimeout(() => initScreen.remove(), 400);
-    }, 80);
+    }, 100);
   }
 
-  // 4. Model State & Background CAD Loading Architecture
+  // 4. Model State & Background CAD Pre-Loading
   const modelState = {
     status: 'idle', // 'idle' | 'loading' | 'parsing' | 'ready' | 'error'
     progress: 0,
@@ -245,14 +231,29 @@ function init() {
                 dissectionAnimationController: gomikinAnimation.controller
               });
 
-              // Enable controls for user exploration
-              controls.enabled = true;
               modelState.status = 'ready';
 
               if (modelState.isFullscreen) {
+                // In fullscreen: reveal 3D canvas and enable OrbitControls
+                const appCanvas = document.getElementById('app-canvas');
+                if (appCanvas) {
+                  appCanvas.style.display = 'block';
+                  appCanvas.style.opacity = '1';
+                }
+                controls.enabled = true;
+                const modularNav = document.getElementById('gomikin-modular-nav');
+                if (modularNav) modularNav.style.display = 'flex';
+
                 canvasHUD.complete();
                 window.dispatchEvent(new Event('resize'));
               } else {
+                // On landing page: Keep 3D canvas and controls hidden!
+                const appCanvas = document.getElementById('app-canvas');
+                if (appCanvas) appCanvas.style.display = 'none';
+                controls.enabled = false;
+                const modularNav = document.getElementById('gomikin-modular-nav');
+                if (modularNav) modularNav.style.display = 'none';
+
                 const statusDot = document.getElementById('canvas-status-dot');
                 if (statusDot) statusDot.className = 'status-dot active';
               }
@@ -295,107 +296,300 @@ function init() {
   // Kick off background model loading immediately (quiet, non-blocking)
   startBackgroundLoad();
 
-  // 5. Fullscreen 3D Launch Experience Transitions
-  function enterFullscreen3D() {
+  // 5. Cinematic Fullscreen Expansion & Exit Animation (FLIP-style shared element)
+  let isAnimatingTransition = false;
+  let placeholderEl = null;
+  let initialRect = null;
+
+  function launchCinematicFullscreen() {
+    if (isAnimatingTransition || modelState.isFullscreen) return;
+    isAnimatingTransition = true;
+
     const canvasWrapper = document.getElementById('gomikin-canvas-wrapper');
-    if (!canvasWrapper) return;
+    const staticPreview = document.getElementById('static-product-preview');
+    const fullscreenHeader = document.getElementById('fullscreen-header-bar');
+    const appCanvas = document.getElementById('app-canvas');
 
-    canvasWrapper.classList.add('fullscreen-mode');
-    modelState.isFullscreen = true;
-
-    const fullscreenText = document.getElementById('fullscreen-text');
-    const fullscreenIcon = document.getElementById('fullscreen-icon');
-    if (fullscreenText) fullscreenText.textContent = 'Exit Fullscreen';
-    if (fullscreenIcon) fullscreenIcon.textContent = '✕';
-
-    // Hide idle preview overlay in fullscreen
-    canvasHUD.hideIdle();
-
-    if (modelState.status === 'ready') {
-      // Model is already ready! Reveal immediately
-      canvasHUD.hideLoading();
-      canvasHUD.hideError();
-      controls.enabled = true;
-    } else if (modelState.status === 'loading') {
-      // Background download in progress: show fullscreen loading overlay with percentage only
-      canvasHUD.showLoading();
-      canvasHUD.setProgress(modelState.progress);
-    } else if (modelState.status === 'parsing') {
-      canvasHUD.showLoading();
-      canvasHUD.setParsing(true);
-    } else if (modelState.status === 'error') {
-      canvasHUD.showError(
-        modelState.error || 'Failed to load CAD assembly.',
-        () => startBackgroundLoad(),
-        () => startBackgroundLoad('cloud')
-      );
-    } else if (modelState.status === 'idle') {
-      startBackgroundLoad();
-      canvasHUD.showLoading();
+    if (!canvasWrapper) {
+      isAnimatingTransition = false;
+      return;
     }
 
-    window.dispatchEvent(new Event('resize'));
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReduced) {
+      canvasWrapper.classList.add('fullscreen-mode');
+      document.body.classList.add('in-fullscreen-cad');
+      if (staticPreview) staticPreview.style.display = 'none';
+      if (fullscreenHeader) fullscreenHeader.style.display = 'flex';
+      modelState.isFullscreen = true;
+
+      if (modelState.status === 'ready') {
+        if (appCanvas) appCanvas.style.display = 'block';
+        controls.enabled = true;
+        const modularNav = document.getElementById('gomikin-modular-nav');
+        if (modularNav) modularNav.style.display = 'flex';
+        canvasHUD.hideLoading();
+      } else if (modelState.status === 'loading' || modelState.status === 'parsing') {
+        canvasHUD.showLoading();
+      } else if (modelState.status === 'error') {
+        canvasHUD.showError(modelState.error || 'Failed to load CAD assembly.', () => startBackgroundLoad(), () => startBackgroundLoad('cloud'));
+      }
+
+      window.dispatchEvent(new Event('resize'));
+      isAnimatingTransition = false;
+      return;
+    }
+
+    // Normal Motion: Capture initial bounding rect
+    initialRect = canvasWrapper.getBoundingClientRect();
+
+    // Create placeholder in document flow to prevent layout shift
+    if (!placeholderEl) {
+      placeholderEl = document.createElement('div');
+      placeholderEl.id = 'canvas-placeholder';
+      placeholderEl.style.width = initialRect.width + 'px';
+      placeholderEl.style.height = initialRect.height + 'px';
+      placeholderEl.style.visibility = 'hidden';
+      placeholderEl.style.pointerEvents = 'none';
+      placeholderEl.style.flexShrink = '0';
+      canvasWrapper.parentNode.insertBefore(placeholderEl, canvasWrapper);
+    } else {
+      placeholderEl.style.width = initialRect.width + 'px';
+      placeholderEl.style.height = initialRect.height + 'px';
+    }
+
+    // Lock wrapper into fixed position at exact current coordinates
+    canvasWrapper.style.position = 'fixed';
+    canvasWrapper.style.top = initialRect.top + 'px';
+    canvasWrapper.style.left = initialRect.left + 'px';
+    canvasWrapper.style.width = initialRect.width + 'px';
+    canvasWrapper.style.height = initialRect.height + 'px';
+    canvasWrapper.style.margin = '0';
+    canvasWrapper.style.zIndex = '9999';
+    canvasWrapper.style.borderRadius = '18px';
+    canvasWrapper.style.boxShadow = '0 24px 60px rgba(0, 0, 0, 0.5)';
+    canvasWrapper.style.transition = 'top 700ms cubic-bezier(0.16, 1, 0.3, 1), left 700ms cubic-bezier(0.16, 1, 0.3, 1), width 700ms cubic-bezier(0.16, 1, 0.3, 1), height 700ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 700ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 700ms cubic-bezier(0.16, 1, 0.3, 1)';
+
+    // Fade surrounding landing page elements
+    document.body.classList.add('cinematic-transitioning');
+    if (staticPreview) {
+      staticPreview.style.transition = 'opacity 350ms ease';
+      staticPreview.style.opacity = '0';
+    }
+
+    // Force reflow
+    void canvasWrapper.offsetHeight;
+
+    // Animate to full viewport bounds
+    canvasWrapper.style.top = '0px';
+    canvasWrapper.style.left = '0px';
+    canvasWrapper.style.width = '100vw';
+    canvasWrapper.style.height = '100vh';
+    canvasWrapper.style.borderRadius = '0px';
+    canvasWrapper.style.boxShadow = 'none';
+
+    setTimeout(() => {
+      canvasWrapper.classList.add('fullscreen-mode');
+      // Clear inline styles once class is applied
+      canvasWrapper.style.position = '';
+      canvasWrapper.style.top = '';
+      canvasWrapper.style.left = '';
+      canvasWrapper.style.width = '';
+      canvasWrapper.style.height = '';
+      canvasWrapper.style.margin = '';
+      canvasWrapper.style.zIndex = '';
+      canvasWrapper.style.borderRadius = '';
+      canvasWrapper.style.boxShadow = '';
+      canvasWrapper.style.transition = '';
+
+      document.body.classList.remove('cinematic-transitioning');
+      document.body.classList.add('in-fullscreen-cad');
+
+      if (staticPreview) {
+        staticPreview.style.display = 'none';
+      }
+      if (fullscreenHeader) {
+        fullscreenHeader.style.display = 'flex';
+      }
+
+      modelState.isFullscreen = true;
+
+      if (modelState.status === 'ready') {
+        if (appCanvas) {
+          appCanvas.style.display = 'block';
+          appCanvas.style.opacity = '1';
+        }
+        controls.enabled = true;
+        const modularNav = document.getElementById('gomikin-modular-nav');
+        if (modularNav) modularNav.style.display = 'flex';
+        canvasHUD.hideLoading();
+      } else if (modelState.status === 'loading' || modelState.status === 'parsing') {
+        canvasHUD.showLoading();
+        if (modelState.status === 'parsing') {
+          canvasHUD.setParsing(true);
+        } else {
+          canvasHUD.setProgress(modelState.progress);
+        }
+      } else if (modelState.status === 'error') {
+        canvasHUD.showError(modelState.error || 'Failed to load CAD assembly.', () => startBackgroundLoad(), () => startBackgroundLoad('cloud'));
+      }
+
+      window.dispatchEvent(new Event('resize'));
+      isAnimatingTransition = false;
+    }, 700);
   }
 
-  function exitFullscreen3D() {
-    const canvasWrapper = document.getElementById('gomikin-canvas-wrapper');
-    if (!canvasWrapper) return;
+  function exitCinematicFullscreen() {
+    if (isAnimatingTransition || !modelState.isFullscreen) return;
+    isAnimatingTransition = true;
 
+    const canvasWrapper = document.getElementById('gomikin-canvas-wrapper');
+    const staticPreview = document.getElementById('static-product-preview');
+    const fullscreenHeader = document.getElementById('fullscreen-header-bar');
+    const appCanvas = document.getElementById('app-canvas');
+    const modularNav = document.getElementById('gomikin-modular-nav');
+
+    if (!canvasWrapper) {
+      isAnimatingTransition = false;
+      return;
+    }
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReduced) {
+      canvasWrapper.classList.remove('fullscreen-mode');
+      document.body.classList.remove('in-fullscreen-cad');
+      if (staticPreview) {
+        staticPreview.style.display = 'flex';
+        staticPreview.style.opacity = '1';
+      }
+      if (fullscreenHeader) fullscreenHeader.style.display = 'none';
+      if (modularNav) modularNav.style.display = 'none';
+      if (appCanvas) appCanvas.style.display = 'none';
+      controls.enabled = false;
+      canvasHUD.hideLoading();
+      if (placeholderEl && placeholderEl.parentNode) placeholderEl.remove();
+      placeholderEl = null;
+      modelState.isFullscreen = false;
+      window.dispatchEvent(new Event('resize'));
+      isAnimatingTransition = false;
+      return;
+    }
+
+    // Normal Motion: Animate back to original bounds
+    const targetRect = placeholderEl ? placeholderEl.getBoundingClientRect() : initialRect;
+
+    // Hide fullscreen header and 3D navigation immediately
+    if (fullscreenHeader) fullscreenHeader.style.display = 'none';
+    if (modularNav) modularNav.style.display = 'none';
+    canvasHUD.hideLoading();
+
+    // Hide 3D canvas so it doesn't leak onto the landing page
+    if (appCanvas) appCanvas.style.display = 'none';
+
+    // Reveal static preview and fade it in
+    if (staticPreview) {
+      staticPreview.style.display = 'flex';
+      staticPreview.style.opacity = '0';
+      staticPreview.style.transition = 'opacity 500ms ease';
+    }
+
+    // Lock wrapper to fixed fullscreen coordinates
     canvasWrapper.classList.remove('fullscreen-mode');
-    modelState.isFullscreen = false;
+    canvasWrapper.style.position = 'fixed';
+    canvasWrapper.style.top = '0px';
+    canvasWrapper.style.left = '0px';
+    canvasWrapper.style.width = '100vw';
+    canvasWrapper.style.height = '100vh';
+    canvasWrapper.style.margin = '0';
+    canvasWrapper.style.zIndex = '9999';
+    canvasWrapper.style.borderRadius = '0px';
+    canvasWrapper.style.transition = 'top 650ms cubic-bezier(0.16, 1, 0.3, 1), left 650ms cubic-bezier(0.16, 1, 0.3, 1), width 650ms cubic-bezier(0.16, 1, 0.3, 1), height 650ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 650ms cubic-bezier(0.16, 1, 0.3, 1)';
 
-    const fullscreenText = document.getElementById('fullscreen-text');
-    const fullscreenIcon = document.getElementById('fullscreen-icon');
-    if (fullscreenText) fullscreenText.textContent = 'Fullscreen';
-    if (fullscreenIcon) fullscreenIcon.textContent = '⛶';
+    // Bring back surrounding landing page elements
+    document.body.classList.remove('in-fullscreen-cad');
+    document.body.classList.add('cinematic-transitioning');
 
-    // If model is not ready, restore idle invitation in hero card
-    if (modelState.status !== 'ready') {
-      canvasHUD.showIdle();
-      canvasHUD.hideLoading();
+    // Force reflow
+    void canvasWrapper.offsetHeight;
+
+    // Animate wrapper back to original card dimensions
+    canvasWrapper.style.top = (targetRect ? targetRect.top : 100) + 'px';
+    canvasWrapper.style.left = (targetRect ? targetRect.left : 100) + 'px';
+    canvasWrapper.style.width = (targetRect ? targetRect.width : 500) + 'px';
+    canvasWrapper.style.height = (targetRect ? targetRect.height : 500) + 'px';
+    canvasWrapper.style.borderRadius = '18px';
+
+    if (staticPreview) {
+      staticPreview.style.opacity = '1';
     }
 
-    window.dispatchEvent(new Event('resize'));
+    setTimeout(() => {
+      // Clear inline styles
+      canvasWrapper.style.position = '';
+      canvasWrapper.style.top = '';
+      canvasWrapper.style.left = '';
+      canvasWrapper.style.width = '';
+      canvasWrapper.style.height = '';
+      canvasWrapper.style.margin = '';
+      canvasWrapper.style.zIndex = '';
+      canvasWrapper.style.borderRadius = '';
+      canvasWrapper.style.transition = '';
+
+      document.body.classList.remove('cinematic-transitioning');
+
+      if (placeholderEl && placeholderEl.parentNode) {
+        placeholderEl.remove();
+        placeholderEl = null;
+      }
+
+      modelState.isFullscreen = false;
+      controls.enabled = false;
+
+      window.dispatchEvent(new Event('resize'));
+      isAnimatingTransition = false;
+    }, 650);
   }
 
-  window.enterFullscreen3D = enterFullscreen3D;
-  window.exitFullscreen3D = exitFullscreen3D;
+  window.launchCinematicFullscreen = launchCinematicFullscreen;
+  window.exitCinematicFullscreen = exitCinematicFullscreen;
 
   // 6. Wire User Interactive Triggers
   const heroExploreBtn = document.getElementById('btn-hero-explore');
   const canvasExploreBtn = document.getElementById('btn-canvas-explore');
-  const canvasIdleOverlay = document.getElementById('canvas-idle-overlay');
+  const staticProductPreview = document.getElementById('static-product-preview');
   const canvasFullscreenBtn = document.getElementById('btn-canvas-fullscreen');
 
   if (heroExploreBtn) {
-    heroExploreBtn.addEventListener('click', enterFullscreen3D);
+    heroExploreBtn.addEventListener('click', launchCinematicFullscreen);
   }
 
   if (canvasExploreBtn) {
     canvasExploreBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      enterFullscreen3D();
+      launchCinematicFullscreen();
     });
   }
 
-  if (canvasIdleOverlay) {
-    canvasIdleOverlay.addEventListener('click', enterFullscreen3D);
+  if (staticProductPreview) {
+    staticProductPreview.addEventListener('click', launchCinematicFullscreen);
   }
 
   if (canvasFullscreenBtn) {
     canvasFullscreenBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (modelState.isFullscreen) {
-        exitFullscreen3D();
+        exitCinematicFullscreen();
       } else {
-        enterFullscreen3D();
+        launchCinematicFullscreen();
       }
     });
   }
 
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modelState.isFullscreen) {
-      exitFullscreen3D();
+      exitCinematicFullscreen();
     }
   });
 
@@ -460,8 +654,11 @@ function init() {
       demoController.update(deltaTime);
     }
 
-    controls.update();
-    renderer.render(scene, camera);
+    // Only render scene if model is ready and in fullscreen (or if user requested)
+    if (modelState.isFullscreen && modelState.status === 'ready') {
+      controls.update();
+      renderer.render(scene, camera);
+    }
   }
 
   animate();
