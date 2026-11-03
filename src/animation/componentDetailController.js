@@ -19,7 +19,7 @@ export class ComponentDetailController {
     this.choreography = choreography;
     this.camera = camera;
     this.controls = controls;
-    this.domElement = domElement || document.body;
+    this.domElement = domElement || document.getElementById('gomikin-canvas-wrapper') || document.body;
 
     // Raycaster & pointer
     this.raycaster = new THREE.Raycaster();
@@ -78,11 +78,11 @@ export class ComponentDetailController {
     style.id = 'gomikin-detail-styles';
     style.textContent = `
       #gomikin-detail-ui {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         pointer-events: none;
         z-index: 1200;
         opacity: 0;

@@ -486,3 +486,45 @@ Eliminated legacy automated top-funnel/chute animations; leftover food is manual
   - Model loading: 268 MB CAD archive decompressed and loaded cleanly.
   - Tab interactions: All 4 navigation tabs (`Full Model`, `Modular Views`, `33-Part Dissection`, `Simulate Flow`) verified functional without state regression.
   - Console Errors: 0 errors recorded throughout execution.
+
+---
+
+## 17. Phase C — Complete Landing Page Redesign & Decoupled On-Demand 3D Architecture (November 2026)
+
+### 1. Architectural Decoupling & Immediate Page Render
+- **Decoupled Startup:** The website no longer blocks on the 268 MB CAD archive. All HTML, CSS, header, hero copy, technical metrics, and supporting feature sections render instantly on initial load ($0\text{ms}$ network waiting time).
+- **Elimination of Full-Screen Blocking HUD:** The old full-screen downloading HUD overlay was removed from global DOM. All loading telemetry and progress indicators now live strictly inside the product canvas card (`#gomikin-canvas-wrapper`).
+- **State Machine Architecture:**
+  - **State 1 & 2 (Idle / Invitation):** Shows an invitation inside the canvas (`#canvas-idle-overlay`) with the folded-G emblem, technical overview, and an interactive "Explore 3D" button. The entire canvas area is clickable.
+  - **State 3 (Model Download):** Initiated on user demand via `#btn-canvas-explore` or `#btn-hero-explore`. Displays `#canvas-loading-overlay` inside the canvas with a clean horizontal progress bar (Champagne fill on Graphite track).
+    - **Strict Telemetry Compliance:** Absolutely NO numerical download statistics other than the percentage ($0\to 100\%$) are displayed. All MB, speed, and size indicators are omitted.
+  - **State 4 (Model Initialization):** Transition status displays "Preparing 3D experience..." with a pulsing Champagne gradient while Three.js USDLoader parses meshes and constructs the scene graph.
+  - **State 5 (Model Ready):** Smoothly fades out the loading overlay, enables OrbitControls, displays active status indicator dot, and mounts the 4 canonical view mode controls inside the canvas container.
+  - **State 6 (Error & Retry):** Displays `#canvas-error-overlay` on network interruption with "Retry Load" and "Force Cloud" fallback actions, without forcing page reloads or breaking the rest of the website.
+
+### 2. Semantic Landing Page Structure (`index.html` & `src/style.css`)
+- **Header:** Sticky translucent header with official Gomikin logo and wordmark, navigation links (`Product`, `Technology`, `How It Works`, `About`), and "Inquire" action.
+- **Hero Section:** Two-column desktop layout (stacks on tablet/mobile):
+  - Left Column: Category kicker (`AUTONOMOUS BIO-RECOVERY APPARATUS`), headline ("Waste isn't the end. It's the beginning."), supporting product description, dual CTAs ("Explore 3D CAD Prototype" & "Technical Specifications ↓"), and 4-metric parameter grid ($500\text{ mm}$, $1020\text{ mm}$, $33\text{ Parts}$, $3\text{ Sectors}$).
+  - Right Column: Interactive product canvas card (`#gomikin-canvas-wrapper`) with studio charcoal background, canvas header bar with status dot, viewport badge, and fullscreen toggle.
+- **Supporting Feature Sections:**
+  1. **Intelligent Segregation (`#technology`):** Optical AI Vision Module, Dual-Axis Sorting Base, and Acoustic/Load Telemetry.
+  2. **Engineered Processing (`#how-it-works`):** Rotary Cross-Shear Cutters, $8\text{ mm}$ Precision Sizing Mesh, and Hydrostatic Liquid Drainage.
+  3. **Value Recovery (`#about`):** Dual-Helix Agitator, Closed-Loop Environmental Telemetry, and Negative-Pressure Carbon Filtration.
+- **Deployment Card & Footer:** High-contrast inquiry card and brand footer with copyright and patent architecture notes.
+
+### 3. Canvas Viewport Integration & Responsive Fullscreen
+- Three.js WebGL renderer automatically queries and observes `#gomikin-canvas-wrapper` dimensions via `ResizeObserver`, ensuring pixel-crisp rendering at container bounds.
+- Added responsive `#btn-canvas-fullscreen` toggle: expands `#gomikin-canvas-wrapper` into an immersive fullscreen viewport with escape key handler and clean resize event synchronization.
+- Connected all existing controllers (`moduleViewController`, `dissectionAnimationSystem`, `componentDetailController`, `physicalFlowController`, `viewCoordinator`) directly into `#gomikin-canvas-wrapper` so all 4 existing views (`Full Model`, `Modular Views`, `33-Part Dissection`, `Simulate Flow`) function with zero regressions.
+
+### 4. Verification Suite Results (`scratch/verify_phase_c.cjs` & `scratch/test_phase_c_error_retry.cjs`)
+- **Build Status:** Passed clean compilation (`npm run build` in $1.59\text{s}$, 0 errors).
+- **Playwright Automated Verification:**
+  - State 1 & 2 immediate render verified (0 full-screen blocking HUD, 0 premature CAD fetch).
+  - State 3 on-demand download verified (in-canvas progress bar active, strictly percentage only, zero MB/speed leakage).
+  - State 5 model ready verified (`usdModel` added, OrbitControls enabled, canvas header active).
+  - All 4 view modes verified: `Full Model` active, `Modular Views` subbar active, `33-Part Dissection` active, `Simulate Flow` console active.
+  - Fullscreen toggle and exit verified.
+  - Error simulation and non-reloading retry verified.
+  - Console Errors: 0 errors recorded.

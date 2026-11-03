@@ -111,17 +111,18 @@ export class DissectionAnimationController {
       container = document.createElement('div');
       container.id = 'gomikin-catalogue-labels';
       Object.assign(container.style, {
-        position: 'fixed',
+        position: 'absolute',
         top: '0',
         left: '0',
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         pointerEvents: 'none',
         overflow: 'hidden',
         zIndex: '900',
         display: 'none'
       });
-      document.body.appendChild(container);
+      const hostLbl = document.getElementById('gomikin-canvas-wrapper') || document.body;
+      hostLbl.appendChild(container);
     }
     container.innerHTML = '';
     this.labelOverlay = container;
@@ -292,8 +293,8 @@ export class DissectionAnimationController {
     this.labelOverlay.style.display = 'block';
     const baseOpacity = Math.max(0, Math.min(1, (this._progress - 0.82) / 0.16));
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = this.controls?.domElement?.clientWidth || window.innerWidth;
+    const height = this.controls?.domElement?.clientHeight || window.innerHeight;
     const tempVec = new THREE.Vector3();
 
     for (const [name, badge] of this.labelElements.entries()) {
@@ -877,7 +878,8 @@ export function createPrimaryDissectButton(controller) {
     }
   });
 
-  document.body.appendChild(btn);
+  const hostBtn = document.getElementById('gomikin-canvas-wrapper') || document.body;
+  hostBtn.appendChild(btn);
   controller.primaryButton = btn;
   controller.updateButtonState();
 

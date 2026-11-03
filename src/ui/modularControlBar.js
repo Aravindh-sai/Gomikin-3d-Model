@@ -28,8 +28,8 @@ export function initModularControlBar({
   styleEl.textContent = `
     /* Top Floating Glassmorphism Navigation Dock */
     #gomikin-modular-nav {
-      position: fixed;
-      top: 18px;
+      position: absolute;
+      top: 50px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -79,8 +79,8 @@ export function initModularControlBar({
 
     /* Sub-bar for Module Selector */
     #gomikin-modules-subbar {
-      position: fixed;
-      top: 74px;
+      position: absolute;
+      top: 96px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -130,9 +130,10 @@ export function initModularControlBar({
 
     /* Left Module Info & Action Card */
     #gomikin-module-card {
-      position: fixed;
-      top: 130px;
-      left: 24px;
+      position: absolute;
+      top: 142px;
+      left: 16px;
+      max-height: calc(100% - 156px);
       width: 320px;
       background: rgba(10, 15, 24, 0.92);
       border: 1px solid rgba(0, 255, 204, 0.3);
@@ -242,8 +243,8 @@ export function initModularControlBar({
 
     /* Bottom Flow Simulation Control Console */
     #gomikin-flow-console {
-      position: fixed;
-      bottom: 24px;
+      position: absolute;
+      bottom: 16px;
       left: 50%;
       transform: translateX(-50%);
       width: 620px;
@@ -437,7 +438,8 @@ export function initModularControlBar({
     </button>
 
   `;
-  document.body.appendChild(navEl);
+  const host = document.getElementById('gomikin-canvas-wrapper') || document.body;
+  host.appendChild(navEl);
 
   // 3. Build Module Selector Sub-bar
   const subbarEl = document.createElement('div');
@@ -458,7 +460,8 @@ export function initModularControlBar({
     `;
   });
   subbarEl.innerHTML = subbarHTML;
-  document.body.appendChild(subbarEl);
+  const hostSub = document.getElementById('gomikin-canvas-wrapper') || document.body;
+  hostSub.appendChild(subbarEl);
 
   // 4. Build Left Module Info Card
   const cardEl = document.createElement('div');
@@ -487,7 +490,8 @@ export function initModularControlBar({
       </button>
     </div>
   `;
-  document.body.appendChild(cardEl);
+  const hostCard = document.getElementById('gomikin-canvas-wrapper') || document.body;
+  hostCard.appendChild(cardEl);
 
   // 5. Build Flow Simulation Console
   const flowConsole = document.createElement('div');
@@ -521,7 +525,8 @@ export function initModularControlBar({
       <button class="btn-icon-sm" id="flow-btn-reset" title="Reset Flow">↺</button>
     </div>
   `;
-  document.body.appendChild(flowConsole);
+  const hostFlow = document.getElementById('gomikin-canvas-wrapper') || document.body;
+  hostFlow.appendChild(flowConsole);
 
   // --- Active Nav Tab State ---
   let activeTab = 'full'; // 'full' | 'modules' | 'dissection' | 'flow'

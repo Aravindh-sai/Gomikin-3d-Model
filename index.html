@@ -3,11 +3,304 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gomikin 3D Interactive Model</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+    <title>Gomikin — Autonomous Bio-Recovery Apparatus</title>
+    <link rel="icon" type="image/png" href="/assets/Gomikin-logo.png" />
+    <meta name="description" content="Meet Gomikin — an intelligent waste management system designed to turn everyday waste into something valuable." />
   </head>
-  <body>
-    <canvas id="app-canvas"></canvas>
+  <body class="landing-body">
+    <!-- Header -->
+    <header class="gomikin-header">
+      <div class="header-container">
+        <a href="#" class="header-brand" aria-label="Gomikin Homepage">
+          <img src="/assets/Gomikin-logo.png" alt="Gomikin Emblem" class="brand-logo-img" />
+          <span class="brand-text-label">GOMIKIN</span>
+        </a>
+        <nav class="header-nav">
+          <a href="#product" class="nav-link active">Product</a>
+          <a href="#technology" class="nav-link">Technology</a>
+          <a href="#how-it-works" class="nav-link">How It Works</a>
+          <a href="#about" class="nav-link">About</a>
+        </nav>
+        <div class="header-actions">
+          <a href="#contact" class="btn-header-contact">Inquire</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="landing-main">
+      <!-- Hero Section -->
+      <section class="hero-section" id="product">
+        <div class="hero-container">
+          <!-- Left Column: Copy & Actions -->
+          <div class="hero-content">
+            <div class="hero-kicker">
+              <span class="kicker-dot"></span>
+              AUTONOMOUS BIO-RECOVERY APPARATUS
+            </div>
+            <h1 class="hero-headline">
+              Waste isn't the end.<br />
+              <span class="headline-accent">It's the beginning.</span>
+            </h1>
+            <p class="hero-description">
+              Meet Gomikin — an intelligent waste management system designed to turn everyday waste into something valuable.
+            </p>
+            <div class="hero-actions">
+              <button id="btn-hero-explore" class="btn-primary-explore">
+                <span class="btn-icon">▶</span>
+                <span>Explore 3D CAD Prototype</span>
+              </button>
+              <a href="#technology" class="btn-secondary-specs">
+                <span>Technical Specifications</span>
+                <span class="arrow-down">↓</span>
+              </a>
+            </div>
+
+            <div class="hero-specs-grid">
+              <div class="spec-card">
+                <div class="spec-value">500 <span class="spec-unit">mm</span></div>
+                <div class="spec-label">Cylinder Diameter</div>
+              </div>
+              <div class="spec-card">
+                <div class="spec-value">1020 <span class="spec-unit">mm</span></div>
+                <div class="spec-label">Overall Height</div>
+              </div>
+              <div class="spec-card">
+                <div class="spec-value">33 <span class="spec-unit">Parts</span></div>
+                <div class="spec-label">CAD Assembly</div>
+              </div>
+              <div class="spec-card">
+                <div class="spec-value">3 <span class="spec-unit">Sectors</span></div>
+                <div class="spec-label">Physical Isolation</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Interactive Product Canvas -->
+          <div class="hero-canvas-column">
+            <div id="gomikin-canvas-wrapper" class="canvas-wrapper">
+              <!-- Canvas Header Bar -->
+              <div class="canvas-header-bar">
+                <div class="canvas-header-left">
+                  <span id="canvas-status-dot" class="status-dot idle"></span>
+                  <span class="canvas-title">GOMIKIN EMBODIMENT B</span>
+                  <span class="canvas-badge">3D CAD VIEWPORT</span>
+                </div>
+                <div class="canvas-header-right">
+                  <button id="btn-canvas-fullscreen" class="btn-canvas-fullscreen-toggle" title="Toggle Fullscreen">
+                    <span id="fullscreen-icon">⛶</span>
+                    <span id="fullscreen-text">Fullscreen</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- WebGL Canvas -->
+              <canvas id="app-canvas"></canvas>
+
+              <!-- State 1 & 2: Idle Preview Overlay -->
+              <div id="canvas-idle-overlay" class="canvas-overlay idle-state">
+                <div class="idle-pattern-bg"></div>
+                <div class="idle-card">
+                  <div class="idle-logo-wrapper">
+                    <img src="/assets/Gomikin-logo.png" alt="Gomikin" class="idle-logo" />
+                  </div>
+                  <div class="idle-kicker">INTERACTIVE 3D CAD MODEL</div>
+                  <h3 class="idle-title">Explore Internal Architecture</h3>
+                  <p class="idle-desc">
+                    Examine full mechanical assembly, modular sub-systems, 33-part exploded kinematics, and physical flow simulation.
+                  </p>
+                  <button id="btn-canvas-explore" class="btn-canvas-start">
+                    <span class="play-icon">▶</span>
+                    <span>Explore 3D</span>
+                  </button>
+                  <div class="idle-hint">Click anywhere inside canvas to initialize</div>
+                </div>
+              </div>
+
+              <!-- State 3 & 4: Loading & Initializing Overlay -->
+              <div id="canvas-loading-overlay" class="canvas-overlay loading-state" style="display: none;">
+                <div class="loading-content">
+                  <img src="/assets/Gomikin-logo.png" alt="Gomikin" class="loading-logo" />
+                  <div class="loading-kicker">PREPARING YOUR GOMIKIN EXPERIENCE</div>
+                  <div id="canvas-loading-status" class="loading-status">Downloading product model...</div>
+                  
+                  <div class="canvas-progress-track">
+                    <div id="canvas-progress-fill" class="canvas-progress-fill" style="width: 0%;"></div>
+                  </div>
+                  
+                  <div class="loading-percentage-row">
+                    <span id="canvas-progress-pct" class="progress-pct">0%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- State 6: Error / Retry Overlay -->
+              <div id="canvas-error-overlay" class="canvas-overlay error-state" style="display: none;">
+                <div class="error-content">
+                  <div class="error-icon">⚠️</div>
+                  <div class="error-title">CAD Loading Interrupted</div>
+                  <div id="canvas-error-msg" class="error-msg">Failed to load CAD assembly. Check network connection.</div>
+                  <div class="error-actions">
+                    <button id="btn-canvas-retry" class="btn-error-action primary">Retry Load</button>
+                    <button id="btn-canvas-cloud" class="btn-error-action secondary">Force Cloud</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 1: Intelligent Segregation -->
+      <section class="feature-section" id="technology">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="section-kicker">EDGE-AI COMPUTER VISION & SENSING</div>
+            <h2 class="section-title">Intelligent Segregation at Point of Intake</h2>
+            <p class="section-subtitle">
+              High-resolution optical classification and multi-sensor telemetry identify and sort waste categories in milliseconds.
+            </p>
+          </div>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <div class="feature-icon">👁️</div>
+              <h3 class="feature-name">Optical AI Vision Module</h3>
+              <p class="feature-desc">
+                Intake chamber camera module with onboard neural inference classifies incoming items into organic, inorganic, or cooked food categories before processing begins.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🧭</div>
+              <h3 class="feature-name">Dual-Axis Sorting Base</h3>
+              <p class="feature-desc">
+                High-precision 2-axis servo orientation platform tilts to divert validated items into targeted internal compartments with positive mechanical indexing.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">📡</div>
+              <h3 class="feature-name">Acoustic & Load Telemetry</h3>
+              <p class="feature-desc">
+                Integrated ultrasonic distance transducers and structural base load cells continuously compute chamber volumetric capacity and biomass weight.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Engineered Processing -->
+      <section class="feature-section alt-bg" id="how-it-works">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="section-kicker">MECHANICAL COMMINUTION & DRAINAGE</div>
+            <h2 class="section-title">Engineered High-Torque Processing</h2>
+            <p class="section-subtitle">
+              Rotary shear comminution with continuous hydrostatic moisture extraction accelerates downstream biological digestion.
+            </p>
+          </div>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <div class="feature-icon">⚙️</div>
+              <h3 class="feature-name">Rotary Cross-Shear Cutters</h3>
+              <p class="feature-desc">
+                High-torque drive motor powers balanced rotary shear blades, slicing organic waste down to uniform particle sizes under 8 millimeters.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">📐</div>
+              <h3 class="feature-name">8 mm Precision Sizing Mesh</h3>
+              <p class="feature-desc">
+                Calibrated stainless steel screen regulates particle dimensions, ensuring only optimally sized biomass enters the primary digestion volume.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">💧</div>
+              <h3 class="feature-name">Hydrostatic Liquid Drainage</h3>
+              <p class="feature-desc">
+                Multi-stage drainage channels separate liquid effluent into a sealed base plinth, preventing anaerobic acidification and odors.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Value Recovery -->
+      <section class="feature-section" id="about">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="section-kicker">THERMOPHILIC BIOMASS CONVERSION</div>
+            <h2 class="section-title">Circular Value Recovery</h2>
+            <p class="section-subtitle">
+              Aerobic digestion accelerates conversion into stabilized, nutrient-dense biological output ready for soil replenishment.
+            </p>
+          </div>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <div class="feature-icon">🌱</div>
+              <h3 class="feature-name">Dual-Helix Agitator</h3>
+              <p class="feature-desc">
+                Helical mixing blades rotate at controlled low speeds to ensure uniform aeration, moisture distribution, and contact with thermophilic microbes.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🌡️</div>
+              <h3 class="feature-name">Closed-Loop Environmental Control</h3>
+              <p class="feature-desc">
+                Solid-state temperature and moisture probes regulate thermophilic curing stages, maintaining peak microbiological digestion kinetics.
+              </p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">💨</div>
+              <h3 class="feature-name">Negative-Pressure Filtration</h3>
+              <p class="feature-desc">
+                Continuous exhaust ventilation draws air through an activated carbon matrix, neutralizing volatile organic compounds and ensuring zero odor escape.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact Section -->
+      <section class="contact-section" id="contact">
+        <div class="section-container">
+          <div class="contact-card">
+            <div class="section-kicker">DEPLOYMENT & PARTNERSHIPS</div>
+            <h2 class="contact-title">Ready to Transform Household Waste?</h2>
+            <p class="contact-desc">
+              Contact our engineering and commercial teams for technical whitepapers, pilot specifications, and deployment inquiries.
+            </p>
+            <div class="contact-actions">
+              <a href="mailto:info@gomikin.com" class="btn-contact-primary">Contact Engineering Team</a>
+              <a href="#product" class="btn-contact-secondary">Back to 3D Model ↑</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="gomikin-footer">
+      <div class="footer-container">
+        <div class="footer-left">
+          <div class="footer-brand">
+            <img src="/assets/Gomikin-logo.png" alt="Gomikin Logo" class="footer-logo" />
+            <span class="footer-title">GOMIKIN</span>
+          </div>
+          <p class="footer-tagline">Autonomous smart waste segregation and in-vessel bio-processing apparatus.</p>
+        </div>
+        <div class="footer-right">
+          <div class="footer-nav">
+            <a href="#product">Product</a>
+            <a href="#technology">Technology</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#about">About</a>
+          </div>
+          <div class="footer-meta">
+            © 2026 Gomikin Technologies. All rights reserved. Alternative Embodiment B.
+          </div>
+        </div>
+      </div>
+    </footer>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
