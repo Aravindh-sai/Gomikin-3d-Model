@@ -708,3 +708,59 @@ Phase C.2 addresses key visual and interaction refinements requested after initi
 - **Console Errors:** 0 errors.
 - **Dev Server Watcher Stability:** Configured `vite.config.js` with `server.watch.ignored` for large static CAD binaries (`public/Gomikin/`, `model_parts/`, `*.glb`, `*.usdz`, `scratch/`), preventing Windows `EBUSY` file watcher crashes.
 
+---
+
+## 22. Phase D1: Updated Blender GLB Integration & Mechanical Pivot Implementation
+
+### 1. Model Inspection & Kinematic Verification
+1. **Model Source & Delivery:**
+   - Production URL: `https://eqvmxwue8iejzeky.public.blob.vercel-storage.com/3dmodel.glb` (87,008,968 bytes / ~82.98 MB, MIME: `model/gltf-binary`).
+   - Local Asset: `public/models/3dmodel.glb` and `public/Gomikin/3dmodel.glb` (identical 87,008,968 bytes).
+   - Centralized Configuration: Configured in `src/utils/resilientModelLoader.js` (`DEFAULT_MODEL_CONFIG`) with automatic fallback between Vercel Blob and local storage, IndexedDB binary caching (`gomikin_3dmodel_glb_v1`), and Range request support.
+2. **Structural Inspection Findings:**
+   - Total Objects: 40
+   - Total Genuine Meshes: 33 (100% exact match to all 33 components in `EXPECTED_COMPONENT_NAMES` in `componentRegistry.js`).
+   - Total Materials: 8 PBR materials.
+   - Bounding Box Dimensions: $0.500\text{m} \times 1.026\text{m} \times 0.500\text{m}$ (center: $(0, 0.513\text{m}, 0)$), identical to baseline USDZ envelope.
+3. **Mechanical Pivot Nodes Verification:**
+   - All 5 required pivot objects exist and retain Blender-to-Three.js world transforms ($X_{three} = X_b, Y_{three} = Z_b, Z_{three} = -Y_b$):
+     - `PIVOT_Rotating_Base`: World Pos: $(0, 0.9405, 0)\text{ m}$. Child: `rotating_base` (Mesh).
+     - `PIVOT_Left_Door`: World Pos: $(-0.1197, 0.6495, 0)\text{ m}$. Child: `door_mechanism_left` (Mesh).
+     - `PIVOT_Right_Door`: World Pos: $(-0.1205, 0.6495, 0)\text{ m}$. Child: `door_mechanism_right` (Mesh).
+     - `PIVOT_Agitator`: World Pos: $(-0.11915, 0.14607, -0.03039)\text{ m}$. Child: `agitator` (Mesh).
+     - `PIVOT_Cutting_Blades`: World Pos: $(-0.12000, 0.86007, -0.00218)\text{ m}$. Child: `cutting_blades` (Mesh).
+
+### 2. Architectural Implementation
+1. **Centralized Mechanical Animation Controller ([`src/animation/mechanicalPivotController.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/mechanicalPivotController.js)):**
+   - Holds centralized references to all 5 pivot objects.
+   - Preserves pristine imported baseline quaternions (`baseQuaternion`), applying local rotational offsets relative to baseline via `baseQuat.multiply(deltaQuat)`.
+   - Discrete Kinematics:
+     - `setRotatingBaseAngle(angleRad, immediate, duration)`: Moves Rotating Base around local Y-axis (agreed production target: $-10^\circ$).
+     - `openLeftDoor(duration)` / `closeLeftDoor(duration)`: Rotates Left Door around local X-axis (target: $+25^\circ$, opening downward).
+     - `openRightDoor(duration)` / `closeRightDoor(duration)`: Rotates Right Door around local X-axis (target: $-25^\circ$, opening downward).
+     - Uses cubic ease-in-out (`easeInOutCubic`) interpolation.
+   - Continuous Kinematics:
+     - `rotateAgitator(speedRadPerSec)` / `stopAgitator()`: Continuous Z-axis mixing rotation.
+     - `rotateCuttingBlades(speedRadPerSec)` / `stopCuttingBlades()`: High-speed continuous Z-axis cutting rotation.
+     - Time-delta driven, independent of display refresh rate.
+   - Full reset via `resetMechanicalComponents()` restoring exact base orientations.
+2. **Main Scene & Render Loop Integration ([`src/main.js`](file:///c:/Projects/Gomikin-3d-Model/src/main.js)):**
+   - Implemented binary format detection: Parses GLB buffers via `GLTFLoader` with automatic fallback to `USDLoader`.
+   - Mounts `window.mechanicalPivotController = new MechanicalPivotController(modelRoot)`.
+   - Integrated `mechanicalPivotController.updateMechanicalAnimations(deltaTime)` inside single Three.js animation loop (`animate()`).
+   - Preserved all 4 navigation modes: Full Model, Modular Views, 33-Part Dissection, and Flow Simulation.
+
+### 3. Verification & Evidence (`scratch/verify_phase_d1.cjs`)
+- **TEST 1 (GLB Integrity):** Loaded in ~$2\text{s}$, 33 meshes indexed, 5 pivots active and parented to CAD meshes.
+- **TEST 2 (Individual Kinematics):**
+  - Rotating Base: $-10.0^\circ$ Y-axis rotation confirmed, child mesh followed, reset confirmed.
+  - Left Door: $+25.0^\circ$ X-axis downward opening confirmed, child mesh followed, reset confirmed.
+  - Right Door: $-25.0^\circ$ X-axis downward opening confirmed, child mesh followed, reset confirmed.
+  - Agitator: Continuous Z-axis rotation confirmed, reset confirmed.
+  - Cutting Blades: Continuous Z-axis rotation confirmed, reset confirmed.
+- **TEST 3 (Combined Kinematics):** All 5 components activated simultaneously without transform conflicts, clean global reset.
+- **TEST 4 (Website Regression):** Verified Full Model, Modular Views, 33-Part Dissection, Simulate Flow, and fullscreen enter/exit.
+- **TEST 5 (Production Asset):** Verified Vercel Blob URL in production config and local asset in development.
+- **Build Status:** `npm run build` completed in $1.48\text{s}$, 0 errors.
+
+

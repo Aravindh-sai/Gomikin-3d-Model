@@ -17,18 +17,33 @@
  *    - Real-time download progress (MB / total MB), percentage, MB/s speed, ETA, and connection recovery state.
  */
 
+const IS_PROD = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD;
+
 export const DEFAULT_MODEL_CONFIG = {
-  sources: [
+  sources: IS_PROD ? [
+    {
+      id: 'vercel-blob',
+      label: 'Vercel Cloud Storage (Production GLB)',
+      url: 'https://eqvmxwue8iejzeky.public.blob.vercel-storage.com/3dmodel.glb',
+      isLocal: false
+    },
     {
       id: 'local',
-      label: 'Local CAD Archive',
-      url: '/Gomikin/gomikin_disection.usdz',
+      label: 'Local CAD Archive (Fallback)',
+      url: '/models/3dmodel.glb',
+      isLocal: true
+    }
+  ] : [
+    {
+      id: 'local',
+      label: 'Local CAD Archive (Development)',
+      url: '/models/3dmodel.glb',
       isLocal: true
     },
     {
       id: 'vercel-blob',
-      label: 'Vercel Cloud Storage',
-      url: 'https://eqvmxwue8iejzeky.public.blob.vercel-storage.com/gomikin_disection.usdz',
+      label: 'Vercel Cloud Storage (Fallback)',
+      url: 'https://eqvmxwue8iejzeky.public.blob.vercel-storage.com/3dmodel.glb',
       isLocal: false
     }
   ],
@@ -38,8 +53,8 @@ export const DEFAULT_MODEL_CONFIG = {
   probeTimeoutMs: 6000,
   dbName: 'GomikinModelCache',
   storeName: 'models',
-  cacheKey: 'gomikin_disection_usdz_v1',
-  expectedMinBytes: 50 * 1024 * 1024 // 50MB minimum to distinguish from HTML 404 responses
+  cacheKey: 'gomikin_3dmodel_glb_v1',
+  expectedMinBytes: 20 * 1024 * 1024 // 20MB minimum to distinguish from HTML 404 responses
 };
 
 class ModelCacheDB {
@@ -116,7 +131,7 @@ class ModelCacheDB {
 
         // Store as Blob to let browser handle large binary stream directly to disk
         const record = {
-          blob: new Blob([value.buffer], { type: 'model/vnd.usdz+zip' }),
+          blob: new Blob([value.buffer], { type: 'model/gltf-binary' }),
           source: value.source,
           timestamp: value.timestamp,
           length: value.length

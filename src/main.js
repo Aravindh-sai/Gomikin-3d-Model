@@ -1,6 +1,8 @@
 import './style.css';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { USDLoader } from 'three/addons/loaders/USDLoader.js';
+import { MechanicalPivotController } from './animation/mechanicalPivotController.js';
 import { buildComponentRegistry } from './components/componentRegistry.js';
 import { initDissectionAnimationSystem } from './animation/dissectionAnimationSystem.js';
 import { initScene } from './scene/scene.js';
@@ -183,55 +185,60 @@ function init() {
         }
 
         await new Promise((resolve, reject) => {
-          const usdLoader = new USDLoader();
-          usdLoader.parse(
-            buffer,
-            '',
-            (usdModel) => {
-              usdModel.name = 'Fusion360_USDZ_Model';
-              scene.add(usdModel);
-              window.usdModel = usdModel;
-              console.log('USDZ model loaded and parsed successfully:', usdModel);
+          // Detect GLB vs USDZ by binary magic bytes
+          const view = new DataView(buffer);
+          const isGLB = buffer.byteLength >= 4 && view.getUint32(0, false) === 0x676C5446; // 'glTF'
 
-              // Build clean component registry for animation control
-              const componentRegistry = buildComponentRegistry(usdModel, true);
-              window.componentRegistry = componentRegistry;
+          const onModelParsed = (loadedRoot) => {
+            loadedRoot.name = 'Gomikin_Production_Model';
+            scene.add(loadedRoot);
+            window.usdModel = loadedRoot;
+            window.glbModel = loadedRoot;
+            console.log('Gomikin model loaded and parsed successfully:', loadedRoot);
 
-              // Initialize Procedural Virtual Door Assembly for Leftover Food Compartment
-              const virtualDoor = new VirtualDoorAssembly(scene, componentRegistry, renderer);
-              window.virtualDoorAssembly = virtualDoor;
+            // 1. Initialize Centralized Mechanical Pivot Animation Controller
+            const mechanicalPivotController = new MechanicalPivotController(loadedRoot);
+            window.mechanicalPivotController = mechanicalPivotController;
 
-              // Initialize Gomikin Interactive Dissection & 3D Catalogue System
-              const gomikinAnimation = initDissectionAnimationSystem(componentRegistry, camera, controls);
-              window.gomikinAnimation = gomikinAnimation;
+            // 2. Build clean component registry for animation control
+            const componentRegistry = buildComponentRegistry(loadedRoot, true);
+            window.componentRegistry = componentRegistry;
 
-              // Initialize Modular View Controller & Physical Flow Controller
-              const moduleViewController = new ModuleViewController(componentRegistry, camera, controls);
-              window.moduleViewController = moduleViewController;
+            // Initialize Procedural Virtual Door Assembly for Leftover Food Compartment
+            const virtualDoor = new VirtualDoorAssembly(scene, componentRegistry, renderer);
+            window.virtualDoorAssembly = virtualDoor;
 
-              const physicalFlowController = new PhysicalFlowController(componentRegistry, scene, camera, controls);
-              window.physicalFlowController = physicalFlowController;
+            // Initialize Gomikin Interactive Dissection & 3D Catalogue System
+            const gomikinAnimation = initDissectionAnimationSystem(componentRegistry, camera, controls);
+            window.gomikinAnimation = gomikinAnimation;
 
-              // Initialize Authoritative View Transition Coordinator
-              const viewCoordinator = new ViewTransitionCoordinator({
-                componentRegistry,
-                camera,
-                controls,
-                moduleViewController,
-                dissectionController: gomikinAnimation.controller,
-                physicalFlowController
-              });
-              window.viewCoordinator = viewCoordinator;
+            // Initialize Modular View Controller & Physical Flow Controller
+            const moduleViewController = new ModuleViewController(componentRegistry, camera, controls);
+            window.moduleViewController = moduleViewController;
 
-              // Mount Modern Glassmorphism Modular Control Bar & Workflow Sim Dock
-              initModularControlBar({
-                viewCoordinator,
-                moduleViewController,
-                physicalFlowController,
-                dissectionAnimationController: gomikinAnimation.controller
-              });
+            const physicalFlowController = new PhysicalFlowController(componentRegistry, scene, camera, controls);
+            window.physicalFlowController = physicalFlowController;
 
-              modelState.status = 'ready';
+            // Initialize Authoritative View Transition Coordinator
+            const viewCoordinator = new ViewTransitionCoordinator({
+              componentRegistry,
+              camera,
+              controls,
+              moduleViewController,
+              dissectionController: gomikinAnimation.controller,
+              physicalFlowController
+            });
+            window.viewCoordinator = viewCoordinator;
+
+            // Mount Modern Glassmorphism Modular Control Bar & Workflow Sim Dock
+            initModularControlBar({
+              viewCoordinator,
+              moduleViewController,
+              physicalFlowController,
+              dissectionAnimationController: gomikinAnimation.controller
+            });
+
+            modelState.status = 'ready';
 
               if (modelState.isFullscreen) {
                 // In fullscreen: reveal 3D canvas and enable OrbitControls
@@ -259,25 +266,57 @@ function init() {
                 const statusDot = document.getElementById('canvas-status-dot');
                 if (statusDot) statusDot.className = 'status-dot active';
               }
+            };
 
-              resolve(usdModel);
-            },
-            (error) => {
-              console.error('Error parsing USDZ:', error);
-              modelState.status = 'error';
-              modelState.error = 'Failed to parse 3D CAD data.';
-              if (modelState.isFullscreen) {
-                canvasHUD.showError(
-                  modelState.error,
-                  () => startBackgroundLoad(),
-                  () => startBackgroundLoad('cloud')
-                );
-              }
-              reject(error);
+            if (isGLB) {
+              const gltfLoader = new GLTFLoader();
+              gltfLoader.parse(
+                buffer,
+                '',
+                (gltf) => {
+                  onModelParsed(gltf.scene);
+                  resolve(gltf.scene);
+                },
+                (error) => {
+                  console.error('Error parsing GLB:', error);
+                  modelState.status = 'error';
+                  modelState.error = 'Failed to parse 3D GLB data.';
+                  if (modelState.isFullscreen) {
+                    canvasHUD.showError(
+                      modelState.error,
+                      () => startBackgroundLoad(),
+                      () => startBackgroundLoad('cloud')
+                    );
+                  }
+                  reject(error);
+                }
+              );
+            } else {
+              const usdLoader = new USDLoader();
+              usdLoader.parse(
+                buffer,
+                '',
+                (usdModel) => {
+                  onModelParsed(usdModel);
+                  resolve(usdModel);
+                },
+                (error) => {
+                  console.error('Error parsing USDZ:', error);
+                  modelState.status = 'error';
+                  modelState.error = 'Failed to parse 3D CAD data.';
+                  if (modelState.isFullscreen) {
+                    canvasHUD.showError(
+                      modelState.error,
+                      () => startBackgroundLoad(),
+                      () => startBackgroundLoad('cloud')
+                    );
+                  }
+                  reject(error);
+                }
+              );
             }
-          );
-        });
-      } catch (loadErr) {
+          });
+        } catch (loadErr) {
         console.error('Error loading CAD model:', loadErr);
         modelState.status = 'error';
         modelState.error = loadErr.message || 'Failed to download CAD assembly.';
@@ -650,6 +689,10 @@ function init() {
 
     if (window.virtualDoorAssembly) {
       window.virtualDoorAssembly.update(deltaTime);
+    }
+
+    if (window.mechanicalPivotController) {
+      window.mechanicalPivotController.updateMechanicalAnimations(deltaTime);
     }
 
     if (window.viewCoordinator) {

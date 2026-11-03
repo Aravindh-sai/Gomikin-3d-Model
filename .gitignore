@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 *.usdz
+*.glb
 
 # Editor directories and files
 .vscode/*
