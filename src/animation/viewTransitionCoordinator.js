@@ -126,6 +126,10 @@ export class ViewTransitionCoordinator {
       window.virtualDoorAssembly.reset();
     }
 
+    if (window.mechanicalPivotController) {
+      window.mechanicalPivotController.resetMechanicalComponents();
+    }
+
     // Stop module view controller camera if it was animating
     if (this.moduleViewController) {
       this.moduleViewController.isCameraAnimating = false;

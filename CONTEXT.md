@@ -810,5 +810,59 @@ Phase C.2 addresses key visual and interaction refinements requested after initi
   - All 5 automated tests passed (GLB Integrity, Mechanical Pivots, Combined Kinematics, 4 View Modes, Exit Fullscreen).
   - Console errors: 0.
 
+---
+
+## 24. Phase D: Mechanical Animation Repair, PBR Material Refinement & Hero Content (November 2026)
+
+### 1. Root Cause Analysis of Mechanical Defects
+1. **Rotating Segregator Base Door-like Behavior:**
+   - In legacy code (`physicalFlowController.js`), `rotBase.rotation.set(baseRot.x, baseRot.y, baseRot.z + tilt)` was applied directly to the CAD mesh `rotating_base`.
+   - The CAD mesh has its local origin at $(0, -0.9405, 0)$ relative to its pivot. Rotating the mesh directly caused it to swing around the bottom $(0, 0, 0)$ across a radius of nearly $1\text{ meter}$, behaving like a massive hinged door dropping through the floor.
+   - In `mechanicalPivotController.js`, `PIVOT_Rotating_Base` Empty is located at $(0, 0.9405, 0)$. When animated around its mechanical Y-axis ($-10^\circ$), the pivot Empty rotates cleanly in place with the child mesh attached, without translating or affecting surrounding structures.
+2. **Cutting Blades Orbiting Error:**
+   - In `physicalFlowController.js`, `blades.rotation.set(...)` was applied directly to the CAD mesh `cutting_blades`.
+   - The mesh origin is at the global machine root $(0, 0, 0)$, while the blades geometry is offset at $(-0.12, 0.86, -0.002)\text{ m}$. Direct mesh rotation caused the blades to orbit around the machine root and fly completely outside the chassis.
+   - In `mechanicalPivotController.js`, `PIVOT_Cutting_Blades` Empty is centered at $(-0.1200, 0.8601, -0.0022)\text{ m}$. Rotating the pivot around local Z spins the blades cleanly in place inside the intake cutting chamber.
+
+### 2. Engineering Corrections Applied
+1. **Mechanical Flow Unification ([`src/animation/physicalFlowController.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/physicalFlowController.js)):**
+   - Replaced all direct mesh rotation manipulations on `rotating_base` and `cutting_blades` with calls to `window.mechanicalPivotController`.
+   - Step 3 (Organic Flow) and Step 3 (Inorganic Flow): Animates `window.mechanicalPivotController.setRotatingBaseAngle(degToRad(-10 * u), true)` on `PIVOT_Rotating_Base`.
+   - Step 4 (Organic Flow): Animates `PIVOT_Cutting_Blades` around local Z via `_applyPivotAngle()`, keeping blades centered in the cutting chamber.
+   - `resetMechanicalPoses()` invokes `window.mechanicalPivotController.resetMechanicalComponents()` to restore baseline quaternions.
+2. **View Transition Reset ([`src/animation/viewTransitionCoordinator.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/viewTransitionCoordinator.js)):**
+   - Added `window.mechanicalPivotController.resetMechanicalComponents()` on every view transition to ensure all 5 mechanical pivots cleanly return to resting states when switching between Full Model, Modular Views, Dissection, and Flow.
+3. **PBR Engineering Materials System ([`src/materials/gomikinMaterialSystem.js`](file:///c:/Projects/Gomikin-3d-Model/src/materials/gomikinMaterialSystem.js)):**
+   - Implemented `applyGomikinPBRMaterials(rootModel)` adhering to official Gomikin design tokens:
+     - Main Enclosure (`Main_Housing`): Refined Graphite (`#343B36`, roughness: 0.42, metalness: 0.35).
+     - Structural Frame (`circular_frame`, `central_divider`, `Rightside_Divider`, supports): Structural dark graphite (`#2B312D`, roughness: 0.52, metalness: 0.32).
+     - Access Doors (`door_mechanism_left`, `door_mechanism_right`, `leftover_food_closur`): Graphite with subtle contrast (`#3C433E`, roughness: 0.38, metalness: 0.45).
+     - Top Closure (`top_closuer`): Refined dark graphite satin finish (`#323834`, roughness: 0.40, metalness: 0.38), replacing the unrendered beige "Warm Stone" plastic.
+     - Segregator Base (`rotating_base`): Muted metallic graphite (`#383F3B`, roughness: 0.32, metalness: 0.65), replacing bright shiny gold.
+     - Cutting Blades (`cutting_blades`): High-grade surgical tool steel (`#D0D6DC`, roughness: 0.20, metalness: 0.88).
+     - Funnel & Grids (`Funnel`, `cutting_mesh`, `agitator`): Brushed stainless steel (`#B8C0C6`, roughness: 0.28, metalness: 0.80).
+     - Internal Chambers (`decompostion_chamber`, `storage_chamber`, `inorganic_output_chamber`): Industrial alloy and subtle sage (`#858E88` / `#8E9692`).
+     - Electronics & Sensors: Matte technical dark composite (`#1E2320`, roughness: 0.48, metalness: 0.22).
+     - Brand Detail Trim: Champagne accent (`#B99A63`) on pull handles.
+4. **Virtual Door Assembly Refinement ([`src/components/virtualDoorAssembly.js`](file:///c:/Projects/Gomikin-3d-Model/src/components/virtualDoorAssembly.js)):**
+   - Replaced high-contrast white panel (`0xecf0f3`) with matching graphite door material (`0x3c433e`).
+   - Replaced neon cyan handle (`0x00ffcc`) with refined Gomikin Champagne metallic pull handle (`0xB99A63`).
+5. **Hero Content Refinement ([`index.html`](file:///c:/Projects/Gomikin-3d-Model/index.html)):**
+   - Updated hero supporting text to technically credible, confident engineering copy:
+     *"Gomikin is an autonomous bio-recovery system engineered for precision multi-stream segregation and automated processing. Integrated optical sensing and mechanical shear reduction convert discarded waste into valuable resources directly at source."*
+
+### 3. Verification & Evidence (`scratch/verify_phase_d_comprehensive.cjs`)
+- **Landing Page Check:** Verified refined hero description, vector preview card, and model meta.
+- **Multi-Angle Visual Inspection:** Captured Front (`phase_d_02_front_view.png`), Three-Quarter (`phase_d_03_three_quarter_view.png`), Side (`phase_d_04_side_view.png`), and Elevated (`phase_d_05_elevated_view.png`) angles confirming cohesive industrial PBR aesthetic.
+- **Pivot Kinematics:**
+  - Rotating Base: $-10.0^\circ$ Y-axis movement verified on pivot Empty with mesh attached.
+  - Left Door: $+25.0^\circ$ X-axis opening verified on pivot Empty.
+  - Right Door: $-25.0^\circ$ X-axis opening verified on pivot Empty.
+  - Cutting Blades: Continuous high-speed Z-axis rotation verified inside cutting chamber without orbiting.
+- **4 Navigation Modes:** Verified Full Model, Modular Views, 33-Part Dissection ($100\%$ exploded catalogue), and Simulate Flow.
+- **Build Status:** `npm run build` passed in $1.42\text{s}$, 0 errors.
+- **Console Errors:** 0 severe console errors recorded throughout entire test suite.
+
+
 
 

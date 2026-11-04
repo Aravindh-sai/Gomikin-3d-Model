@@ -110,11 +110,11 @@ export class VirtualDoorAssembly {
     // Relative to pivot at (0, yCenter, -R), cylinder center is at (0, 0, +R)!
     doorGeo.translate(0, 0, R);
 
-    // Outer door material: clean brushed metallic finish matching Main_Housing
+    // Outer door material: graphite with subtle material contrast matching Gomikin design tokens
     this.doorMaterial = new THREE.MeshStandardMaterial({
-      color: 0xecf0f3,
-      roughness: 0.35,
-      metalness: 0.25,
+      color: 0x3c433e, // Graphite with subtle contrast
+      roughness: 0.38,
+      metalness: 0.45,
       side: THREE.DoubleSide
     });
 
@@ -127,10 +127,10 @@ export class VirtualDoorAssembly {
     // 3. Crisp Panel Edge Outlines
     const edgeGeo = new THREE.EdgesGeometry(doorGeo, 15);
     const edgeMat = new THREE.LineBasicMaterial({
-      color: 0x94a3b8,
-      linewidth: 1.5,
+      color: 0x4a534c,
+      linewidth: 1.0,
       transparent: true,
-      opacity: 0.85
+      opacity: 0.5
     });
     this.doorEdges = new THREE.LineSegments(edgeGeo, edgeMat);
     this.doorEdges.name = 'VirtualDoor_PanelEdges';
@@ -145,9 +145,9 @@ export class VirtualDoorAssembly {
 
     const handleBarGeo = new THREE.CylinderGeometry(0.005, 0.005, 0.16, 16);
     const handleMat = new THREE.MeshStandardMaterial({
-      color: 0x00ffcc, // Gomikin Cyan accent
-      roughness: 0.3,
-      metalness: 0.8
+      color: 0xb99a63, // Gomikin Champagne accent
+      roughness: 0.28,
+      metalness: 0.78
     });
     const handleBar = new THREE.Mesh(handleBarGeo, handleMat);
     handleBar.name = 'VirtualDoor_HandleBar';

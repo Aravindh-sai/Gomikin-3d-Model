@@ -20,6 +20,7 @@ import { initModularControlBar } from './ui/modularControlBar.js';
 import { ViewTransitionCoordinator } from './animation/viewTransitionCoordinator.js';
 import { VirtualDoorAssembly } from './components/virtualDoorAssembly.js';
 import { ResilientModelLoader, DEFAULT_MODEL_CONFIG } from './utils/resilientModelLoader.js';
+import { applyGomikinPBRMaterials } from './materials/gomikinMaterialSystem.js';
 
 /**
  * In-Canvas State HUD Controller
@@ -195,6 +196,9 @@ function init() {
             window.usdModel = loadedRoot;
             window.glbModel = loadedRoot;
             console.log('Gomikin model loaded and parsed successfully:', loadedRoot);
+
+            // Refine model materials to coherent Gomikin industrial PBR aesthetic
+            applyGomikinPBRMaterials(loadedRoot);
 
             // 1. Initialize Centralized Mechanical Pivot Animation Controller
             const mechanicalPivotController = new MechanicalPivotController(loadedRoot);

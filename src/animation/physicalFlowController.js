@@ -123,7 +123,9 @@ export class PhysicalFlowController {
         mesh.scale.copy(baseline.scale);
       }
     }
-
+    if (window.mechanicalPivotController) {
+      window.mechanicalPivotController.resetMechanicalComponents();
+    }
   }
 
   createMainParticle() {
@@ -326,11 +328,8 @@ export class PhysicalFlowController {
     // Step 3: Base tilts toward 180° Organic sector (-X) [0.22 - 0.35]
     else if (p <= 0.35) {
       const u = (p - 0.22) / 0.13;
-      const tilt = THREE.MathUtils.degToRad(30 * u);
-      const rotBase = this.registry.get('rotating_base');
-      const baseRot = this.cachedTransforms.get('rotating_base')?.rot;
-      if (rotBase && baseRot) {
-        rotBase.rotation.set(baseRot.x, baseRot.y, baseRot.z + tilt);
+      if (window.mechanicalPivotController) {
+        window.mechanicalPivotController.setRotatingBaseAngle(THREE.MathUtils.degToRad(-10 * u), true);
       }
 
       // Particle slides down tilted base towards cutting entrance
@@ -343,10 +342,12 @@ export class PhysicalFlowController {
     // Step 4: Cutting blades shredding [0.35 - 0.48]
     else if (p <= 0.48) {
       const u = (p - 0.35) / 0.13;
-      const blades = this.registry.get('cutting_blades');
-      const baseRot = this.cachedTransforms.get('cutting_blades')?.rot;
-      if (blades && baseRot) {
-        blades.rotation.set(baseRot.x, baseRot.y, baseRot.z + u * Math.PI * 18);
+      if (window.mechanicalPivotController) {
+        const pBlades = window.mechanicalPivotController.pivots.cuttingBlades;
+        if (pBlades && pBlades.object) {
+          pBlades.currentAngle = u * Math.PI * 18;
+          window.mechanicalPivotController._applyPivotAngle(pBlades);
+        }
       }
 
       this.mainParticle.position.set(-0.12, THREE.MathUtils.lerp(0.885, 0.855, u), 0);
@@ -438,14 +439,8 @@ export class PhysicalFlowController {
     // 3. Platform routes to Inorganic quadrant (+X, +Z) [0.35 - 0.50]
     else if (p <= 0.50) {
       const u = (p - 0.35) / 0.15;
-      const rotBase = this.registry.get('rotating_base');
-      const baseRot = this.cachedTransforms.get('rotating_base')?.rot;
-      if (rotBase && baseRot) {
-        rotBase.rotation.set(
-          baseRot.x + THREE.MathUtils.degToRad(25 * u),
-          baseRot.y,
-          baseRot.z + THREE.MathUtils.degToRad(-25 * u)
-        );
+      if (window.mechanicalPivotController) {
+        window.mechanicalPivotController.setRotatingBaseAngle(THREE.MathUtils.degToRad(-10 * u), true);
       }
       this.mainParticle.position.set(
         THREE.MathUtils.lerp(0, 0.12, u),
