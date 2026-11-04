@@ -863,6 +863,30 @@ Phase C.2 addresses key visual and interaction refinements requested after initi
 - **Build Status:** `npm run build` passed in $1.42\text{s}$, 0 errors.
 - **Console Errors:** 0 severe console errors recorded throughout entire test suite.
 
+---
+
+## 25. Vercel Production Deployment & Resilient Model Streaming Verification (November 2026)
+
+### 1. Issue Analysis from Vercel Production Deployment
+1. **HTTP 416 (Requested Range Not Satisfiable) at 83.0 MB:**
+   - **Cause:** Previous build deployed on Vercel had `DEFAULT_MODEL_CONFIG` hardcoded for the legacy 268 MB USDZ archive, calculating 17 chunks (at 16 MB each). When streaming the new 87.0 MB (`87008968` bytes) `3dmodel.glb` from Vercel Blob Storage, chunks 1 through 6 downloaded the full 83.0 MB. At chunk 7, the loader requested byte range beyond the file's end (`> 87 MB`), triggering Vercel Blob's `HTTP 416` response. The unhandled 416 threw an error and exhausted 5 retry attempts before aborting.
+   - **Resolution:**
+     - Configured `expectedKnownBytes: 87008968` (`~83.0 MB`), calculating exact 6 chunks.
+     - Handled `HTTP 416` as clean End-Of-File (EOF) when bytes downloaded exceed minimum CAD size threshold (`20 MB`).
+     - Added robust single-stream fallback (`downloadDirectStream`) if HTTP Range requests fail.
+     - Tested live against production URL (`https://eqvmxwue8iejzeky.public.blob.vercel-storage.com/3dmodel.glb`) via `scratch/test_vercel_download.mjs`: all 87,008,968 bytes downloaded in 6 chunks ($27.4\text{s}$) with valid GLB binary header `0x676C5446`.
+2. **Leaking "⚡ DISSECT GOMIKIN" Button on Landing Page:**
+   - **Cause:** When the 3D model initialized in the background, `createPrimaryDissectButton()` added `#btn-dissect-gomikin` to the DOM without strict CSS/JS containment, causing it to render prematurely over the landing page invitation card and Launch 3D button.
+   - **Resolution:**
+     - Added strict CSS display barrier (`#btn-dissect-gomikin, .btn-dissect-primary { display: none !important; }`), strictly requiring `body.in-fullscreen-cad .canvas-wrapper.fullscreen-mode` to display.
+     - Updated `updateButtonState()` in `dissectionAnimationSystem.js` to enforce `display: none` whenever outside fullscreen.
+     - Updated landing page model meta from `268 MB` to `87 MB`.
+
+### 2. Git Synchronization
+- Checkpoint `cad0fb6` and all loader fixes pushed to remote `origin/main` (`https://github.com/Aravindh-sai/Gomikin-3d-Model.git`).
+- Vercel automated CI/CD pipeline triggered to deploy the updated build.
+
+
 
 
 
