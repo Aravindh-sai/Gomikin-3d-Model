@@ -863,7 +863,7 @@ body:not(.in-fullscreen-cad) .btn-dissect-primary,
   display: flex !important;
 }
 
-.canvas-wrapper.fullscreen-mode #btn-dissect-gomikin.btn-dissect-primary {
+body.in-fullscreen-cad .canvas-wrapper.fullscreen-mode #btn-dissect-gomikin.btn-dissect-primary {
   display: flex !important;
   visibility: visible !important;
   pointer-events: auto !important;

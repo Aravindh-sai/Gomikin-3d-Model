@@ -784,7 +784,7 @@ export function createPrimaryDissectButton(controller) {
         left: 50%;
         transform: translateX(-50%);
         z-index: 1500;
-        display: flex;
+        display: none;
         align-items: center;
         gap: 10px;
         padding: 12px 26px;
@@ -802,6 +802,9 @@ export function createPrimaryDissectButton(controller) {
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 255, 204, 0.35), inset 0 0 12px rgba(0, 255, 204, 0.15);
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         user-select: none;
+      }
+      body.in-fullscreen-cad .canvas-wrapper.fullscreen-mode .btn-dissect-primary {
+        display: flex !important;
       }
       .btn-dissect-primary:hover {
         background: rgba(0, 255, 204, 0.18);

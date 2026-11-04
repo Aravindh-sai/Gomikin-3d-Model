@@ -763,4 +763,52 @@ Phase C.2 addresses key visual and interaction refinements requested after initi
 - **TEST 5 (Production Asset):** Verified Vercel Blob URL in production config and local asset in development.
 - **Build Status:** `npm run build` completed in $1.48\text{s}$, 0 errors.
 
+---
+
+## 23. Production Fix: Vercel Blob HTTP 416 Range Resolution, Accurate Asset Meta & Button Containment (November 2026)
+
+### 1. Root Cause Analysis
+1. **Asset Size Mismatch:**
+   - Production model `3dmodel.glb` is $87,008,968\text{ bytes}$ (~$83.0\text{ MB}$).
+   - `ResilientModelLoader` had legacy fallback sizes hardcoded to $268,571,020\text{ bytes}$ (~$256\text{ MB}$, old USDZ archive).
+2. **CORS Header Masking on Vercel Blob:**
+   - Cross-Origin requests to `https://eqvmxwue8iejzeky.public.blob.vercel-storage.com/3dmodel.glb` do not expose `Content-Range` or `Content-Length` in `Access-Control-Expose-Headers`.
+   - In browser environments, `res.headers.get('content-range')` returns `null`, defaulting `totalBytes` to $268,571,020\text{ bytes}$ ($17\text{ chunks}$ at $16\text{ MB}$).
+3. **HTTP 416 (Requested Range Not Satisfiable):**
+   - Chunks 1–5 downloaded $16\text{ MB}$ each ($80\text{ MB}$ total).
+   - Chunk 6 requested bytes $83886080$ to $100663295$ and downloaded the remaining $3,122,888\text{ bytes}$ to reach exact EOF ($87,008,968\text{ bytes}$, $100\%$ downloaded).
+   - Chunk 7 then requested bytes $100663296$ to $117440511$. Because the start offset exceeded the EOF ($87,008,968$), Vercel Blob responded with `HTTP 416 Requested Range Not Satisfiable`.
+   - The loader lacked HTTP 416 / EOF detection, retried 5 times, and crashed with `Error: Failed to download CAD model after 5 attempts at 83.0 MB.`
+4. **Visual Discrepancies:**
+   - Landing page preview card displayed `MODEL LOADS ON DEMAND · 268 MB`.
+   - Stray `.btn-dissect-primary` style injection lacked strict fullscreen-only gating.
+
+### 2. Engineering Corrections Applied
+1. **Centralized Configuration Update ([`src/utils/resilientModelLoader.js`](file:///c:/Projects/Gomikin-3d-Model/src/utils/resilientModelLoader.js)):**
+   - Added `DEFAULT_MODEL_CONFIG.expectedKnownBytes = 87008968`.
+   - Updated all probe and fallback size references from `268571020` to `87008968`.
+2. **Robust Resumable Range Engine with EOF Detection:**
+   - **HTTP 416 Handling:** If `res.status === 416`, recognized as EOF, terminates further chunk requests immediately, updates `totalBytes = downloadedBytes`, and proceeds cleanly to assembly.
+   - **Short Chunk Detection:** If `uint8Data.byteLength < expectedChunkLength`, detects that the chunk reached the exact end of the file, marks `isEOF = true`, updates `totalBytes = downloadedBytes`, and terminates loop cleanly.
+   - **Dynamic Buffer Allocation:** Allocates `new Uint8Array(downloadedBytes)` to guarantee exact binary size match without trailing zeros or out-of-bounds corruption.
+3. **Automatic Direct Single-Stream Fallback:**
+   - Added `downloadDirectStream` using `fetch(source.url).body.getReader()`. If chunked range download encounters unexpected network errors, the loader automatically cascades to a single continuous stream with real-time percentage progress.
+4. **Landing Page Meta Update ([`index.html`](file:///c:/Projects/Gomikin-3d-Model/index.html)):**
+   - Updated preview copy from `MODEL LOADS ON DEMAND · 268 MB` to `MODEL LOADS ON DEMAND · 87 MB`.
+5. **Strict Button Containment ([`src/style.css`](file:///c:/Projects/Gomikin-3d-Model/src/style.css) & [`src/animation/dissectionAnimationSystem.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/dissectionAnimationSystem.js)):**
+   - `.btn-dissect-primary` now defaults to `display: none !important` and only activates when both `body.in-fullscreen-cad` and `.canvas-wrapper.fullscreen-mode` are active.
+
+### 3. Verification & Live Blob Testing
+- **Live Vercel Blob Download Test (`scratch/test_vercel_download.mjs`):**
+  - Downloaded from `https://eqvmxwue8iejzeky.public.blob.vercel-storage.com/3dmodel.glb` via `ResilientModelLoader`.
+  - All 6 chunks loaded seamlessly ($19\%, 39\%, 58\%, 77\%, 96\%, 100\%$) with zero 416 errors.
+  - Buffer byte length: exactly $87,008,968\text{ bytes}$.
+  - Header validation: verified valid `glTF` binary magic bytes (`0x676C5446`).
+- **Production Build:**
+  - `npm run build` compiled clean in $2.17\text{s}$ with 0 errors.
+- **End-to-End Suite (`scratch/verify_phase_d1.cjs`):**
+  - All 5 automated tests passed (GLB Integrity, Mechanical Pivots, Combined Kinematics, 4 View Modes, Exit Fullscreen).
+  - Console errors: 0.
+
+
 

@@ -11,7 +11,7 @@
  *    - Automatically retries interrupted chunks with exponential backoff.
  *    - Preserves downloaded progress on network drops.
  * 3. Client-Side Persistent Cache (IndexedDB):
- *    - Caches the loaded 268MB ArrayBuffer in browser IndexedDB.
+ *    - Caches the loaded CAD ArrayBuffer in browser IndexedDB.
  *    - Subsequent visits / page reloads load instantly (<300ms) with zero network overhead.
  * 4. Rich Diagnostic Telemetry:
  *    - Real-time download progress (MB / total MB), percentage, MB/s speed, ETA, and connection recovery state.
@@ -54,7 +54,8 @@ export const DEFAULT_MODEL_CONFIG = {
   dbName: 'GomikinModelCache',
   storeName: 'models',
   cacheKey: 'gomikin_3dmodel_glb_v1',
-  expectedMinBytes: 20 * 1024 * 1024 // 20MB minimum to distinguish from HTML 404 responses
+  expectedMinBytes: 20 * 1024 * 1024, // 20MB minimum to distinguish from HTML 404 responses
+  expectedKnownBytes: 87008968 // Exact byte size of production 3dmodel.glb (~83.0 MB)
 };
 
 class ModelCacheDB {
@@ -257,7 +258,7 @@ export class ResilientModelLoader {
 
       return {
         ok: true,
-        totalBytes: totalBytes || 268571020, // Default to known asset size if unstated
+        totalBytes: totalBytes || this.config.expectedKnownBytes || 87008968, // Default to known asset size if unstated
         supportsRanges
       };
     } catch (err) {
@@ -337,7 +338,7 @@ export class ResilientModelLoader {
     // If probing failed for all sources, fallback to the last source directly
     if (!selectedSource && candidateSources.length > 0) {
       selectedSource = candidateSources[candidateSources.length - 1];
-      sourceMeta = { ok: true, totalBytes: 268571020, supportsRanges: true };
+      sourceMeta = { ok: true, totalBytes: this.config.expectedKnownBytes || 87008968, supportsRanges: true };
       console.warn(`[ResilientModelLoader] All probes inconclusive. Direct attempting fallback source: ${selectedSource.label}`);
     }
 
@@ -347,11 +348,21 @@ export class ResilientModelLoader {
 
     notifyStatus(`Connected to ${selectedSource.label}. Starting download...`);
 
-    // 3. Perform Resumable Chunked Range Download
-    const buffer = await this.downloadWithResumption(selectedSource, sourceMeta, {
-      onProgress: notifyProgress,
-      onStatus: notifyStatus
-    });
+    // 3. Perform Resumable Chunked Range Download with Single-Stream Fallback
+    let buffer = null;
+    try {
+      buffer = await this.downloadWithResumption(selectedSource, sourceMeta, {
+        onProgress: notifyProgress,
+        onStatus: notifyStatus
+      });
+    } catch (rangeErr) {
+      console.warn('[ResilientModelLoader] Resumable range download failed, attempting single-stream fallback:', rangeErr);
+      notifyStatus(`Resuming via direct stream from ${selectedSource.label}...`);
+      buffer = await this.downloadDirectStream(selectedSource, sourceMeta, {
+        onProgress: notifyProgress,
+        onStatus: notifyStatus
+      });
+    }
 
     // 4. Save to IndexedDB cache
     if (buffer && buffer.byteLength >= this.config.expectedMinBytes && !this.shouldBypassCache()) {
@@ -378,18 +389,19 @@ export class ResilientModelLoader {
    * Resumable download engine with range requests, chunk tracking, and exponential backoff retry.
    */
   async downloadWithResumption(source, meta, { onProgress, onStatus }) {
-    const totalBytes = meta.totalBytes || 268571020;
+    let totalBytes = meta.totalBytes || this.config.expectedKnownBytes || 87008968;
     const chunkSize = this.config.chunkSize;
     const numChunks = Math.ceil(totalBytes / chunkSize);
 
-    console.log(`[ResilientModelLoader] Downloading ${totalBytes} bytes in ${numChunks} chunks (${(chunkSize / (1024 * 1024)).toFixed(1)} MB each) from ${source.url}`);
+    console.log(`[ResilientModelLoader] Downloading ${totalBytes} bytes in up to ${numChunks} chunks (${(chunkSize / (1024 * 1024)).toFixed(1)} MB each) from ${source.url}`);
 
-    const chunks = new Array(numChunks);
+    const chunks = [];
     let downloadedBytes = 0;
     let startTime = performance.now();
     let speedSamples = [];
+    let isEOF = false;
 
-    for (let chunkIdx = 0; chunkIdx < numChunks; chunkIdx++) {
+    for (let chunkIdx = 0; chunkIdx < numChunks && !isEOF; chunkIdx++) {
       const start = chunkIdx * chunkSize;
       const end = Math.min(start + chunkSize - 1, totalBytes - 1);
       const expectedChunkLength = end - start + 1;
@@ -412,19 +424,57 @@ export class ResilientModelLoader {
 
           clearTimeout(timeoutId);
 
+          // HTTP 416 means Requested Range Not Satisfiable:
+          // The start of this chunk is at or beyond the file's end, meaning EOF was already reached!
+          if (res.status === 416) {
+            console.log(`[ResilientModelLoader] Chunk ${chunkIdx + 1} received HTTP 416 (Requested Range Not Satisfiable). EOF reached at ${downloadedBytes} bytes.`);
+            totalBytes = downloadedBytes;
+            isEOF = true;
+            chunkDownloaded = true;
+            break;
+          }
+
           if (!res.ok && res.status !== 206 && res.status !== 200) {
             throw new Error(`HTTP ${res.status} ${res.statusText}`);
           }
 
+          // If server returned 200 on first chunk (server ignores Range and sent the whole file)
+          if (res.status === 200 && chunkIdx === 0) {
+            const arrayBuf = await res.arrayBuffer();
+            if (arrayBuf.byteLength >= this.config.expectedMinBytes) {
+              console.log(`[ResilientModelLoader] Server returned full body (${(arrayBuf.byteLength / (1024 * 1024)).toFixed(1)} MB) directly on initial request.`);
+              chunks.push(new Uint8Array(arrayBuf));
+              downloadedBytes = arrayBuf.byteLength;
+              totalBytes = downloadedBytes;
+              isEOF = true;
+              chunkDownloaded = true;
+              break;
+            }
+          }
+
           const arrayBuf = await res.arrayBuffer();
           if (arrayBuf.byteLength === 0) {
+            if (downloadedBytes >= this.config.expectedMinBytes) {
+              console.log(`[ResilientModelLoader] Received 0 bytes for chunk ${chunkIdx + 1} after downloading ${downloadedBytes} bytes. Treating as EOF.`);
+              totalBytes = downloadedBytes;
+              isEOF = true;
+              chunkDownloaded = true;
+              break;
+            }
             throw new Error('Received 0 bytes for chunk');
           }
 
           const uint8Data = new Uint8Array(arrayBuf);
-          chunks[chunkIdx] = uint8Data;
+          chunks.push(uint8Data);
           downloadedBytes += uint8Data.byteLength;
           chunkDownloaded = true;
+
+          // If received chunk is smaller than requested range, we reached EOF!
+          if (uint8Data.byteLength < expectedChunkLength) {
+            console.log(`[ResilientModelLoader] Chunk ${chunkIdx + 1} returned ${uint8Data.byteLength} bytes (< expected ${expectedChunkLength} bytes). Reached EOF at ${downloadedBytes} bytes.`);
+            totalBytes = downloadedBytes;
+            isEOF = true;
+          }
 
           // Speed and ETA calculation
           const chunkDurationSec = (performance.now() - chunkStartTime) / 1000;
@@ -440,9 +490,9 @@ export class ResilientModelLoader {
 
           const remainingBytes = Math.max(0, totalBytes - downloadedBytes);
           const etaSeconds = avgSpeedMBps > 0 ? Math.ceil((remainingBytes / (1024 * 1024)) / avgSpeedMBps) : 0;
-          const pct = Math.min(100, (downloadedBytes / totalBytes) * 100);
+          const pct = Math.min(100, Math.round((downloadedBytes / (totalBytes || downloadedBytes)) * 100));
 
-          console.log(`[ResilientModelLoader] Chunk ${chunkIdx + 1}/${numChunks} loaded (${pct.toFixed(0)}%) - ${avgSpeedMBps.toFixed(1)} MB/s`);
+          console.log(`[ResilientModelLoader] Chunk ${chunkIdx + 1}/${numChunks} loaded (${pct}%) - ${avgSpeedMBps.toFixed(1)} MB/s`);
 
           onProgress({
             phase: 'downloading',
@@ -467,7 +517,7 @@ export class ResilientModelLoader {
               phase: 'downloading',
               sourceLabel: source.label,
               sourceId: source.id,
-              percent: Math.min(100, (downloadedBytes / totalBytes) * 100),
+              percent: Math.min(100, Math.round((downloadedBytes / (totalBytes || downloadedBytes)) * 100)),
               loaded: downloadedBytes,
               total: totalBytes,
               speedMBps: 0,
@@ -485,9 +535,9 @@ export class ResilientModelLoader {
       }
     }
 
-    // Assemble all chunks into a unified ArrayBuffer
+    // Assemble all chunks into a unified ArrayBuffer based on downloadedBytes
     onStatus('Assembling downloaded data...');
-    const combinedBuffer = new Uint8Array(totalBytes);
+    const combinedBuffer = new Uint8Array(downloadedBytes);
     let offset = 0;
     for (let i = 0; i < chunks.length; i++) {
       if (chunks[i]) {
@@ -498,6 +548,87 @@ export class ResilientModelLoader {
 
     const elapsedSec = ((performance.now() - startTime) / 1000).toFixed(1);
     console.log(`[ResilientModelLoader] Download complete! ${(combinedBuffer.byteLength / (1024 * 1024)).toFixed(1)} MB in ${elapsedSec}s.`);
+
+    return combinedBuffer.buffer;
+  }
+
+  /**
+   * Direct single-stream fallback when range requests fail or are unsupported.
+   */
+  async downloadDirectStream(source, meta, { onProgress, onStatus }) {
+    console.log(`[ResilientModelLoader] Streaming CAD model directly from ${source.url}`);
+    onStatus(`Streaming model from ${source.label}...`);
+
+    const res = await fetch(source.url);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    }
+
+    const lenHeader = res.headers.get('content-length');
+    const totalBytes = lenHeader ? parseInt(lenHeader, 10) : (meta && meta.totalBytes ? meta.totalBytes : this.config.expectedKnownBytes || 87008968);
+
+    if (!res.body || typeof res.body.getReader !== 'function') {
+      const buffer = await res.arrayBuffer();
+      onProgress({
+        phase: 'downloading',
+        sourceLabel: source.label,
+        sourceId: source.id,
+        percent: 100,
+        loaded: buffer.byteLength,
+        total: buffer.byteLength,
+        speedMBps: 0,
+        etaSeconds: 0,
+        retrying: false
+      });
+      return buffer;
+    }
+
+    const reader = res.body.getReader();
+    const chunks = [];
+    let downloadedBytes = 0;
+    let startTime = performance.now();
+    let lastProgressUpdate = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      chunks.push(value);
+      downloadedBytes += value.byteLength;
+
+      const now = performance.now();
+      if (now - lastProgressUpdate > 100 || downloadedBytes >= totalBytes) {
+        lastProgressUpdate = now;
+        const pct = Math.min(100, Math.round((downloadedBytes / (totalBytes || downloadedBytes)) * 100));
+        const elapsedSec = (now - startTime) / 1000;
+        const speedMBps = elapsedSec > 0.1 ? (downloadedBytes / (1024 * 1024)) / elapsedSec : 0;
+        const remainingBytes = Math.max(0, totalBytes - downloadedBytes);
+        const etaSeconds = speedMBps > 0 ? Math.ceil((remainingBytes / (1024 * 1024)) / speedMBps) : 0;
+
+        onProgress({
+          phase: 'downloading',
+          sourceLabel: source.label,
+          sourceId: source.id,
+          percent: pct,
+          loaded: downloadedBytes,
+          total: totalBytes,
+          speedMBps,
+          etaSeconds,
+          retrying: false
+        });
+      }
+    }
+
+    onStatus('Assembling downloaded data...');
+    const combinedBuffer = new Uint8Array(downloadedBytes);
+    let offset = 0;
+    for (const chunk of chunks) {
+      combinedBuffer.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+
+    const elapsedSec = ((performance.now() - startTime) / 1000).toFixed(1);
+    console.log(`[ResilientModelLoader] Direct stream complete! ${(combinedBuffer.byteLength / (1024 * 1024)).toFixed(1)} MB in ${elapsedSec}s.`);
 
     return combinedBuffer.buffer;
   }
