@@ -156,7 +156,7 @@ export class ComponentDetailController {
       /* Back to Catalogue Button */
       .btn-back-catalogue {
         position: absolute;
-        top: 26px;
+        top: 76px;
         left: 28px;
         display: flex;
         align-items: center;
@@ -247,7 +247,8 @@ export class ComponentDetailController {
         <button id="btn-toggle-autorotate" class="btn-autorotate">🔄 Auto-Rotate: OFF</button>
       </div>
     `;
-    document.body.appendChild(overlay);
+    const hostDetail = document.getElementById('gomikin-canvas-wrapper') || document.body;
+    hostDetail.appendChild(overlay);
 
     const backBtn = document.getElementById('btn-back-to-grid');
     if (backBtn) {
@@ -727,18 +728,23 @@ export class ComponentDetailController {
    * @param {Object} comp
    */
   _applyCatalogueTransform(comp) {
-    const targetLocalCenter = new THREE.Vector3(
-      comp.targetWorldCenter.x * 1000,
-      -comp.targetWorldCenter.z * 1000,
-      comp.targetWorldCenter.y * 1000
+    const targetParentCenter = comp.targetWorldCenter.clone();
+    if (comp.mesh.parent) {
+      comp.mesh.parent.updateMatrixWorld(true);
+      comp.mesh.parent.worldToLocal(targetParentCenter);
+    }
+    const scale = comp.initialScale.clone().multiplyScalar(comp.catalogueScaleMultiplier);
+    const totalEuler = new THREE.Euler(
+      comp.initialRotation.x + comp.presentationRotation.x,
+      comp.initialRotation.y + comp.presentationRotation.y,
+      comp.initialRotation.z + comp.presentationRotation.z
     );
-    const scale = new THREE.Vector3().copy(comp.initialScale).multiplyScalar(comp.catalogueScaleMultiplier);
-    const q = new THREE.Quaternion().setFromEuler(comp.presentationRotation);
-    const scaledOffset = new THREE.Vector3().copy(comp.geomCenter).multiply(scale).applyQuaternion(q);
-    const meshPos = new THREE.Vector3().subVectors(targetLocalCenter, scaledOffset);
+    const q = new THREE.Quaternion().setFromEuler(totalEuler);
+    const scaledOffset = comp.geomCenter.clone().multiply(scale).applyQuaternion(q);
+    const meshPos = new THREE.Vector3().subVectors(targetParentCenter, scaledOffset);
 
     comp.mesh.position.copy(meshPos);
-    comp.mesh.rotation.copy(comp.presentationRotation);
+    comp.mesh.rotation.copy(totalEuler);
     comp.mesh.scale.copy(scale);
   }
 
@@ -818,28 +824,28 @@ export class ComponentDetailController {
     const detailWorldCenter = new THREE.Vector3(detailTargetX, detailTargetY, 0.0);
     const currentWorldCenter = new THREE.Vector3().lerpVectors(comp.targetWorldCenter, detailWorldCenter, easeT);
 
-    // Convert to local parent space
-    const targetLocalCenter = new THREE.Vector3(
-      currentWorldCenter.x * 1000,
-      -currentWorldCenter.z * 1000,
-      currentWorldCenter.y * 1000
-    );
+    // Convert to local parent space (universal for any parent hierarchy/scale)
+    const targetParentCenter = currentWorldCenter.clone();
+    if (comp.mesh.parent) {
+      comp.mesh.parent.updateMatrixWorld(true);
+      comp.mesh.parent.worldToLocal(targetParentCenter);
+    }
 
     // Interpolate rotation: presentationRotation -> presentationRotation + orbit
-    const rotX = comp.presentationRotation.x + this.detailOrbit.y * easeT;
-    const rotY = comp.presentationRotation.y + this.detailOrbit.x * easeT;
-    const rotZ = comp.presentationRotation.z;
+    const rotX = comp.initialRotation.x + comp.presentationRotation.x + this.detailOrbit.y * easeT;
+    const rotY = comp.initialRotation.y + comp.presentationRotation.y + this.detailOrbit.x * easeT;
+    const rotZ = comp.initialRotation.z + comp.presentationRotation.z;
     const currentRot = new THREE.Euler(rotX, rotY, rotZ);
 
     // Interpolate scale multiplier
     const targetDetailMult = this.calculateDetailScaleMultiplier(this.selectedName);
     const currentMult = THREE.MathUtils.lerp(comp.catalogueScaleMultiplier, targetDetailMult, easeT);
-    const currentScale = new THREE.Vector3().copy(comp.initialScale).multiplyScalar(currentMult);
+    const currentScale = comp.initialScale.clone().multiplyScalar(currentMult);
 
-    // Pivot-offset correction: mathematically keeps center at targetLocalCenter
+    // Pivot-offset correction: mathematically keeps center at targetParentCenter
     const q = new THREE.Quaternion().setFromEuler(currentRot);
-    const scaledOffset = new THREE.Vector3().copy(comp.geomCenter).multiply(currentScale).applyQuaternion(q);
-    const meshPos = new THREE.Vector3().subVectors(targetLocalCenter, scaledOffset);
+    const scaledOffset = comp.geomCenter.clone().multiply(currentScale).applyQuaternion(q);
+    const meshPos = new THREE.Vector3().subVectors(targetParentCenter, scaledOffset);
 
     comp.mesh.position.copy(meshPos);
     comp.mesh.rotation.copy(currentRot);

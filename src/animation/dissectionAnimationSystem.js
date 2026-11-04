@@ -314,7 +314,7 @@ export class DissectionAnimationController {
       tempVec.project(this.camera);
 
       // Behind camera check
-      if (tempVec.z > 1.0) {
+      if (tempVec.z > 1.0 || tempVec.x < -1.05 || tempVec.x > 1.05 || tempVec.y < -1.05 || tempVec.y > 1.05) {
         badge.style.opacity = '0';
         continue;
       }
@@ -322,7 +322,9 @@ export class DissectionAnimationController {
       const screenX = (tempVec.x * 0.5 + 0.5) * width;
       const screenY = (-tempVec.y * 0.5 + 0.5) * height;
 
-      badge.style.transform = `translate(-50%, 0) translate3d(${screenX.toFixed(1)}px, ${screenY.toFixed(1)}px, 0)`;
+      const clampedX = Math.max(50, Math.min(width - 50, screenX));
+      const clampedY = Math.max(70, Math.min(height - 40, screenY));
+      badge.style.transform = `translate(-50%, 0) translate3d(${clampedX.toFixed(1)}px, ${clampedY.toFixed(1)}px, 0)`;
     }
 
     // Position module pod header banners
@@ -335,7 +337,7 @@ export class DissectionAnimationController {
         headerEl.style.opacity = baseOpacity.toFixed(3);
 
         tempVec.project(this.camera);
-        if (tempVec.z > 1.0) {
+        if (tempVec.z > 1.0 || tempVec.x < -1.05 || tempVec.x > 1.05 || tempVec.y < -1.05 || tempVec.y > 1.05) {
           headerEl.style.opacity = '0';
           continue;
         }
@@ -343,7 +345,9 @@ export class DissectionAnimationController {
         const screenX = (tempVec.x * 0.5 + 0.5) * width;
         const screenY = (-tempVec.y * 0.5 + 0.5) * height;
 
-        headerEl.style.transform = `translate(-50%, -50%) translate3d(${screenX.toFixed(1)}px, ${screenY.toFixed(1)}px, 0)`;
+        const clampedX = Math.max(140, Math.min(width - 140, screenX));
+        const clampedY = Math.max(70, Math.min(height - 40, screenY));
+        headerEl.style.transform = `translate(-50%, -50%) translate3d(${clampedX.toFixed(1)}px, ${clampedY.toFixed(1)}px, 0)`;
       }
     }
   }
@@ -766,137 +770,17 @@ export class DissectionAnimationController {
  * @returns {HTMLButtonElement}
  */
 export function createPrimaryDissectButton(controller) {
-  // Remove any legacy test buttons
+  // Priority 2: Permanently remove redundant "DISSECT GOMIKIN" button
   const oldTestBtn = document.getElementById('btn-test-dissection');
   if (oldTestBtn) oldTestBtn.remove();
 
   const existing = document.getElementById('btn-dissect-gomikin');
   if (existing) existing.remove();
 
-  // Inject primary button CSS styles
-  if (!document.getElementById('gomikin-dissect-button-styles')) {
-    const style = document.createElement('style');
-    style.id = 'gomikin-dissect-button-styles';
-    style.textContent = `
-      .btn-dissect-primary {
-        position: absolute;
-        bottom: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1500;
-        display: none;
-        align-items: center;
-        gap: 10px;
-        padding: 12px 26px;
-        background: rgba(10, 15, 24, 0.92);
-        border: 1.5px solid #00ffcc;
-        border-radius: 30px;
-        color: #00ffcc;
-        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 1.2px;
-        text-transform: uppercase;
-        cursor: pointer;
-        backdrop-filter: blur(14px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 255, 204, 0.35), inset 0 0 12px rgba(0, 255, 204, 0.15);
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        user-select: none;
-      }
-      body.in-fullscreen-cad .canvas-wrapper.fullscreen-mode .btn-dissect-primary {
-        display: flex !important;
-      }
-      .btn-dissect-primary:hover {
-        background: rgba(0, 255, 204, 0.18);
-        border-color: #38bdf8;
-        color: #ffffff;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 255, 204, 0.6), inset 0 0 16px rgba(0, 255, 204, 0.25);
-        transform: translateX(-50%) translateY(-2px) scale(1.02);
-      }
-      .btn-dissect-primary:active {
-        transform: translateX(-50%) translateY(1px) scale(0.98);
-      }
-      .btn-dissect-primary.state-dissecting {
-        border-color: #38bdf8;
-        color: #38bdf8;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(56, 189, 248, 0.4);
-      }
-      .btn-dissect-primary.state-exploded {
-        border-color: #10b981;
-        color: #10b981;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 24px rgba(16, 185, 129, 0.45);
-      }
-      .btn-dissect-primary.state-exploded:hover {
-        background: rgba(16, 185, 129, 0.2);
-        color: #ffffff;
-        border-color: #34d399;
-      }
-      .btn-dissect-primary.state-resetting {
-        border-color: #f59e0b;
-        color: #f59e0b;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 20px rgba(245, 158, 11, 0.4);
-      }
-      .btn-dissect-primary .btn-spin {
-        display: inline-block;
-        animation: gomikin-spin 1.5s linear infinite;
-      }
-      @keyframes gomikin-spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-    `;
-    document.head.appendChild(style);
+  if (controller) {
+    controller.primaryButton = null;
   }
-
-  const btn = document.createElement('button');
-  btn.id = 'btn-dissect-gomikin';
-  btn.className = 'btn-dissect-primary state-assembled';
-  btn.innerHTML = `
-    <span class="btn-icon">⚡</span>
-    <span class="btn-text">DISSECT GOMIKIN</span>
-  `;
-  btn.title = 'Click to smoothly disassemble Gomikin into an organized 3D component catalogue';
-
-  btn.addEventListener('click', () => {
-    const currentState = controller.state();
-    if (window.viewCoordinator) {
-      if (currentState === ANIMATION_STATES.ASSEMBLED) {
-        window.viewCoordinator.switchView('dissection');
-        return;
-      } else if (currentState === ANIMATION_STATES.EXPLODED) {
-        window.viewCoordinator.switchView('full');
-        return;
-      }
-    }
-
-    if (currentState === ANIMATION_STATES.ASSEMBLED) {
-      controller.play(1.0);
-    } else if (currentState === ANIMATION_STATES.EXPLODED) {
-      controller.reset(false); // smooth animated reverse reassembly
-    } else if (currentState === ANIMATION_STATES.DISSECTION) {
-      if (controller.isPlaying) {
-        controller.pause();
-      } else {
-        controller.play(1.0);
-      }
-    } else if (currentState === ANIMATION_STATES.RESETTING) {
-      if (controller.isPlaying) {
-        controller.pause();
-      } else {
-        controller.play(-1.0);
-      }
-    }
-  });
-
-  const hostBtn = document.getElementById('gomikin-canvas-wrapper') || document.body;
-  const isFullscreen = hostBtn && hostBtn.classList && hostBtn.classList.contains('fullscreen-mode');
-  btn.style.display = isFullscreen ? 'flex' : 'none';
-
-  hostBtn.appendChild(btn);
-  controller.primaryButton = btn;
-  controller.updateButtonState();
-
-  return btn;
+  return null;
 }
 
 /**

@@ -1,12 +1,36 @@
 import * as THREE from 'three';
 
 export const FLOW_MODES = {
+  INPUT: 'INPUT',
+  CUTTING: 'CUTTING',
+  STORAGE: 'STORAGE',
+  DECOMPOSITION: 'DECOMPOSITION',
   ORGANIC: 'ORGANIC',
   INORGANIC: 'INORGANIC',
   LEFTOVER_FOOD: 'LEFTOVER_FOOD'
 };
 
 export const FLOW_STEPS = {
+  INPUT: [
+    { title: '1. Waste Reception & Inflow', desc: 'Waste is deposited into the intake funnel and settles onto the 2-axis base.' },
+    { title: '2. Optical & Sensor Classification', desc: 'Computer vision camera and ultrasonic depth sensors detect and classify the deposited material.' },
+    { title: '3. Intake Base Tilt & Transfer', desc: 'The 2-axis segregator base tilts -10° to slide classified material into the internal processing collar.' }
+  ],
+  CUTTING: [
+    { title: '1. Waste Inflow Transfer', desc: 'Sorted organic material enters the high-torque cutting throat above the rotary blades.' },
+    { title: '2. High-Speed Rotary Cutting', desc: 'Dual rotary shear blades rotate at high speed, shredding waste down to <8 mm.' },
+    { title: '3. Size Reduction & Mesh Passage', desc: 'Shredded fragments pass through the circular sizing screen and accumulate in the storage chamber.' }
+  ],
+  STORAGE: [
+    { title: '1. Storage Chamber Accumulation', desc: 'Shredded biomass accumulates cleanly inside the sealed intermediate storage chamber.' },
+    { title: '2. Hydrostatic Liquid Drainage', desc: 'Cellular moisture drains through perforated bottom screen into the lower leachate collector.' },
+    { title: '3. Drop-Down Door Mechanism', desc: 'Dual center-hinged drop doors swing open 45° to discharge the batch downwards.' }
+  ],
+  DECOMPOSITION: [
+    { title: '1. Biomass Inflow Transfer', desc: 'Discharged organic biomass drops into the primary decomposition chamber.' },
+    { title: '2. Continuous Agitator Mixing', desc: 'Helical agitator rotates continuously around its mechanical axis, mixing and aerating biomass.' },
+    { title: '3. Thermophilic Decomposition', desc: 'Aerobic microbial curing stabilizes biomass with temperature monitoring and aeration.' }
+  ],
   ORGANIC: [
     { title: '1. Waste Deposit', desc: 'Organic waste is dropped into the top receiving funnel.' },
     { title: '2. Optical & Depth Sensing', desc: 'Waste settles on 2-axis platform; camera and ultrasonic sensors classify material.' },
@@ -45,11 +69,11 @@ export class PhysicalFlowController {
     this.camera = camera;
     this.controls = controls;
 
-    this.activeMode = FLOW_MODES.ORGANIC;
+    this.activeMode = FLOW_MODES.INPUT;
     this.progress = 0.0;
     this.isPlaying = false;
     this.speed = 1.0;
-    this.duration = 14.0; // seconds for full flow
+    this.duration = 8.0; // seconds for modular flow
 
     // Component baseline transform cache for mechanical motions
     this.cachedTransforms = new Map();
@@ -227,12 +251,25 @@ export class PhysicalFlowController {
   setMode(mode) {
     if (!FLOW_MODES[mode]) return;
     this.activeMode = mode;
+    this.duration = (mode === FLOW_MODES.ORGANIC) ? 14.0 : 8.0;
     this.reset();
 
     const mesh = this.mainParticle.children[0];
     const halo = this.mainParticle.getObjectByName('Halo');
 
-    if (mode === FLOW_MODES.ORGANIC) {
+    if (mode === FLOW_MODES.INPUT) {
+      mesh.material.color.setHex(0x00ffcc);
+      mesh.material.emissive.setHex(0x00b4d8);
+      if (halo) halo.material.color.setHex(0x00ffcc);
+    } else if (mode === FLOW_MODES.CUTTING) {
+      mesh.material.color.setHex(0x38bdf8);
+      mesh.material.emissive.setHex(0x0284c7);
+      if (halo) halo.material.color.setHex(0x38bdf8);
+    } else if (mode === FLOW_MODES.STORAGE) {
+      mesh.material.color.setHex(0xa855f7);
+      mesh.material.emissive.setHex(0x7e22ce);
+      if (halo) halo.material.color.setHex(0xc084fc);
+    } else if (mode === FLOW_MODES.DECOMPOSITION || mode === FLOW_MODES.ORGANIC) {
       mesh.material.color.setHex(0x22c55e);
       mesh.material.emissive.setHex(0x15803d);
       if (halo) halo.material.color.setHex(0x4ade80);
@@ -290,7 +327,15 @@ export class PhysicalFlowController {
   setProgress(p) {
     this.progress = Math.max(0.0, Math.min(1.0, p));
 
-    if (this.activeMode === FLOW_MODES.ORGANIC) {
+    if (this.activeMode === FLOW_MODES.INPUT) {
+      this.updateInputFlow(this.progress);
+    } else if (this.activeMode === FLOW_MODES.CUTTING) {
+      this.updateCuttingFlow(this.progress);
+    } else if (this.activeMode === FLOW_MODES.STORAGE) {
+      this.updateStorageFlow(this.progress);
+    } else if (this.activeMode === FLOW_MODES.DECOMPOSITION) {
+      this.updateDecompositionFlow(this.progress);
+    } else if (this.activeMode === FLOW_MODES.ORGANIC) {
       this.updateOrganicFlow(this.progress);
     } else if (this.activeMode === FLOW_MODES.INORGANIC) {
       this.updateInorganicFlow(this.progress);
@@ -299,6 +344,215 @@ export class PhysicalFlowController {
     }
 
     this.notifyListeners();
+  }
+
+  /**
+   * Module 1: Input & Intake Module Flow Simulation
+   * Steps:
+   * 1. Waste Reception [0.00 - 0.33]
+   * 2. Optical & Sensor Classification [0.33 - 0.66]
+   * 3. Intake Base Tilt & Transfer [0.66 - 1.00]
+   */
+  updateInputFlow(p) {
+    this.resetMechanicalPoses();
+    if (this.leftoverFoodScrapsGroup) this.leftoverFoodScrapsGroup.visible = false;
+    if (window.virtualDoorAssembly) window.virtualDoorAssembly.setDoorAngle(0.0);
+
+    this.mainParticle.visible = true;
+    this.fragmentsGroup.visible = false;
+    this.leachateDrops.visible = false;
+    this.scanBeam.visible = false;
+
+    // Step 1: Deposit down funnel [0.00 - 0.33]
+    if (p <= 0.33) {
+      const u = p / 0.33;
+      this.mainParticle.position.set(0, THREE.MathUtils.lerp(1.10, 0.945, u), 0);
+      this.mainParticle.scale.set(1, 1, 1);
+    }
+    // Step 2: Sensed on platform with vision scanner [0.33 - 0.66]
+    else if (p <= 0.66) {
+      const u = (p - 0.33) / 0.33;
+      this.mainParticle.position.set(0, 0.945, 0);
+      this.scanBeam.visible = true;
+      const pulse = 1.0 + Math.sin(u * Math.PI * 4) * 0.10;
+      this.mainParticle.scale.set(pulse, pulse, pulse);
+    }
+    // Step 3: Base tilts toward 180° Organic sector (-X) [0.66 - 1.00]
+    else {
+      const u = (p - 0.66) / 0.34;
+      if (window.mechanicalPivotController) {
+        window.mechanicalPivotController.setRotatingBaseAngle(THREE.MathUtils.degToRad(-10 * u), true);
+      }
+      this.mainParticle.position.set(
+        THREE.MathUtils.lerp(0, -0.12, u),
+        THREE.MathUtils.lerp(0.945, 0.885, u),
+        0
+      );
+      this.mainParticle.scale.set(1, 1, 1);
+    }
+  }
+
+  /**
+   * Module 2: Organic Preprocessing & Cutting Module Flow Simulation
+   * Steps:
+   * 1. Waste Inflow Transfer [0.00 - 0.33]
+   * 2. High-Speed Rotary Cutting [0.33 - 0.66]
+   * 3. Size Reduction & Mesh Passage [0.66 - 1.00]
+   */
+  updateCuttingFlow(p) {
+    this.resetMechanicalPoses();
+    if (this.leftoverFoodScrapsGroup) this.leftoverFoodScrapsGroup.visible = false;
+    if (window.virtualDoorAssembly) window.virtualDoorAssembly.setDoorAngle(0.0);
+
+    this.scanBeam.visible = false;
+    this.leachateDrops.visible = false;
+
+    // Step 1: Waste Inflow Transfer into cutting throat [0.00 - 0.33]
+    if (p <= 0.33) {
+      const u = p / 0.33;
+      this.mainParticle.visible = true;
+      this.fragmentsGroup.visible = false;
+      this.mainParticle.position.set(-0.12, THREE.MathUtils.lerp(0.92, 0.885, u), 0);
+      this.mainParticle.scale.set(1, 1, 1);
+    }
+    // Step 2: High-Speed Rotary Cutting [0.33 - 0.66]
+    else if (p <= 0.66) {
+      const u = (p - 0.33) / 0.33;
+      if (window.mechanicalPivotController) {
+        const pBlades = window.mechanicalPivotController.pivots.cuttingBlades;
+        if (pBlades && pBlades.object) {
+          pBlades.currentAngle = u * Math.PI * 24;
+          window.mechanicalPivotController._applyPivotAngle(pBlades);
+        }
+      }
+
+      this.mainParticle.visible = true;
+      this.mainParticle.position.set(-0.12, THREE.MathUtils.lerp(0.885, 0.855, u), 0);
+      const shrink = THREE.MathUtils.lerp(1.0, 0.25, u);
+      this.mainParticle.scale.set(shrink, shrink, shrink);
+
+      this.fragmentsGroup.visible = true;
+      this.fragmentsGroup.position.set(-0.12, 0.855, 0);
+    }
+    // Step 3: Size Reduction & Mesh Passage [0.66 - 1.00]
+    else {
+      const u = (p - 0.66) / 0.34;
+      this.mainParticle.visible = false;
+      this.fragmentsGroup.visible = true;
+      this.fragmentsGroup.position.set(-0.12, THREE.MathUtils.lerp(0.855, 0.70, u), 0);
+    }
+  }
+
+  /**
+   * Module 3: Organic Storage & Drainage Module Flow Simulation
+   * Steps:
+   * 1. Storage Chamber Accumulation [0.00 - 0.33]
+   * 2. Hydrostatic Liquid Drainage [0.33 - 0.66]
+   * 3. Drop-Down Door Mechanism [0.66 - 1.00]
+   */
+  updateStorageFlow(p) {
+    this.resetMechanicalPoses();
+    if (this.leftoverFoodScrapsGroup) this.leftoverFoodScrapsGroup.visible = false;
+    if (window.virtualDoorAssembly) window.virtualDoorAssembly.setDoorAngle(0.0);
+
+    this.mainParticle.visible = false;
+    this.scanBeam.visible = false;
+
+    // Step 1: Storage Chamber Accumulation [0.00 - 0.33]
+    if (p <= 0.33) {
+      const u = p / 0.33;
+      this.fragmentsGroup.visible = true;
+      this.fragmentsGroup.position.set(-0.12, THREE.MathUtils.lerp(0.74, 0.68, u), 0);
+      this.leachateDrops.visible = false;
+    }
+    // Step 2: Hydrostatic Drainage [0.33 - 0.66]
+    else if (p <= 0.66) {
+      const u = (p - 0.33) / 0.33;
+      this.fragmentsGroup.visible = true;
+      this.fragmentsGroup.position.set(-0.12, 0.68, 0);
+
+      this.leachateDrops.visible = true;
+      this.leachateDrops.position.set(-0.12, 0, 0);
+      this.leachateDrops.children.forEach((drop, idx) => {
+        const dropY = 0.65 - ((u * 3 + idx * 0.15) % 1.0) * 0.55;
+        drop.position.set(0, dropY, 0);
+      });
+    }
+    // Step 3: Drop-Down Doors Discharge [0.66 - 1.00]
+    else {
+      const u = (p - 0.66) / 0.34;
+      this.leachateDrops.visible = false;
+      const doorAngle = Math.sin(u * Math.PI) * THREE.MathUtils.degToRad(45);
+      const doorL = this.registry.get('door_mechanism_left');
+      const doorR = this.registry.get('door_mechanism_right');
+      const baseL = this.cachedTransforms.get('door_mechanism_left')?.rot;
+      const baseR = this.cachedTransforms.get('door_mechanism_right')?.rot;
+      if (doorL && baseL) doorL.rotation.set(baseL.x, baseL.y - doorAngle, baseL.z);
+      if (doorR && baseR) doorR.rotation.set(baseR.x, baseR.y + doorAngle, baseR.z);
+
+      this.fragmentsGroup.visible = true;
+      this.fragmentsGroup.position.set(-0.12, THREE.MathUtils.lerp(0.68, 0.25, u), 0);
+    }
+  }
+
+  /**
+   * Module 4: Decomposition & Agitation Module Flow Simulation
+   * Steps:
+   * 1. Biomass Inflow Transfer [0.00 - 0.33]
+   * 2. Continuous Agitator Mixing [0.33 - 0.66]
+   * 3. Thermophilic Decomposition [0.66 - 1.00]
+   */
+  updateDecompositionFlow(p) {
+    this.resetMechanicalPoses();
+    if (this.leftoverFoodScrapsGroup) this.leftoverFoodScrapsGroup.visible = false;
+    if (window.virtualDoorAssembly) window.virtualDoorAssembly.setDoorAngle(0.0);
+
+    this.mainParticle.visible = false;
+    this.scanBeam.visible = false;
+    this.leachateDrops.visible = false;
+
+    // Step 1: Biomass Inflow Transfer [0.00 - 0.33]
+    if (p <= 0.33) {
+      const u = p / 0.33;
+      this.fragmentsGroup.visible = true;
+      this.fragmentsGroup.position.set(-0.12, THREE.MathUtils.lerp(0.38, 0.22, u), 0);
+    }
+    // Step 2: Continuous Agitator Mixing [0.33 - 0.66]
+    else if (p <= 0.66) {
+      const u = (p - 0.33) / 0.33;
+      if (window.mechanicalPivotController) {
+        const pAgitator = window.mechanicalPivotController.pivots.agitator;
+        if (pAgitator && pAgitator.object) {
+          pAgitator.currentAngle = u * Math.PI * 16;
+          window.mechanicalPivotController._applyPivotAngle(pAgitator);
+        }
+      }
+
+      this.fragmentsGroup.visible = true;
+      this.fragmentsGroup.position.set(
+        -0.12 + Math.cos(u * Math.PI * 6) * 0.035,
+        0.22,
+        Math.sin(u * Math.PI * 6) * 0.035
+      );
+    }
+    // Step 3: Thermophilic Decomposition Curing [0.66 - 1.00]
+    else {
+      const u = (p - 0.66) / 0.34;
+      if (window.mechanicalPivotController) {
+        const pAgitator = window.mechanicalPivotController.pivots.agitator;
+        if (pAgitator && pAgitator.object) {
+          pAgitator.currentAngle = (1.0 + u) * Math.PI * 16;
+          window.mechanicalPivotController._applyPivotAngle(pAgitator);
+        }
+      }
+
+      this.fragmentsGroup.visible = true;
+      this.fragmentsGroup.position.set(
+        -0.12 + Math.cos((1.0 + u) * Math.PI * 6) * 0.025,
+        0.22,
+        Math.sin((1.0 + u) * Math.PI * 6) * 0.025
+      );
+    }
   }
 
   updateOrganicFlow(p) {

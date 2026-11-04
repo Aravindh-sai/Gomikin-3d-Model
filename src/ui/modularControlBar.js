@@ -291,22 +291,29 @@ export function initModularControlBar({
       border-color: rgba(255, 255, 255, 0.2);
     }
 
+    .flow-mode-btn.active.input {
+      background: rgba(0, 255, 204, 0.2);
+      border-color: #00ffcc;
+      color: #00ffcc;
+    }
+
+    .flow-mode-btn.active.cutting {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+
+    .flow-mode-btn.active.storage {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: #a855f7;
+      color: #c084fc;
+    }
+
+    .flow-mode-btn.active.decomposition,
     .flow-mode-btn.active.organic {
       background: rgba(34, 197, 94, 0.2);
       border-color: #22c55e;
       color: #4ade80;
-    }
-
-    .flow-mode-btn.active.inorganic {
-      background: rgba(6, 182, 212, 0.2);
-      border-color: #06b6d4;
-      color: #38bdf8;
-    }
-
-    .flow-mode-btn.active.leftover {
-      background: rgba(245, 158, 11, 0.2);
-      border-color: #f59e0b;
-      color: #fbbf24;
     }
 
     .flow-step-callout {
@@ -499,14 +506,17 @@ export function initModularControlBar({
   flowConsole.style.display = 'none';
   flowConsole.innerHTML = `
     <div class="flow-mode-tabs">
-      <button class="flow-mode-btn active organic" data-flow="ORGANIC">
-        <span>🌿</span> Organic Flow
+      <button class="flow-mode-btn active input" data-flow="INPUT">
+        <span>📥</span> Input & Intake
       </button>
-      <button class="flow-mode-btn" data-flow="INORGANIC">
-        <span>🥫</span> Inorganic Flow
+      <button class="flow-mode-btn" data-flow="CUTTING">
+        <span>⚙️</span> Preprocessing & Cutting
       </button>
-      <button class="flow-mode-btn" data-flow="LEFTOVER_FOOD">
-        <span>🍲</span> Leftover Food
+      <button class="flow-mode-btn" data-flow="STORAGE">
+        <span>📦</span> Storage & Drainage
+      </button>
+      <button class="flow-mode-btn" data-flow="DECOMPOSITION">
+        <span>🌱</span> Decomposition & Agitation
       </button>
     </div>
 
@@ -541,17 +551,9 @@ export function initModularControlBar({
     if (tab === 'dissection') document.getElementById('tab-dissection')?.classList.add('active');
     if (tab === 'flow') document.getElementById('tab-flow-sim')?.classList.add('active');
 
-    // Toggle bottom dissection button visibility based on active tab
-    const canvasWrapper = document.getElementById('gomikin-canvas-wrapper');
-    const isFullscreen = canvasWrapper && canvasWrapper.classList.contains('fullscreen-mode');
+    // Priority 2: Redundant bottom dissect button is permanently removed
     const dissectBtn = document.getElementById('btn-dissect-gomikin');
-    if (dissectBtn) {
-      if (!isFullscreen) {
-        dissectBtn.style.display = 'none';
-      } else {
-        dissectBtn.style.display = (tab === 'full' || tab === 'dissection') ? 'flex' : 'none';
-      }
-    }
+    if (dissectBtn) dissectBtn.remove();
 
     if (tab === 'full') {
       subbarEl.style.display = 'none';
@@ -578,12 +580,12 @@ export function initModularControlBar({
       flowConsole.style.display = 'block';
 
       const currentFlow = (options && options.flowMode) ||
-        (physicalFlowController ? physicalFlowController.activeMode : 'ORGANIC');
+        (physicalFlowController ? physicalFlowController.activeMode : 'INPUT');
       flowConsole.querySelectorAll('.flow-mode-btn').forEach(b => {
         const m = b.getAttribute('data-flow');
         b.className = 'flow-mode-btn';
         if (m === currentFlow) {
-          b.classList.add('active', m.toLowerCase().replace('_', ''));
+          b.classList.add('active', m.toLowerCase());
         }
       });
     }
@@ -738,37 +740,29 @@ export function initModularControlBar({
       flowConsole.querySelectorAll('.flow-mode-btn').forEach(b => {
         b.className = 'flow-mode-btn';
       });
-      btn.classList.add('active', mode.toLowerCase().replace('_', ''));
+      btn.classList.add('active', mode.toLowerCase());
+
+      // 1. Cleanly stop and reset running animation before switching
+      physicalFlowController.pause();
+      physicalFlowController.reset();
+
+      // 2. Set new mode
       physicalFlowController.setMode(mode);
 
+      // 3. Ensure ghost material on Main_Housing so internal parts remain visible
       const housing = moduleViewController.registry.get('Main_Housing');
-      if (mode === 'LEFTOVER_FOOD') {
-        if (housing && housing.userData && housing.userData.originalMaterial) {
-          housing.material = housing.userData.originalMaterial;
-        }
-        if (window.virtualDoorAssembly) {
-          window.virtualDoorAssembly.setupHousingAperture();
-        }
-        if (viewCoordinator) {
-          viewCoordinator.glideCameraTo(
-            viewCoordinator.cameraPresets.FLOW_LEFTOVER.position,
-            viewCoordinator.cameraPresets.FLOW_LEFTOVER.target,
-            0.9
-          );
-        }
-      } else {
-        if (housing && moduleViewController.ghostMaterial) {
-          housing.material = moduleViewController.ghostMaterial;
-        }
-        if (viewCoordinator) {
-          viewCoordinator.glideCameraTo(
-            viewCoordinator.cameraPresets.FLOW.position,
-            viewCoordinator.cameraPresets.FLOW.target,
-            0.9
-          );
-        }
+      if (housing && moduleViewController.ghostMaterial) {
+        housing.material = moduleViewController.ghostMaterial;
       }
 
+      // 4. Glide camera to frame selected module
+      if (viewCoordinator) {
+        const presetKey = `FLOW_${mode}`;
+        const preset = viewCoordinator.cameraPresets[presetKey] || viewCoordinator.cameraPresets.FLOW;
+        viewCoordinator.glideCameraTo(preset.position, preset.target, 0.9);
+      }
+
+      // 5. Start simulation playback
       physicalFlowController.play();
     });
   });

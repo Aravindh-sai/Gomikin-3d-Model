@@ -826,23 +826,21 @@ body.in-fullscreen-cad .gomikin-minimal-footer {
   display: block;
 }
 
-/* Strict Boundary: Hide all 3D modular navigation controls & dissect buttons outside fullscreen */
-#btn-dissect-gomikin,
-.btn-dissect-primary,
-#gomikin-modular-nav,
-#gomikin-modules-subbar,
-#gomikin-sub-nav,
-#gomikin-module-card,
-#gomikin-part-card,
-#gomikin-workflow-card,
-#gomikin-flow-console,
-#gomikin-ui,
-#ui-toggle-btn,
-#gomikin-right-panel,
-#gomikin-presentation-dock,
-#gomikin-inspection-hud,
-#gomikin-inspection-panel,
-#gomikin-component-detail-overlay {
+/* Strict Boundary: Hide all 3D modular navigation controls outside fullscreen */
+body:not(.in-fullscreen-cad) #gomikin-modular-nav,
+body:not(.in-fullscreen-cad) #gomikin-modules-subbar,
+body:not(.in-fullscreen-cad) #gomikin-sub-nav,
+body:not(.in-fullscreen-cad) #gomikin-module-card,
+body:not(.in-fullscreen-cad) #gomikin-part-card,
+body:not(.in-fullscreen-cad) #gomikin-workflow-card,
+body:not(.in-fullscreen-cad) #gomikin-flow-console,
+body:not(.in-fullscreen-cad) #gomikin-ui,
+body:not(.in-fullscreen-cad) #ui-toggle-btn,
+body:not(.in-fullscreen-cad) #gomikin-right-panel,
+body:not(.in-fullscreen-cad) #gomikin-presentation-dock,
+body:not(.in-fullscreen-cad) #gomikin-inspection-hud,
+body:not(.in-fullscreen-cad) #gomikin-inspection-panel,
+body:not(.in-fullscreen-cad) #gomikin-component-detail-overlay {
   display: none !important;
 }
 
@@ -863,10 +861,12 @@ body:not(.in-fullscreen-cad) .btn-dissect-primary,
   display: flex !important;
 }
 
-body.in-fullscreen-cad .canvas-wrapper.fullscreen-mode #btn-dissect-gomikin.btn-dissect-primary {
-  display: flex !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
+/* Priority 2: Redundant dissect button permanently removed */
+#btn-dissect-gomikin,
+.btn-dissect-primary {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* --------------------------------------------------------------------------

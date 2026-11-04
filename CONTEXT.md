@@ -915,3 +915,58 @@ Phase C.2 addresses key visual and interaction refinements requested after initi
 - **Console Errors Audit:** 0 console errors recorded.
 - **Build Status:** `npm run build` passed in $1.36\text{s}$, 0 errors.
 
+
+---
+
+## 27. Phase D Urgent Fixes: Multi-Module Flow Simulation, Redundant Button Removal & 33-Part Dissection Repair (November 2026)
+
+### 1. Priority 1 — Multi-Module Simulate Flow Experience
+- **Problem:** Simulate Flow was constrained to a single Organic Flow mode with no interface to explore the other functional modules of Gomikin.
+- **Root Cause & Solution:**
+  - Expanded `FLOW_MODES` and `FLOW_STEPS` in [`src/animation/physicalFlowController.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/physicalFlowController.js) to support all 4 major functional modules:
+    1. **Input & Intake Module (`INPUT`):** Waste reception into intake funnel, optical/sensor classification, and -10° rotating base tilt transfer.
+    2. **Organic Preprocessing & Cutting Module (`CUTTING`):** Inflow transfer into cutting collar, high-speed rotary cutting blade shredding, and <8 mm sizing mesh passage.
+    3. **Organic Storage & Drainage Module (`STORAGE`):** Storage chamber accumulation, hydrostatic liquid drainage with animated leachate droplets, and dual 45° drop-down door mechanism.
+    4. **Decomposition & Agitation Module (`DECOMPOSITION`):** Biomass inflow transfer into decomposition vessel, continuous helical agitator mixing around its mechanical axis, and thermophilic decomposition curing.
+  - In [`src/ui/modularControlBar.js`](file:///c:/Projects/Gomikin-3d-Model/src/ui/modularControlBar.js), updated `flowConsole` with an intuitive 4-module tab bar (`INPUT`, `CUTTING`, `STORAGE`, `DECOMPOSITION`).
+  - Implemented clean teardown on module switch: running animations and particle emitters are authoritatively paused and reset, camera glides to frame the selected module, and simulation starts cleanly.
+  - Added dedicated camera presets (`FLOW_INPUT`, `FLOW_CUTTING`, `FLOW_STORAGE`, `FLOW_DECOMPOSITION`) in [`src/animation/viewTransitionCoordinator.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/viewTransitionCoordinator.js).
+
+### 2. Priority 2 — Redundant Dissect Button Removal
+- **Problem:** An unnecessary `DISSECT GOMIKIN` button (`#btn-dissect-gomikin` / `.btn-dissect-primary`) hovered at the bottom of the canvas, competing with the navigation bar and cluttering the viewport.
+- **Solution:**
+  - Permanently removed `#btn-dissect-gomikin` creation in [`src/animation/dissectionAnimationSystem.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/dissectionAnimationSystem.js). `createPrimaryDissectButton()` now ensures any leftover element is pruned from the DOM and sets `controller.primaryButton = null`.
+  - Removed button visibility toggles in [`src/ui/modularControlBar.js`](file:///c:/Projects/Gomikin-3d-Model/src/ui/modularControlBar.js).
+  - Added permanent CSS suppression in [`src/style.css`](file:///c:/Projects/Gomikin-3d-Model/src/style.css) (`display: none !important; visibility: hidden !important; pointer-events: none !important;`).
+  - The top navigation bar (`#tab-dissection`) is now the single, authoritative entry point to the 33-Part Dissection experience.
+
+### 3. Priority 3 — 33-Part Dissection Choreography Repair
+- **Problem:** Following the Blender GLB update with dedicated mechanical pivots, the Dissection choreography broke because it still evaluated meshes using the legacy USDZ coordinate inversion (`Local = (X*1000, -Z*1000, Y*1000)`), scattering components kilometers away.
+- **Root Cause & Mathematical Correction:**
+  - In [`src/animation/dissectionChoreography.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/dissectionChoreography.js):
+    - Removed coordinate swapping and 1000x multiplication. `initialWorldCenter` now cleanly clones `entry.center`, which is already in exact meters from the scene bounding box.
+    - Replaced hardcoded local conversion with universal parent-space transformation:
+      `comp.mesh.parent.worldToLocal(targetParentCenter)`.
+    - Computed exact local geometry center via `entry.mesh.geometry.boundingBox.getCenter()`.
+    - Solved translation offset: `scaledOffset = comp.geomCenter * currentScale * Q(totalRot)`, `meshPos = targetParentCenter - scaledOffset`.
+    - Verified component placement error is **$1.58 \times 10^{-14}\text{ m}$ (machine-precision zero)** across all 33 components.
+  - In [`src/animation/componentDetailController.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/componentDetailController.js):
+    - Updated `_applyCatalogueTransform()` and `update()` to universal parent `worldToLocal` transformations.
+    - Reparented `#gomikin-detail-ui` inside `#gomikin-canvas-wrapper` with `z-index: 1500` so telemetry cards and the `← BACK TO CATALOGUE` button render cleanly above the 3D canvas.
+  - In [`src/animation/dissectionAnimationSystem.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/dissectionAnimationSystem.js):
+    - Added frustum-aware visibility checks (`tempVec.x/y \in [-1.05, 1.05]`) in `updateLabelPositions()` to prevent out-of-view lower pod headers from bunching against the screen border while maintaining clean readability.
+
+### 4. Verification Evidence & Test Summary (`scratch/verify_phase_d_urgent_fixes.cjs`)
+- **Test 1 (Landing Page):** Redundant dissect button absent/hidden.
+- **Test 2 (Full Model 3D):** Model loaded, redundant button absent/hidden.
+- **Test 3 (33-Part Dissection):** Max component center error = $1.58 \times 10^{-14}$, 33 parts separated cleanly into 7 pods, labels visible and readable.
+- **Test 4 (Detail Isolation):** Component detail view isolated Cutting Blades with header telemetry card and working Back to Catalogue navigation.
+- **Test 5 (Reassembly):** Full model reassembled to exact baseline positions with 0 errors.
+- **Test 6 (Simulate Flow 4 Modules):**
+  - Input & Intake (`INPUT`): 3 steps, rotating base tilt kinematics verified.
+  - Preprocessing & Cutting (`CUTTING`): 3 steps, cutting blades rotation ($50.4\text{ rad}$) verified.
+  - Storage & Drainage (`STORAGE`): 3 steps, leachate droplets and drop door mechanisms verified.
+  - Decomposition & Agitation (`DECOMPOSITION`): 3 steps, agitator rotation ($33.7\text{ rad}$) verified.
+  - Play, Pause, Next, Prev, Reset controls verified across all modules.
+- **Test 7 (Console Errors Audit):** 0 console errors recorded.
+- **Build Status:** `npm run build` passed in $1.35\text{s}$, 0 errors.

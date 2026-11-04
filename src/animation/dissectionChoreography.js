@@ -254,30 +254,19 @@ export function buildDissectionChoreography(componentRegistry) {
         continue;
       }
 
-      // Initial center in world space (meters)
-      const initialWorldCenter = new THREE.Vector3(
-        entry.center.x * 0.001,
-        entry.center.z * 0.001,
-        -entry.center.y * 0.001
-      );
+      // Initial center in world space (meters) - exact scene bounding box center
+      const initialWorldCenter = entry.center.clone();
 
       // Dimensions in world space (meters)
-      const worldDimensions = new THREE.Vector3(
-        entry.size.x * 0.001,
-        entry.size.z * 0.001,
-        entry.size.y * 0.001
-      );
+      const worldDimensions = entry.size.clone();
 
       // Target world position in catalogue grid (meters)
       const targetWorldCenter = compDef.pos.clone();
 
       // Geometry center relative to mesh origin (in mesh local units)
-      // Since entry.center is in parent space where mesh.scale is entry.initialScale:
-      const geomCenter = new THREE.Vector3(
-        entry.center.x / Math.max(0.0001, entry.initialScale.x),
-        entry.center.y / Math.max(0.0001, entry.initialScale.y),
-        entry.center.z / Math.max(0.0001, entry.initialScale.z)
-      );
+      entry.mesh.geometry.computeBoundingBox();
+      const geomCenter = new THREE.Vector3();
+      entry.mesh.geometry.boundingBox.getCenter(geomCenter);
 
       // Exploded world center (Phase 1)
       const expOffset = EXPLODED_WORLD_OFFSETS[name] || [0, 0, 0];
@@ -388,23 +377,27 @@ export function buildDissectionChoreography(componentRegistry) {
         scaleMult = THREE.MathUtils.lerp(1.0, comp.catalogueScaleMultiplier, t2);
       }
 
-      // Convert target world position to local coordinates inside Fusion360_USDZ_Model:
-      // Local X = World X * 1000
-      // Local Y = -World Z * 1000
-      // Local Z = World Y * 1000
-      const targetLocalCenter = new THREE.Vector3(
-        targetWorld.x * 1000,
-        -targetWorld.z * 1000,
-        targetWorld.y * 1000
-      );
+      // Target center in mesh parent coordinates (universal for any parent hierarchy/scale)
+      const targetParentCenter = targetWorld.clone();
+      if (comp.mesh.parent) {
+        comp.mesh.parent.updateMatrixWorld(true);
+        comp.mesh.parent.worldToLocal(targetParentCenter);
+      }
 
       // Current scale vector
-      const currentScale = new THREE.Vector3().copy(comp.initialScale).multiplyScalar(scaleMult);
+      const currentScale = comp.initialScale.clone().multiplyScalar(scaleMult);
 
-      // Pivot-offset correction: ensures geometric center is exactly at targetLocalCenter
-      const q = new THREE.Quaternion().setFromEuler(rotEuler);
-      const scaledOffset = new THREE.Vector3().copy(comp.geomCenter).multiply(currentScale).applyQuaternion(q);
-      const meshPos = new THREE.Vector3().subVectors(targetLocalCenter, scaledOffset);
+      // Total rotation = initial rotation + rotEuler
+      const totalEuler = new THREE.Euler(
+        comp.initialRotation.x + rotEuler.x,
+        comp.initialRotation.y + rotEuler.y,
+        comp.initialRotation.z + rotEuler.z
+      );
+      const totalQ = new THREE.Quaternion().setFromEuler(totalEuler);
+
+      // Pivot-offset correction: ensures geometric center is exactly at targetParentCenter
+      const scaledOffset = comp.geomCenter.clone().multiply(currentScale).applyQuaternion(totalQ);
+      const meshPos = new THREE.Vector3().subVectors(targetParentCenter, scaledOffset);
 
       // Position offset relative to initial position
       const posOffset = new THREE.Vector3().subVectors(meshPos, comp.initialPosition);

@@ -54,6 +54,22 @@ export class ViewTransitionCoordinator {
       FLOW_LEFTOVER: {
         position: new THREE.Vector3(1.05, 0.85, -1.05),
         target: new THREE.Vector3(0.05, 0.55, -0.05)
+      },
+      FLOW_INPUT: {
+        position: new THREE.Vector3(-0.65, 1.25, 0.90),
+        target: new THREE.Vector3(-0.02, 0.92, 0)
+      },
+      FLOW_CUTTING: {
+        position: new THREE.Vector3(-0.65, 1.10, 0.85),
+        target: new THREE.Vector3(-0.12, 0.82, 0)
+      },
+      FLOW_STORAGE: {
+        position: new THREE.Vector3(-0.75, 0.90, 0.95),
+        target: new THREE.Vector3(-0.10, 0.60, 0)
+      },
+      FLOW_DECOMPOSITION: {
+        position: new THREE.Vector3(-0.80, 0.65, 1.05),
+        target: new THREE.Vector3(-0.12, 0.30, 0)
       }
     };
 
@@ -227,8 +243,7 @@ export class ViewTransitionCoordinator {
         this.dissectionController.play(1.0);
       }
     } else if (targetView === VIEWS.FLOW) {
-      const flowMode = options.flowMode ||
-        (this.physicalFlowController ? this.physicalFlowController.activeMode : 'ORGANIC');
+      const flowMode = options.flowMode || (this.physicalFlowController ? this.physicalFlowController.activeMode : 'INPUT');
 
       if (window.virtualDoorAssembly) {
         window.virtualDoorAssembly.setVisible(true);
@@ -261,9 +276,9 @@ export class ViewTransitionCoordinator {
         this.physicalFlowController.play();
       }
 
-      const camPreset = (flowMode === 'LEFTOVER_FOOD')
-        ? this.cameraPresets.FLOW_LEFTOVER
-        : this.cameraPresets.FLOW;
+      const presetKey = `FLOW_${flowMode}`;
+      const camPreset = this.cameraPresets[presetKey] ||
+        (flowMode === 'LEFTOVER_FOOD' ? this.cameraPresets.FLOW_LEFTOVER : this.cameraPresets.FLOW);
 
       this.glideCameraTo(
         camPreset.position,
