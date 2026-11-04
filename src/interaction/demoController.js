@@ -377,11 +377,17 @@ export class DemoController {
 
   startAgitator() {
     this.state.agitatorRunning = true;
+    if (window.mechanicalPivotController) {
+      window.mechanicalPivotController.rotateAgitator();
+    }
     console.log('[DemoController] Starting agitator...');
   }
 
   stopAgitator() {
     this.state.agitatorRunning = false;
+    if (window.mechanicalPivotController) {
+      window.mechanicalPivotController.stopAgitator();
+    }
     console.log('[DemoController] Stopping agitator.');
   }
 

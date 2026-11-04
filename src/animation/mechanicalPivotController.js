@@ -31,7 +31,7 @@ export const MECHANICAL_LIMITS = Object.freeze({
     openRad: THREE.MathUtils.degToRad(-25)
   },
   AGITATOR: {
-    axis: 'z', // Continuous mixing rotation
+    axis: 'y', // In Three.js coordinate system (Blender vertical Z-axis maps to Three.js Y-axis)
     defaultSpeedRad: THREE.MathUtils.degToRad(360) // 1 revolution per second default
   },
   CUTTING_BLADES: {
@@ -54,7 +54,7 @@ function easeInOutCubic(t) {
  * 1. PIVOT_Rotating_Base (Y-axis rotation: -10°)
  * 2. PIVOT_Left_Door (X-axis opening: +25°)
  * 3. PIVOT_Right_Door (X-axis opening: -25°)
- * 4. PIVOT_Agitator (Z-axis continuous mixing rotation)
+ * 4. PIVOT_Agitator (Y-axis continuous mixing rotation, corresponding to Blender vertical Z-axis)
  * 5. PIVOT_Cutting_Blades (Z-axis continuous high-speed cutting rotation)
  * 
  * Guarantees:
@@ -120,7 +120,7 @@ export class MechanicalPivotController {
         name: PIVOT_NAMES.AGITATOR,
         object: null,
         baseQuaternion: new THREE.Quaternion(),
-        axis: new THREE.Vector3(0, 0, 1), // Local Z axis
+        axis: new THREE.Vector3(0, 1, 0), // Local Y axis (vertical spindle axis of decomposition chamber)
         currentAngle: 0,
         speed: 0, // rad/sec
         isContinuous: false
@@ -326,11 +326,11 @@ export class MechanicalPivotController {
   }
 
   // =========================================================================
-  // AGITATOR METHODS (Continuous Z rotation)
+  // AGITATOR METHODS (Continuous Y mixing rotation around spindle axis)
   // =========================================================================
 
   /**
-   * Sets continuous rotation of the agitator.
+   * Sets continuous rotation of the agitator around its vertical spindle axis.
    * @param {number} [speedRadPerSec] Angular velocity in rad/sec
    */
   rotateAgitator(speedRadPerSec = MECHANICAL_LIMITS.AGITATOR.defaultSpeedRad) {

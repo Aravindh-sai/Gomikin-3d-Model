@@ -886,7 +886,32 @@ Phase C.2 addresses key visual and interaction refinements requested after initi
 - Checkpoint `cad0fb6` and all loader fixes pushed to remote `origin/main` (`https://github.com/Aravindh-sai/Gomikin-3d-Model.git`).
 - Vercel automated CI/CD pipeline triggered to deploy the updated build.
 
+---
 
+## 26. Decomposition Chamber Agitator: Mechanical Animation Repair (November 2026)
 
+### 1. Root Cause Analysis
+1. **Coordinate Conversion from Blender to Three.js:**
+   - In Blender, `PIVOT_Agitator` is documented at `(-0.11915, 0.03039, 0.14607)` metres, where $+Z$ is the vertical axis ($Z = 0.14607\text{ m}$).
+   - Blender's glTF exporter maps $(X, Y, Z)_{\text{blender}} \to (X, Z, -Y)_{\text{Three.js}}$. Therefore, `PIVOT_Agitator` imports into Three.js at `(-0.11915, 0.14607, -0.03039)` metres, where the vertical spindle axis is **$+Y$ (Three.js Local Y-axis)**.
+   - In `mechanicalPivotController.js`, `pivots.agitator.axis` was previously configured as `Vector3(0, 0, 1)` (Three.js Z-axis). Rotating around Three.js Z caused the horizontal blades to flip vertically by $90^\circ$, cutting through the bottom floor into the leachate plinth ($Y = 0.034\text{ m}$, below chamber floor $Y = 0.114\text{ m}$) and into the ceiling ($Y = 0.258\text{ m}$).
+2. **Mesh-Origin Mutation in Flow Controller:**
+   - In Step 8 of Organic Flow (`physicalFlowController.js`), `agitator.rotation.set(...)` was applied directly to the CAD mesh rather than the pivot Empty. Because the mesh origin is at the global origin relative to its geometry, direct mesh rotation caused the blades to orbit across a $19\text{ cm}$ radius outside the chassis.
 
+### 2. Engineering Corrections Applied
+1. **Mechanical Pivot Kinematics ([`src/animation/mechanicalPivotController.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/mechanicalPivotController.js)):**
+   - Configured `MECHANICAL_LIMITS.AGITATOR.axis = 'y'`.
+   - Updated `pivots.agitator.axis = new THREE.Vector3(0, 1, 0)` (Local Y vertical spindle).
+2. **Organic Flow Step 8 Delegation ([`src/animation/physicalFlowController.js`](file:///c:/Projects/Gomikin-3d-Model/src/animation/physicalFlowController.js)):**
+   - Delegated agitator rotation directly to `window.mechanicalPivotController.pivots.agitator` via `_applyPivotAngle()`, keeping the agitator perfectly centered on its spindle inside the chamber.
+3. **Demo Controller Integration ([`src/interaction/demoController.js`](file:///c:/Projects/Gomikin-3d-Model/src/interaction/demoController.js)):**
+   - Connected `startAgitator()` and `stopAgitator()` to `window.mechanicalPivotController.rotateAgitator()` and `stopAgitator()`.
+
+### 3. Verification & Evidence (`scratch/verify_agitator_final.cjs`)
+- **Test A (Initial Position):** Confirmed parent is `PIVOT_Agitator` at `(-0.11915, 0.14607, -0.03039)`. Center offset between mesh and pivot is $0.003\text{ mm}$. Elevation $Y \in [0.121, 0.171]\text{ m}$ is strictly inside decomposition chamber $Y \in [0.114, 0.384]\text{ m}$.
+- **Test B (Continuous Animation):** Maximum center drift during 360° rotation was $0.003\text{ mm}$. Multi-angle visual inspection captured from front, elevated, side, and top angles.
+- **Test C (Chassis Isolation):** Decomposition chamber rotation remained $(0, 0, 0)$. Surrounding frames and enclosures remained 100% stationary.
+- **Test D (Repeated Operation):** 4 start/stop cycles verified with zero quaternion drift. Organic Flow Step 8 mixing verified.
+- **Console Errors Audit:** 0 console errors recorded.
+- **Build Status:** `npm run build` passed in $1.36\text{s}$, 0 errors.
 

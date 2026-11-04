@@ -399,10 +399,12 @@ export class PhysicalFlowController {
     // Step 8: Thermophilic Agitator Mixing [0.86 - 1.00]
     else {
       const u = (p - 0.86) / 0.14;
-      const agitator = this.registry.get('agitator');
-      const baseRot = this.cachedTransforms.get('agitator')?.rot;
-      if (agitator && baseRot) {
-        agitator.rotation.set(baseRot.x, baseRot.y, baseRot.z + u * Math.PI * 12);
+      if (window.mechanicalPivotController) {
+        const pAgitator = window.mechanicalPivotController.pivots.agitator;
+        if (pAgitator && pAgitator.object) {
+          pAgitator.currentAngle = u * Math.PI * 12;
+          window.mechanicalPivotController._applyPivotAngle(pAgitator);
+        }
       }
 
       this.mainParticle.visible = false;
